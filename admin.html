@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,12 +25,6 @@
       deleteDoc,
       updateDoc,
     } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
-    import {
-      getStorage,
-      ref,
-      uploadBytes,
-      getDownloadURL,
-    } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-storage.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCW0BqYOirnrPRkgvSvtSjK2-OGVTa71uQ",
@@ -43,7 +38,6 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
-    const storage = getStorage(app);
     const appId = "default-app-id";
 
     const loginForm = document.getElementById("login-form");
@@ -87,7 +81,7 @@
       }
     });
 
-    // Stats
+    // Stats update
     const statForm = document.getElementById("stats-form");
     statForm.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -118,19 +112,13 @@
 
     portfolioForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const file = portfolioForm.imageFile.files[0];
-      const storageRef = ref(storage, `portfolio-images/${Date.now()}-${file.name}`);
-      await uploadBytes(storageRef, file);
-      const imageUrl = await getDownloadURL(storageRef);
-
       await addDoc(collection(db, `artifacts/${appId}/public/data/portfolio`), {
         title: portfolioForm.title.value,
         description: portfolioForm.description.value,
         link: portfolioForm.link.value,
-        imageUrl: imageUrl,
+        imageUrl: portfolioForm.imageUrl.value,
         linkText: portfolioForm.linkText.value || "View Project",
       });
-
       portfolioForm.reset();
     });
 
@@ -144,7 +132,6 @@
             <div class="border p-4 rounded shadow mb-2">
               <p><strong>${data.title}</strong></p>
               <p>${data.description}</p>
-              <img src="${data.imageUrl}" class="w-full h-48 object-cover rounded my-2" />
               <button onclick="deletePortfolio('${docSnap.id}')" class="text-red-600 text-sm mt-2">Delete</button>
             </div>
           `;
@@ -210,6 +197,7 @@
   </script>
 </head>
 <body class="bg-gray-100 font-sans">
+
   <div id="login-page" class="flex justify-center items-center h-screen">
     <form id="login-form" class="bg-white p-8 rounded shadow-md w-full max-w-sm">
       <h2 class="text-2xl font-bold text-center mb-6">Admin Login</h2>
@@ -240,7 +228,7 @@
       <form id="portfolio-form" class="grid gap-4 max-w-md mb-4">
         <input name="title" placeholder="Project Title" required class="p-2 border rounded" />
         <input name="description" placeholder="Project Description" required class="p-2 border rounded" />
-        <input type="file" name="imageFile" accept="image/*" required class="p-2 border rounded" />
+        <input name="imageUrl" placeholder="Image URL" required class="p-2 border rounded" />
         <input name="link" placeholder="Project Link" required class="p-2 border rounded" />
         <input name="linkText" placeholder="Link Text (optional)" class="p-2 border rounded" />
         <button class="bg-green-600 text-white p-2 rounded">Add Project</button>
