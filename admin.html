@@ -143,6 +143,7 @@
     const portfolioImageInput = document.getElementById("portfolio-image-upload");
     const portfolioAddButton = portfolioForm.querySelector('button[type="submit"]');
     const imageUploadStatus = document.getElementById("image-upload-status");
+    const imageUploadSpinner = document.getElementById("image-upload-spinner"); // Get the spinner element
 
     let uploadedImageUrl = ""; // To store the URL after upload
 
@@ -154,7 +155,8 @@
       const file = e.target.files[0];
       if (file) {
         imageUploadStatus.textContent = "Uploading image...";
-        imageUploadStatus.classList.remove("hidden");
+        imageUploadStatus.classList.remove("hidden", "text-red-600", "text-green-600");
+        imageUploadSpinner.classList.remove("hidden"); // Show spinner
         portfolioAddButton.disabled = true; // Disable button during upload
         portfolioAddButton.classList.add("opacity-50", "cursor-not-allowed");
 
@@ -163,22 +165,23 @@
           await uploadBytes(storageRef, file);
           uploadedImageUrl = await getDownloadURL(storageRef);
           imageUploadStatus.textContent = "Image uploaded successfully!";
-          imageUploadStatus.classList.remove("text-red-600");
           imageUploadStatus.classList.add("text-green-600");
           portfolioAddButton.disabled = false; // Enable button after successful upload
           portfolioAddButton.classList.remove("opacity-50", "cursor-not-allowed");
         } catch (error) {
           imageUploadStatus.textContent = "Image upload failed: " + error.message;
-          imageUploadStatus.classList.remove("text-green-600");
           imageUploadStatus.classList.add("text-red-600");
           uploadedImageUrl = ""; // Clear URL on failure
           portfolioAddButton.disabled = true; // Keep button disabled on failure
           portfolioAddButton.classList.add("opacity-50", "cursor-not-allowed");
+        } finally {
+          imageUploadSpinner.classList.add("hidden"); // Hide spinner
         }
       } else {
         uploadedImageUrl = "";
         imageUploadStatus.textContent = "";
         imageUploadStatus.classList.add("hidden");
+        imageUploadSpinner.classList.add("hidden"); // Hide spinner
         portfolioAddButton.disabled = true; // Disable if no file selected
         portfolioAddButton.classList.add("opacity-50", "cursor-not-allowed");
       }
@@ -204,6 +207,7 @@
         uploadedImageUrl = ""; // Reset the URL
         imageUploadStatus.textContent = ""; // Clear status message
         imageUploadStatus.classList.add("hidden");
+        imageUploadSpinner.classList.add("hidden"); // Hide spinner
         portfolioAddButton.disabled = true; // Disable button again after submission
         portfolioAddButton.classList.add("opacity-50", "cursor-not-allowed");
       } catch (error) {
@@ -340,7 +344,11 @@
       <form id="portfolio-form" class="grid gap-4 max-w-md mb-4">
         <input name="title" placeholder="Project Title" required class="p-2 border rounded" />
         <input name="description" placeholder="Project Description" required class="p-2 border rounded" />
-        <input type="file" id="portfolio-image-upload" accept="image/*" class="p-2 border rounded" />
+        <div class="flex items-center space-x-2">
+          <input type="file" id="portfolio-image-upload" accept="image/*" class="p-2 border rounded flex-grow" />
+          <!-- Spinner for image upload -->
+          <div id="image-upload-spinner" class="hidden animate-spin rounded-full h-5 w-5 border-b-2 border-gray-900"></div>
+        </div>
         <p id="image-upload-status" class="text-sm mt-1 hidden"></p> <!-- Status message for image upload -->
         <input name="link" placeholder="Project Link" required class="p-2 border rounded" />
         <input name="linkText" placeholder="Link Text (optional)" class="p-2 border rounded" />
