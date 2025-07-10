@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,65 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Dashboard - Prince Alex Digital</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  
-</head>
-<body class="bg-gray-100 font-sans">
-
-  <div id="login-page" class="flex justify-center items-center h-screen">
-    <form id="login-form" class="bg-white p-8 rounded shadow-md w-full max-w-sm">
-      <h2 class="text-2xl font-bold text-center mb-6">Admin Login</h2>
-      <input name="email" type="email" placeholder="Email" required class="w-full mb-4 p-2 border rounded" />
-      <input name="password" type="password" placeholder="Password" required class="w-full mb-6 p-2 border rounded" />
-      <button type="submit" class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700">Login</button>
-    </form>
-  </div>
-
-  <div id="dashboard" class="hidden p-6 space-y-10">
-    <div class="flex justify-between items-center">
-      <h1 class="text-3xl font-bold">Admin Dashboard</h1>
-      <button id="logout-btn" class="bg-red-500 text-white px-4 py-2 rounded">Logout</button>
-    </div>
-
-    <section>
-      <h2 class="text-xl font-semibold mb-2">Update Website Statistics</h2>
-      <form id="stats-form" class="grid gap-4 max-w-md">
-        <input name="projects" placeholder="Projects Delivered" required class="p-2 border rounded" />
-        <input name="clients" placeholder="Happy Clients" required class="p-2 border rounded" />
-        <input name="success" placeholder="Success Rate" required class="p-2 border rounded" />
-        <button class="bg-blue-600 text-white p-2 rounded">Update Stats</button>
-      </form>
-    </section>
-
-    <section>
-      <h2 class="text-xl font-semibold mb-2">Manage Portfolio Projects</h2>
-      <form id="portfolio-form" class="grid gap-4 max-w-md mb-4" enctype="multipart/form-data">
-        <input name="title" placeholder="Project Title" required class="p-2 border rounded" />
-        <input name="description" placeholder="Project Description" required class="p-2 border rounded" />
-        <input name="image" type="file" accept="image/*" required class="p-2 border rounded" />
-        <input name="link" placeholder="Project Link" required class="p-2 border rounded" />
-        <input name="linkText" placeholder="Link Text (optional)" class="p-2 border rounded" />
-        <button class="bg-green-600 text-white p-2 rounded">Add Project</button>
-      </form>
-      <div id="portfolio-list"></div>
-    </section>
-
-    <section>
-      <h2 class="text-xl font-semibold mb-2">Manage Client Testimonials</h2>
-      <form id="testimonial-form" class="grid gap-4 max-w-md mb-4">
-        <textarea name="quote" placeholder="Client Quote" required class="p-2 border rounded"></textarea>
-        <input name="author" placeholder="Author" required class="p-2 border rounded" />
-        <input name="company" placeholder="Company" required class="p-2 border rounded" />
-        <button class="bg-green-600 text-white p-2 rounded">Add Testimonial</button>
-      </form>
-      <div id="testimonial-list"></div>
-    </section>
-
-    <section>
-      <h2 class="text-xl font-semibold mb-2">Received Contact Messages</h2>
-      <div id="messages-list"></div>
-    </section>
-  </div>
-<script type="module">
+  <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
     import {
       getAuth,
@@ -82,12 +25,6 @@
       deleteDoc,
       updateDoc,
     } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
-    import {
-      getStorage,
-      ref,
-      uploadBytes,
-      getDownloadURL,
-    } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-storage.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCW0BqYOirnrPRkgvSvtSjK2-OGVTa71uQ",
@@ -101,7 +38,6 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
-    const storage = getStorage(app);
     const appId = "default-app-id";
 
     const loginForm = document.getElementById("login-form");
@@ -145,6 +81,7 @@
       }
     });
 
+    // Stats update
     const statForm = document.getElementById("stats-form");
     statForm.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -169,36 +106,20 @@
       });
     }
 
+    // Portfolio
     const portfolioList = document.getElementById("portfolio-list");
     const portfolioForm = document.getElementById("portfolio-form");
 
     portfolioForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const title = portfolioForm.title.value;
-      const description = portfolioForm.description.value;
-      const link = portfolioForm.link.value;
-      const linkText = portfolioForm.linkText.value || "View Project";
-      const imageFile = portfolioForm.image.files[0];
-
-      if (!imageFile) {
-        alert("Please select an image file.");
-        return;
-      }
-
-      const imageRef = ref(storage, `portfolioImages/${Date.now()}_${imageFile.name}`);
-      await uploadBytes(imageRef, imageFile);
-      const imageUrl = await getDownloadURL(imageRef);
-
       await addDoc(collection(db, `artifacts/${appId}/public/data/portfolio`), {
-        title,
-        description,
-        link,
-        linkText,
-        imageUrl,
+        title: portfolioForm.title.value,
+        description: portfolioForm.description.value,
+        link: portfolioForm.link.value,
+        imageUrl: portfolioForm.imageUrl.value,
+        linkText: portfolioForm.linkText.value || "View Project",
       });
-
       portfolioForm.reset();
-      alert("Portfolio item added!");
     });
 
     function loadPortfolio() {
@@ -209,11 +130,9 @@
           const data = docSnap.data();
           portfolioList.innerHTML += `
             <div class="border p-4 rounded shadow mb-2">
-              <img src="${data.imageUrl}" alt="${data.title}" class="w-full h-40 object-cover rounded mb-2"/>
               <p><strong>${data.title}</strong></p>
               <p>${data.description}</p>
-              <a href="${data.link}" target="_blank" class="text-blue-600 underline">${data.linkText}</a>
-              <button onclick="deletePortfolio('${docSnap.id}')" class="text-red-600 text-sm mt-2 block">Delete</button>
+              <button onclick="deletePortfolio('${docSnap.id}')" class="text-red-600 text-sm mt-2">Delete</button>
             </div>
           `;
         });
@@ -224,6 +143,7 @@
       await deleteDoc(doc(db, `artifacts/${appId}/public/data/portfolio`, id));
     };
 
+    // Testimonials
     const testimonialForm = document.getElementById("testimonial-form");
     const testimonialList = document.getElementById("testimonial-list");
 
@@ -257,6 +177,7 @@
       await deleteDoc(doc(db, `artifacts/${appId}/public/data/testimonials`, id));
     };
 
+    // Messages
     function loadMessages() {
       const ref = collection(db, `artifacts/${appId}/public/data/messages`);
       const container = document.getElementById("messages-list");
@@ -274,5 +195,62 @@
       });
     }
   </script>
+</head>
+<body class="bg-gray-100 font-sans">
+
+  <div id="login-page" class="flex justify-center items-center h-screen">
+    <form id="login-form" class="bg-white p-8 rounded shadow-md w-full max-w-sm">
+      <h2 class="text-2xl font-bold text-center mb-6">Admin Login</h2>
+      <input name="email" type="email" placeholder="Email" required class="w-full mb-4 p-2 border rounded" />
+      <input name="password" type="password" placeholder="Password" required class="w-full mb-6 p-2 border rounded" />
+      <button type="submit" class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700">Login</button>
+    </form>
+  </div>
+
+  <div id="dashboard" class="hidden p-6 space-y-10">
+    <div class="flex justify-between items-center">
+      <h1 class="text-3xl font-bold">Admin Dashboard</h1>
+      <button id="logout-btn" class="bg-red-500 text-white px-4 py-2 rounded">Logout</button>
+    </div>
+
+    <section>
+      <h2 class="text-xl font-semibold mb-2">Update Website Statistics</h2>
+      <form id="stats-form" class="grid gap-4 max-w-md">
+        <input name="projects" placeholder="Projects Delivered" required class="p-2 border rounded" />
+        <input name="clients" placeholder="Happy Clients" required class="p-2 border rounded" />
+        <input name="success" placeholder="Success Rate" required class="p-2 border rounded" />
+        <button class="bg-blue-600 text-white p-2 rounded">Update Stats</button>
+      </form>
+    </section>
+
+    <section>
+      <h2 class="text-xl font-semibold mb-2">Manage Portfolio Projects</h2>
+      <form id="portfolio-form" class="grid gap-4 max-w-md mb-4">
+        <input name="title" placeholder="Project Title" required class="p-2 border rounded" />
+        <input name="description" placeholder="Project Description" required class="p-2 border rounded" />
+        <input name="imageUrl" placeholder="Image URL" required class="p-2 border rounded" />
+        <input name="link" placeholder="Project Link" required class="p-2 border rounded" />
+        <input name="linkText" placeholder="Link Text (optional)" class="p-2 border rounded" />
+        <button class="bg-green-600 text-white p-2 rounded">Add Project</button>
+      </form>
+      <div id="portfolio-list"></div>
+    </section>
+
+    <section>
+      <h2 class="text-xl font-semibold mb-2">Manage Client Testimonials</h2>
+      <form id="testimonial-form" class="grid gap-4 max-w-md mb-4">
+        <textarea name="quote" placeholder="Client Quote" required class="p-2 border rounded"></textarea>
+        <input name="author" placeholder="Author" required class="p-2 border rounded" />
+        <input name="company" placeholder="Company" required class="p-2 border rounded" />
+        <button class="bg-green-600 text-white p-2 rounded">Add Testimonial</button>
+      </form>
+      <div id="testimonial-list"></div>
+    </section>
+
+    <section>
+      <h2 class="text-xl font-semibold mb-2">Received Contact Messages</h2>
+      <div id="messages-list"></div>
+    </section>
+  </div>
 </body>
 </html>
