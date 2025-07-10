@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Dashboard - Prince Alex Digital</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script type="module">
+  <!-- moved below -->
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
     import {
       getAuth,
@@ -273,5 +273,216 @@
       <div id="messages-list"></div>
     </section>
   </div>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+    import {
+      getAuth,
+      signInWithEmailAndPassword,
+      onAuthStateChanged,
+      signOut,
+    } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      setDoc,
+      getDoc,
+      onSnapshot,
+      collection,
+      addDoc,
+      deleteDoc,
+      updateDoc,
+    } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+    import {
+      getStorage,
+      ref,
+      uploadBytes,
+      getDownloadURL,
+    } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-storage.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCW0BqYOirnrPRkgvSvtSjK2-OGVTa71uQ",
+      authDomain: "princealexdigital-4848c.firebaseapp.com",
+      projectId: "princealexdigital-4848c",
+      storageBucket: "princealexdigital-4848c.appspot.com",
+      messagingSenderId: "1316427677",
+      appId: "1:1316427677:web:21bdffbf2095d1d5064174"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    const storage = getStorage(app);
+    const appId = "default-app-id";
+
+    const loginForm = document.getElementById("login-form");
+    const dashboard = document.getElementById("dashboard");
+    const loginPage = document.getElementById("login-page");
+    const logoutBtn = document.getElementById("logout-btn");
+
+    loginForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = loginForm.email.value;
+      const password = loginForm.password.value;
+
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          loginPage.classList.add("hidden");
+          dashboard.classList.remove("hidden");
+        })
+        .catch((error) => {
+          alert("Login failed: " + error.message);
+        });
+    });
+
+    logoutBtn.addEventListener("click", () => {
+      signOut(auth).then(() => {
+        dashboard.classList.add("hidden");
+        loginPage.classList.remove("hidden");
+      });
+    });
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        loginPage.classList.add("hidden");
+        dashboard.classList.remove("hidden");
+        loadStats();
+        loadPortfolio();
+        loadTestimonials();
+        loadMessages();
+      } else {
+        dashboard.classList.add("hidden");
+        loginPage.classList.remove("hidden");
+      }
+    });
+
+    const statForm = document.getElementById("stats-form");
+    statForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const statsRef = doc(db, `artifacts/${appId}/public/data/statistics/currentStats`);
+      await setDoc(statsRef, {
+        projects: statForm.projects.value,
+        clients: statForm.clients.value,
+        successRate: statForm.success.value,
+      });
+      alert("Statistics updated!");
+    });
+
+    function loadStats() {
+      const statsRef = doc(db, `artifacts/${appId}/public/data/statistics/currentStats`);
+      onSnapshot(statsRef, (docSnap) => {
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          statForm.projects.value = data.projects || "";
+          statForm.clients.value = data.clients || "";
+          statForm.success.value = data.successRate || "";
+        }
+      });
+    }
+
+    const portfolioList = document.getElementById("portfolio-list");
+    const portfolioForm = document.getElementById("portfolio-form");
+
+    portfolioForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const title = portfolioForm.title.value;
+      const description = portfolioForm.description.value;
+      const link = portfolioForm.link.value;
+      const linkText = portfolioForm.linkText.value || "View Project";
+      const imageFile = portfolioForm.image.files[0];
+
+      if (!imageFile) {
+        alert("Please select an image file.");
+        return;
+      }
+
+      const imageRef = ref(storage, `portfolioImages/${Date.now()}_${imageFile.name}`);
+      await uploadBytes(imageRef, imageFile);
+      const imageUrl = await getDownloadURL(imageRef);
+
+      await addDoc(collection(db, `artifacts/${appId}/public/data/portfolio`), {
+        title,
+        description,
+        link,
+        linkText,
+        imageUrl,
+      });
+
+      portfolioForm.reset();
+      alert("Portfolio item added!");
+    });
+
+    function loadPortfolio() {
+      const portfolioRef = collection(db, `artifacts/${appId}/public/data/portfolio`);
+      onSnapshot(portfolioRef, (snapshot) => {
+        portfolioList.innerHTML = "";
+        snapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+          portfolioList.innerHTML += `
+            <div class="border p-4 rounded shadow mb-2">
+              <img src="${data.imageUrl}" alt="${data.title}" class="w-full h-40 object-cover rounded mb-2"/>
+              <p><strong>${data.title}</strong></p>
+              <p>${data.description}</p>
+              <a href="${data.link}" target="_blank" class="text-blue-600 underline">${data.linkText}</a>
+              <button onclick="deletePortfolio('${docSnap.id}')" class="text-red-600 text-sm mt-2 block">Delete</button>
+            </div>
+          `;
+        });
+      });
+    }
+
+    window.deletePortfolio = async (id) => {
+      await deleteDoc(doc(db, `artifacts/${appId}/public/data/portfolio`, id));
+    };
+
+    const testimonialForm = document.getElementById("testimonial-form");
+    const testimonialList = document.getElementById("testimonial-list");
+
+    testimonialForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      await addDoc(collection(db, `artifacts/${appId}/public/data/testimonials`), {
+        quote: testimonialForm.quote.value,
+        author: testimonialForm.author.value,
+        company: testimonialForm.company.value,
+      });
+      testimonialForm.reset();
+    });
+
+    function loadTestimonials() {
+      const ref = collection(db, `artifacts/${appId}/public/data/testimonials`);
+      onSnapshot(ref, (snapshot) => {
+        testimonialList.innerHTML = "";
+        snapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+          testimonialList.innerHTML += `
+            <div class="border p-4 rounded shadow mb-2">
+              <p>"${data.quote}" - ${data.author}, ${data.company}</p>
+              <button onclick="deleteTestimonial('${docSnap.id}')" class="text-red-600 text-sm mt-2">Delete</button>
+            </div>
+          `;
+        });
+      });
+    }
+
+    window.deleteTestimonial = async (id) => {
+      await deleteDoc(doc(db, `artifacts/${appId}/public/data/testimonials`, id));
+    };
+
+    function loadMessages() {
+      const ref = collection(db, `artifacts/${appId}/public/data/messages`);
+      const container = document.getElementById("messages-list");
+      onSnapshot(ref, (snapshot) => {
+        container.innerHTML = "";
+        snapshot.forEach((docSnap) => {
+          const m = docSnap.data();
+          container.innerHTML += `
+            <div class="border p-4 rounded shadow mb-2">
+              <p><strong>${m.fullName}</strong> (${m.emailAddress})</p>
+              <p>${m.projectDetails}</p>
+            </div>
+          `;
+        });
+      });
+    }
+  </script>
 </body>
 </html>
