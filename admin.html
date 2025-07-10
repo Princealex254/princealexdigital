@@ -82,6 +82,23 @@
         .list-item-actions {
             @apply flex space-x-2 mt-4 md:mt-0;
         }
+
+        /* Table specific styles for messages */
+        .messages-table {
+            @apply w-full border-collapse;
+        }
+        .messages-table th, .messages-table td {
+            @apply px-4 py-3 border border-gray-200 text-left;
+        }
+        .messages-table th {
+            @apply bg-gray-100 text-gray-700 font-semibold uppercase text-sm;
+        }
+        .messages-table tbody tr:nth-child(even) {
+            @apply bg-gray-50;
+        }
+        .messages-table tbody tr:hover {
+            @apply bg-gray-100;
+        }
     </style>
 </head>
 <body>
@@ -135,7 +152,10 @@
                     <label for="success-rate" class="block text-gray-700 text-base font-semibold mb-2">Success Rate (%):</label>
                     <input type="text" id="success-rate" placeholder="e.g., 95%" required>
                 </div>
-                <button type="submit" class="btn-primary">Update Statistics</button>
+                <div class="flex space-x-4">
+                    <button type="submit" class="btn-primary flex-grow">Update Statistics</button>
+                    <button type="button" id="clear-stats-form" class="btn-secondary">Clear Data</button>
+                </div>
                 <div id="stats-message" class="mt-4 text-center hidden text-sm"></div>
             </form>
         </div>
@@ -211,8 +231,21 @@
         <!-- Section: View Contact Messages -->
         <div class="card" data-aos="fade-up" data-aos-delay="400" data-aos-duration="800">
             <h2 class="text-2xl font-semibold mb-6">Received Contact Messages</h2>
-            <div id="messages-list" class="space-y-4">
-                <p class="text-gray-600">Loading messages...</p>
+            <div class="overflow-x-auto"> <!-- Added for responsive table scrolling -->
+                <table id="messages-table" class="messages-table">
+                    <thead>
+                        <tr>
+                            <th>Full Name</th>
+                            <th>Email Address</th>
+                            <th>Message</th>
+                            <th>Received On</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Messages will be loaded here -->
+                        <tr><td colspan="4" class="text-center text-gray-600 py-4">Loading messages...</td></tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -317,6 +350,7 @@
         const clientsInput = document.getElementById('clients');
         const successRateInput = document.getElementById('success-rate');
         const statsMessageDiv = document.getElementById('stats-message');
+        const clearStatsFormBtn = document.getElementById('clear-stats-form'); // New clear button
         const statsDocRef = doc(db, `artifacts/${appId}/public/data/statistics/currentStats`);
 
         async function loadStatisticsData() {
@@ -348,6 +382,14 @@
                 showMessage(statsMessageDiv, "Failed to update statistics.", "red");
             }
         });
+
+        // Clear Statistics Form
+        clearStatsFormBtn.addEventListener('click', () => {
+            projectsInput.value = '';
+            clientsInput.value = '';
+            successRateInput.value = '';
+        });
+
 
         // --- Portfolio Management ---
         const portfolioForm = document.getElementById('portfolio-form');
@@ -419,7 +461,8 @@
                 portfolioList.querySelectorAll('.delete-portfolio-btn').forEach(button => {
                     button.addEventListener('click', async () => {
                         const id = button.dataset.id;
-                        if (confirm('Are you sure you want to delete this project?')) {
+                        // Using a custom modal/message box instead of confirm()
+                        showConfirmation('Are you sure you want to delete this project?', async () => {
                             try {
                                 await deleteDoc(doc(db, `artifacts/${appId}/public/data/portfolio`, id));
                                 showMessage(portfolioMessageDiv, "Project deleted successfully!", "green");
@@ -427,7 +470,7 @@
                                 console.error("Error deleting project:", error);
                                 showMessage(portfolioMessageDiv, "Failed to delete project.", "red");
                             }
-                        }
+                        });
                     });
                 });
             }, (error) => {
@@ -525,7 +568,8 @@
                 testimonialList.querySelectorAll('.delete-testimonial-btn').forEach(button => {
                     button.addEventListener('click', async () => {
                         const id = button.dataset.id;
-                        if (confirm('Are you sure you want to delete this testimonial?')) {
+                        // Using a custom modal/message box instead of confirm()
+                        showConfirmation('Are you sure you want to delete this testimonial?', async () => {
                             try {
                                 await deleteDoc(doc(db, `artifacts/${appId}/public/data/testimonials`, id));
                                 showMessage(testimonialMessageDiv, "Testimonial deleted successfully!", "green");
@@ -533,7 +577,7 @@
                                 console.error("Error deleting testimonial:", error);
                                 showMessage(testimonialMessageDiv, "Failed to delete testimonial.", "red");
                             }
-                        }
+                        });
                     });
                 });
             }, (error) => {
@@ -567,35 +611,34 @@
         });
 
         // --- Contact Messages Viewing ---
-        const messagesList = document.getElementById('messages-list');
+        const messagesTableBody = document.querySelector('#messages-table tbody'); // Get the tbody
         const messagesCollectionRef = collection(db, `artifacts/${appId}/public/data/messages`);
 
         async function loadMessagesData() {
             onSnapshot(query(messagesCollectionRef, orderBy("timestamp", "desc")), (snapshot) => {
-                messagesList.innerHTML = '';
+                messagesTableBody.innerHTML = ''; // Clear existing rows
                 if (snapshot.empty) {
-                    messagesList.innerHTML = '<p class="text-gray-600">No contact messages received yet.</p>';
+                    messagesTableBody.innerHTML = '<tr><td colspan="4" class="text-center text-gray-600 py-4">No contact messages received yet.</td></tr>';
                 }
                 snapshot.forEach((docItem) => {
                     const message = docItem.data();
                     const timestamp = message.timestamp ? new Date(message.timestamp.toDate()).toLocaleString() : 'N/A';
-                    const messageDiv = document.createElement('div');
-                    messageDiv.className = 'list-item'; // Use new class for list items
-                    messageDiv.innerHTML = `
-                        <div class="list-item-content text-left">
-                            <p class="text-gray-900"><strong>From:</strong> ${message.fullName} (<a href="mailto:${message.emailAddress}" class="text-brand-blue hover:underline">${message.emailAddress}</a>)</p>
-                            <p class="text-gray-800 mt-1"><strong>Message:</strong> ${message.projectDetails}</p>
-                            <p class="text-gray-500 text-sm mt-1">Received: ${timestamp}</p>
-                        </div>
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${message.fullName}</td>
+                        <td><a href="mailto:${message.emailAddress}" class="text-brand-blue hover:underline">${message.emailAddress}</a></td>
+                        <td>${message.projectDetails}</td>
+                        <td>${timestamp}</td>
                     `;
-                    messagesList.appendChild(messageDiv);
+                    messagesTableBody.appendChild(row);
                 });
             }, (error) => {
                 console.error("Error loading messages data:", error);
+                messagesTableBody.innerHTML = '<tr><td colspan="4" class="text-center text-red-500 py-4">Error loading messages.</td></tr>';
             });
         }
 
-        // Utility function for showing messages
+        // Utility function for showing messages (success/error)
         function showMessage(element, message, type) {
             element.textContent = message;
             element.classList.remove('hidden', 'text-green-500', 'text-red-500');
@@ -608,6 +651,53 @@
                 element.classList.add('hidden');
             }, 5000);
         }
+
+        // Custom Confirmation Modal (replaces window.confirm)
+        function showConfirmation(message, onConfirm) {
+            const modalId = 'confirmation-modal';
+            let modal = document.getElementById(modalId);
+
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = modalId;
+                modal.className = 'fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4';
+                modal.innerHTML = `
+                    <div class="bg-white rounded-lg shadow-xl p-8 max-w-sm w-full text-center" data-aos="zoom-in" data-aos-duration="300">
+                        <p id="confirmation-message" class="text-lg font-semibold text-gray-800 mb-6"></p>
+                        <div class="flex justify-center space-x-4">
+                            <button id="confirm-yes" class="btn-danger px-6 py-2">Yes</button>
+                            <button id="confirm-no" class="btn-secondary px-6 py-2">No</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            }
+
+            document.getElementById('confirmation-message').textContent = message;
+            modal.classList.remove('hidden');
+
+            const confirmYes = document.getElementById('confirm-yes');
+            const confirmNo = document.getElementById('confirm-no');
+
+            const cleanup = () => {
+                confirmYes.removeEventListener('click', handleYes);
+                confirmNo.removeEventListener('click', handleNo);
+                modal.classList.add('hidden');
+            };
+
+            const handleYes = () => {
+                onConfirm();
+                cleanup();
+            };
+
+            const handleNo = () => {
+                cleanup();
+            };
+
+            confirmYes.addEventListener('click', handleYes);
+            confirmNo.addEventListener('click', handleNo);
+        }
+
 
         // Initialize AOS
         document.addEventListener('DOMContentLoaded', () => {
