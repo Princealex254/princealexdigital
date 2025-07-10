@@ -51,25 +51,6 @@
     const loginPage = document.getElementById("login-page");
     const logoutBtn = document.getElementById("logout-btn");
 
-    // Custom alert/message box function
-    function showMessage(message, type = 'info') {
-      const messageBox = document.getElementById('message-box');
-      const messageText = document.getElementById('message-text');
-      const closeMessage = document.getElementById('close-message');
-
-      messageText.textContent = message;
-      messageBox.className = `fixed top-4 right-4 p-4 rounded shadow-lg z-50 ${type === 'error' ? 'bg-red-500' : 'bg-blue-500'} text-white`;
-      messageBox.classList.remove('hidden');
-
-      closeMessage.onclick = () => {
-        messageBox.classList.add('hidden');
-      };
-
-      setTimeout(() => {
-        messageBox.classList.add('hidden');
-      }, 5000); // Hide after 5 seconds
-    }
-
     loginForm.addEventListener("submit", (e) => {
       e.preventDefault();
       const email = loginForm.email.value;
@@ -79,10 +60,9 @@
         .then(() => {
           loginPage.classList.add("hidden");
           dashboard.classList.remove("hidden");
-          showMessage("Login successful!", "info");
         })
         .catch((error) => {
-          showMessage("Login failed: " + error.message, "error");
+          alert("Login failed: " + error.message);
         });
     });
 
@@ -90,7 +70,6 @@
       signOut(auth).then(() => {
         dashboard.classList.add("hidden");
         loginPage.classList.remove("hidden");
-        showMessage("Logged out successfully!", "info");
       });
     });
 
@@ -108,21 +87,16 @@
       }
     });
 
-    // Stats update
     const statForm = document.getElementById("stats-form");
     statForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       const statsRef = doc(db, `artifacts/${appId}/public/data/statistics/currentStats`);
-      try {
-        await setDoc(statsRef, {
-          projects: statForm.projects.value,
-          clients: statForm.clients.value,
-          successRate: statForm.success.value,
-        });
-        showMessage("Statistics updated!", "info");
-      } catch (error) {
-        showMessage("Failed to update statistics: " + error.message, "error");
-      }
+      await setDoc(statsRef, {
+        projects: statForm.projects.value,
+        clients: statForm.clients.value,
+        successRate: statForm.success.value,
+      });
+      alert("Statistics updated!");
     });
 
     function loadStats() {
@@ -137,82 +111,36 @@
       });
     }
 
-    // Portfolio
     const portfolioList = document.getElementById("portfolio-list");
     const portfolioForm = document.getElementById("portfolio-form");
-    const portfolioImageInput = document.getElementById("portfolio-image-upload");
-    const portfolioAddButton = portfolioForm.querySelector('button[type="submit"]');
-    const imageUploadStatus = document.getElementById("image-upload-status");
-    const imageUploadSpinner = document.getElementById("image-upload-spinner"); // Get the spinner element
-
-    let uploadedImageUrl = ""; // To store the URL after upload
-
-    // Disable the add project button by default
-    portfolioAddButton.disabled = true;
-    portfolioAddButton.classList.add("opacity-50", "cursor-not-allowed");
-
-    portfolioImageInput.addEventListener("change", async (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        imageUploadStatus.textContent = "Uploading image...";
-        imageUploadStatus.classList.remove("hidden", "text-red-600", "text-green-600");
-        imageUploadSpinner.classList.remove("hidden"); // Show spinner
-        portfolioAddButton.disabled = true; // Disable button during upload
-        portfolioAddButton.classList.add("opacity-50", "cursor-not-allowed");
-
-        const storageRef = ref(storage, `portfolio-images/${file.name}`);
-        try {
-          await uploadBytes(storageRef, file);
-          uploadedImageUrl = await getDownloadURL(storageRef);
-          imageUploadStatus.textContent = "Image uploaded successfully!";
-          imageUploadStatus.classList.add("text-green-600");
-          portfolioAddButton.disabled = false; // Enable button after successful upload
-          portfolioAddButton.classList.remove("opacity-50", "cursor-not-allowed");
-        } catch (error) {
-          imageUploadStatus.textContent = "Image upload failed: " + error.message;
-          imageUploadStatus.classList.add("text-red-600");
-          uploadedImageUrl = ""; // Clear URL on failure
-          portfolioAddButton.disabled = true; // Keep button disabled on failure
-          portfolioAddButton.classList.add("opacity-50", "cursor-not-allowed");
-        } finally {
-          imageUploadSpinner.classList.add("hidden"); // Hide spinner
-        }
-      } else {
-        uploadedImageUrl = "";
-        imageUploadStatus.textContent = "";
-        imageUploadStatus.classList.add("hidden");
-        imageUploadSpinner.classList.add("hidden"); // Hide spinner
-        portfolioAddButton.disabled = true; // Disable if no file selected
-        portfolioAddButton.classList.add("opacity-50", "cursor-not-allowed");
-      }
-    });
 
     portfolioForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-      if (!uploadedImageUrl) {
-        showMessage("Please upload an image first.", "error");
+      const title = portfolioForm.title.value;
+      const description = portfolioForm.description.value;
+      const link = portfolioForm.link.value;
+      const linkText = portfolioForm.linkText.value || "View Project";
+      const imageFile = portfolioForm.image.files[0];
+
+      if (!imageFile) {
+        alert("Please select an image file.");
         return;
       }
-      try {
-        await addDoc(collection(db, `artifacts/${appId}/public/data/portfolio`), {
-          title: portfolioForm.title.value,
-          description: portfolioForm.description.value,
-          link: portfolioForm.link.value,
-          imageUrl: uploadedImageUrl,
-          linkText: portfolioForm.linkText.value || "View Project",
-        });
-        showMessage("Project added successfully!", "info");
-        portfolioForm.reset();
-        portfolioImageInput.value = ""; // Clear the file input
-        uploadedImageUrl = ""; // Reset the URL
-        imageUploadStatus.textContent = ""; // Clear status message
-        imageUploadStatus.classList.add("hidden");
-        imageUploadSpinner.classList.add("hidden"); // Hide spinner
-        portfolioAddButton.disabled = true; // Disable button again after submission
-        portfolioAddButton.classList.add("opacity-50", "cursor-not-allowed");
-      } catch (error) {
-        showMessage("Failed to add project: " + error.message, "error");
-      }
+
+      const imageRef = ref(storage, `portfolioImages/${Date.now()}_${imageFile.name}`);
+      await uploadBytes(imageRef, imageFile);
+      const imageUrl = await getDownloadURL(imageRef);
+
+      await addDoc(collection(db, `artifacts/${appId}/public/data/portfolio`), {
+        title,
+        description,
+        link,
+        linkText,
+        imageUrl,
+      });
+
+      portfolioForm.reset();
+      alert("Portfolio item added!");
     });
 
     function loadPortfolio() {
@@ -223,10 +151,10 @@
           const data = docSnap.data();
           portfolioList.innerHTML += `
             <div class="border p-4 rounded shadow mb-2">
+              <img src="${data.imageUrl}" alt="${data.title}" class="w-full h-40 object-cover rounded mb-2"/>
               <p><strong>${data.title}</strong></p>
               <p>${data.description}</p>
-              ${data.imageUrl ? `<img src="${data.imageUrl}" alt="${data.title}" class="w-full h-32 object-cover mt-2 mb-2 rounded">` : ''}
-              <a href="${data.link}" target="_blank" class="text-blue-600 hover:underline">${data.linkText}</a>
+              <a href="${data.link}" target="_blank" class="text-blue-600 underline">${data.linkText}</a>
               <button onclick="deletePortfolio('${docSnap.id}')" class="text-red-600 text-sm mt-2 block">Delete</button>
             </div>
           `;
@@ -235,31 +163,20 @@
     }
 
     window.deletePortfolio = async (id) => {
-      try {
-        await deleteDoc(doc(db, `artifacts/${appId}/public/data/portfolio`, id));
-        showMessage("Project deleted successfully!", "info");
-      } catch (error) {
-        showMessage("Failed to delete project: " + error.message, "error");
-      }
+      await deleteDoc(doc(db, `artifacts/${appId}/public/data/portfolio`, id));
     };
 
-    // Testimonials
     const testimonialForm = document.getElementById("testimonial-form");
     const testimonialList = document.getElementById("testimonial-list");
 
     testimonialForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-      try {
-        await addDoc(collection(db, `artifacts/${appId}/public/data/testimonials`), {
-          quote: testimonialForm.quote.value,
-          author: testimonialForm.author.value,
-          company: testimonialForm.company.value,
-        });
-        showMessage("Testimonial added successfully!", "info");
-        testimonialForm.reset();
-      } catch (error) {
-        showMessage("Failed to add testimonial: " + error.message, "error");
-      }
+      await addDoc(collection(db, `artifacts/${appId}/public/data/testimonials`), {
+        quote: testimonialForm.quote.value,
+        author: testimonialForm.author.value,
+        company: testimonialForm.company.value,
+      });
+      testimonialForm.reset();
     });
 
     function loadTestimonials() {
@@ -279,15 +196,9 @@
     }
 
     window.deleteTestimonial = async (id) => {
-      try {
-        await deleteDoc(doc(db, `artifacts/${appId}/public/data/testimonials`, id));
-        showMessage("Testimonial deleted successfully!", "info");
-      } catch (error) {
-        showMessage("Failed to delete testimonial: " + error.message, "error");
-      }
+      await deleteDoc(doc(db, `artifacts/${appId}/public/data/testimonials`, id));
     };
 
-    // Messages
     function loadMessages() {
       const ref = collection(db, `artifacts/${appId}/public/data/messages`);
       const container = document.getElementById("messages-list");
@@ -307,12 +218,6 @@
   </script>
 </head>
 <body class="bg-gray-100 font-sans">
-
-  <!-- Custom Message Box -->
-  <div id="message-box" class="hidden">
-    <span id="message-text"></span>
-    <button id="close-message" class="ml-4 font-bold">&times;</button>
-  </div>
 
   <div id="login-page" class="flex justify-center items-center h-screen">
     <form id="login-form" class="bg-white p-8 rounded shadow-md w-full max-w-sm">
@@ -341,18 +246,13 @@
 
     <section>
       <h2 class="text-xl font-semibold mb-2">Manage Portfolio Projects</h2>
-      <form id="portfolio-form" class="grid gap-4 max-w-md mb-4">
+      <form id="portfolio-form" class="grid gap-4 max-w-md mb-4" enctype="multipart/form-data">
         <input name="title" placeholder="Project Title" required class="p-2 border rounded" />
         <input name="description" placeholder="Project Description" required class="p-2 border rounded" />
-        <div class="flex items-center space-x-2">
-          <input type="file" id="portfolio-image-upload" accept="image/*" class="p-2 border rounded flex-grow" />
-          <!-- Spinner for image upload -->
-          <div id="image-upload-spinner" class="hidden animate-spin rounded-full h-5 w-5 border-b-2 border-gray-900"></div>
-        </div>
-        <p id="image-upload-status" class="text-sm mt-1 hidden"></p> <!-- Status message for image upload -->
+        <input name="image" type="file" accept="image/*" required class="p-2 border rounded" />
         <input name="link" placeholder="Project Link" required class="p-2 border rounded" />
         <input name="linkText" placeholder="Link Text (optional)" class="p-2 border rounded" />
-        <button type="submit" class="bg-green-600 text-white p-2 rounded">Add Project</button>
+        <button class="bg-green-600 text-white p-2 rounded">Add Project</button>
       </form>
       <div id="portfolio-list"></div>
     </section>
