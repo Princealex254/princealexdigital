@@ -26,12 +26,7 @@
       updateDoc,
       serverTimestamp, // Import serverTimestamp for consistent timestamps
     } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
-    import {
-      getStorage,
-      ref,
-      uploadBytes,
-      getDownloadURL,
-    } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-storage.js"; // Import Firebase Storage
+    // Removed Firebase Storage imports as image upload is no longer direct
 
     // Firebase configuration (from your provided code)
     const firebaseConfig = {
@@ -47,7 +42,7 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
-    const storage = getStorage(app); // Initialize Firebase Storage
+    // Removed Firebase Storage initialization
 
     // Get the dynamic app ID from the environment if available, otherwise use a default
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
@@ -172,7 +167,7 @@
     // --- Portfolio Management Logic ---
     const portfolioList = document.getElementById("portfolio-list");
     const portfolioForm = document.getElementById("portfolio-form");
-    const imageUploadInput = document.getElementById("imageUpload"); // Get the new file input
+    // Removed imageUploadInput as direct file upload is no longer used
 
     portfolioForm.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -181,34 +176,8 @@
       const title = portfolioForm.title.value;
       const description = portfolioForm.description.value;
       const link = portfolioForm.link.value;
+      const imageUrl = portfolioForm.imageUrl.value; // Get the image URL from the text input
       const linkText = portfolioForm.linkText.value || "View Project";
-      const imageFile = imageUploadInput.files[0]; // Get the selected image file
-
-      let imageUrl = ''; // Variable to store the download URL
-
-      if (imageFile) {
-        // Create a unique file name for the image in Firebase Storage
-        const fileName = `${Date.now()}_${imageFile.name}`;
-        const storageRef = ref(storage, `artifacts/${appId}/public/images/portfolio/${fileName}`);
-
-        try {
-          // Upload the image file
-          const snapshot = await uploadBytes(storageRef, imageFile);
-          // Get the public download URL
-          imageUrl = await getDownloadURL(snapshot.ref);
-          displayMessage("Image uploaded successfully!");
-        } catch (error) {
-          console.error("Error uploading image:", error);
-          displayMessage("Image upload failed: " + error.message, "error");
-          hideLoading(); // Hide loading even if image upload fails
-          return; // Stop the function if image upload fails
-        }
-      } else {
-        // If no image is selected, use a placeholder or handle as needed
-        // For now, it will just be an empty string if no file is chosen.
-        // You might want to add validation here to require an image.
-        displayMessage("No image selected. Adding project without an image.", "info");
-      }
 
       // Add project data to Firestore, including the image URL
       try {
@@ -216,13 +185,12 @@
           title: title,
           description: description,
           link: link,
-          imageUrl: imageUrl, // Save the obtained image URL
+          imageUrl: imageUrl, // Save the provided image URL
           linkText: linkText,
           createdAt: serverTimestamp() // Add a timestamp for ordering if needed
         });
         displayMessage("Project added successfully!");
         portfolioForm.reset(); // Clear the form fields
-        imageUploadInput.value = ''; // Clear the file input
       } catch (error) {
         console.error("Error adding project to Firestore:", error);
         displayMessage("Failed to add project: " + error.message, "error");
@@ -234,8 +202,6 @@
     // Load portfolio projects
     function loadPortfolio() {
       const portfolioRef = collection(db, `artifacts/${appId}/public/data/portfolio`);
-      // You might want to order them, e.g., by createdAt timestamp
-      // const q = query(portfolioRef, orderBy("createdAt", "desc")); // Removed orderBy as per instructions
       onSnapshot(portfolioRef, (snapshot) => {
         portfolioList.innerHTML = ""; // Clear current list
         snapshot.forEach((docSnap) => {
@@ -298,7 +264,6 @@
     // Load testimonials
     function loadTestimonials() {
       const ref = collection(db, `artifacts/${appId}/public/data/testimonials`);
-      // const q = query(ref, orderBy("createdAt", "desc")); // Removed orderBy as per instructions
       onSnapshot(ref, (snapshot) => {
         testimonialList.innerHTML = "";
         snapshot.forEach((docSnap) => {
@@ -333,7 +298,6 @@
     // --- Messages Display Logic ---
     function loadMessages() {
       const ref = collection(db, `artifacts/${appId}/public/data/messages`);
-      // const q = query(ref, orderBy("createdAt", "desc")); // Assuming messages have a timestamp
       const container = document.getElementById("messages-list");
       onSnapshot(ref, (snapshot) => {
         container.innerHTML = "";
@@ -411,8 +375,8 @@
       <form id="portfolio-form" class="grid gap-4 max-w-md mb-6">
         <input name="title" placeholder="Project Title" required class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" />
         <input name="description" placeholder="Project Description" required class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" />
-        <!-- New file input for image upload -->
-        <input type="file" id="imageUpload" accept="image/*" class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" />
+        <!-- Reverted to text input for image URL -->
+        <input name="imageUrl" placeholder="Image URL" required class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" />
         <input name="link" placeholder="Project Link (URL)" required class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" />
         <input name="linkText" placeholder="Link Text (e.g., 'View Project')" class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" />
         <button class="bg-green-600 text-white p-2 rounded-md hover:bg-green-700 transition duration-300">Add Project</button>
