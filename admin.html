@@ -29,13 +29,13 @@
       ref,
       uploadBytes,
       getDownloadURL,
-    } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-storage.js"; // Import Firebase Storage
+    } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-storage.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCW0BqYOirnrPRkgvSvtSjK2-OGVTa71uQ",
       authDomain: "princealexdigital-4848c.firebaseapp.com",
       projectId: "princealexdigital-4848c",
-      storageBucket: "princealexdigital-4848c.appspot.com", // Make sure this is present
+      storageBucket: "princealexdigital-4848c.appspot.com",
       messagingSenderId: "1316427677",
       appId: "1:1316427677:web:21bdffbf2095d1d5064174"
     };
@@ -43,13 +43,32 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
-    const storage = getStorage(app); // Initialize Firebase Storage
+    const storage = getStorage(app);
     const appId = "default-app-id";
 
     const loginForm = document.getElementById("login-form");
     const dashboard = document.getElementById("dashboard");
     const loginPage = document.getElementById("login-page");
     const logoutBtn = document.getElementById("logout-btn");
+
+    // Custom alert/message box function
+    function showMessage(message, type = 'info') {
+      const messageBox = document.getElementById('message-box');
+      const messageText = document.getElementById('message-text');
+      const closeMessage = document.getElementById('close-message');
+
+      messageText.textContent = message;
+      messageBox.className = `fixed top-4 right-4 p-4 rounded shadow-lg z-50 ${type === 'error' ? 'bg-red-500' : 'bg-blue-500'} text-white`;
+      messageBox.classList.remove('hidden');
+
+      closeMessage.onclick = () => {
+        messageBox.classList.add('hidden');
+      };
+
+      setTimeout(() => {
+        messageBox.classList.add('hidden');
+      }, 5000); // Hide after 5 seconds
+    }
 
     loginForm.addEventListener("submit", (e) => {
       e.preventDefault();
@@ -60,9 +79,10 @@
         .then(() => {
           loginPage.classList.add("hidden");
           dashboard.classList.remove("hidden");
+          showMessage("Login successful!", "info");
         })
         .catch((error) => {
-          alert("Login failed: " + error.message);
+          showMessage("Login failed: " + error.message, "error");
         });
     });
 
@@ -70,6 +90,7 @@
       signOut(auth).then(() => {
         dashboard.classList.add("hidden");
         loginPage.classList.remove("hidden");
+        showMessage("Logged out successfully!", "info");
       });
     });
 
@@ -92,12 +113,16 @@
     statForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       const statsRef = doc(db, `artifacts/${appId}/public/data/statistics/currentStats`);
-      await setDoc(statsRef, {
-        projects: statForm.projects.value,
-        clients: statForm.clients.value,
-        successRate: statForm.success.value,
-      });
-      alert("Statistics updated!");
+      try {
+        await setDoc(statsRef, {
+          projects: statForm.projects.value,
+          clients: statForm.clients.value,
+          successRate: statForm.success.value,
+        });
+        showMessage("Statistics updated!", "info");
+      } catch (error) {
+        showMessage("Failed to update statistics: " + error.message, "error");
+      }
     });
 
     function loadStats() {
@@ -115,39 +140,75 @@
     // Portfolio
     const portfolioList = document.getElementById("portfolio-list");
     const portfolioForm = document.getElementById("portfolio-form");
-    const portfolioImageInput = document.getElementById("portfolio-image-upload"); // New image input
+    const portfolioImageInput = document.getElementById("portfolio-image-upload");
+    const portfolioAddButton = portfolioForm.querySelector('button[type="submit"]');
+    const imageUploadStatus = document.getElementById("image-upload-status");
+
     let uploadedImageUrl = ""; // To store the URL after upload
+
+    // Disable the add project button by default
+    portfolioAddButton.disabled = true;
+    portfolioAddButton.classList.add("opacity-50", "cursor-not-allowed");
 
     portfolioImageInput.addEventListener("change", async (e) => {
       const file = e.target.files[0];
       if (file) {
+        imageUploadStatus.textContent = "Uploading image...";
+        imageUploadStatus.classList.remove("hidden");
+        portfolioAddButton.disabled = true; // Disable button during upload
+        portfolioAddButton.classList.add("opacity-50", "cursor-not-allowed");
+
         const storageRef = ref(storage, `portfolio-images/${file.name}`);
         try {
           await uploadBytes(storageRef, file);
           uploadedImageUrl = await getDownloadURL(storageRef);
-          alert("Image uploaded successfully!");
+          imageUploadStatus.textContent = "Image uploaded successfully!";
+          imageUploadStatus.classList.remove("text-red-600");
+          imageUploadStatus.classList.add("text-green-600");
+          portfolioAddButton.disabled = false; // Enable button after successful upload
+          portfolioAddButton.classList.remove("opacity-50", "cursor-not-allowed");
         } catch (error) {
-          alert("Image upload failed: " + error.message);
+          imageUploadStatus.textContent = "Image upload failed: " + error.message;
+          imageUploadStatus.classList.remove("text-green-600");
+          imageUploadStatus.classList.add("text-red-600");
+          uploadedImageUrl = ""; // Clear URL on failure
+          portfolioAddButton.disabled = true; // Keep button disabled on failure
+          portfolioAddButton.classList.add("opacity-50", "cursor-not-allowed");
         }
+      } else {
+        uploadedImageUrl = "";
+        imageUploadStatus.textContent = "";
+        imageUploadStatus.classList.add("hidden");
+        portfolioAddButton.disabled = true; // Disable if no file selected
+        portfolioAddButton.classList.add("opacity-50", "cursor-not-allowed");
       }
     });
 
     portfolioForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       if (!uploadedImageUrl) {
-        alert("Please upload an image first.");
+        showMessage("Please upload an image first.", "error");
         return;
       }
-      await addDoc(collection(db, `artifacts/${appId}/public/data/portfolio`), {
-        title: portfolioForm.title.value,
-        description: portfolioForm.description.value,
-        link: portfolioForm.link.value,
-        imageUrl: uploadedImageUrl, // Use the uploaded URL
-        linkText: portfolioForm.linkText.value || "View Project",
-      });
-      portfolioForm.reset();
-      portfolioImageInput.value = ""; // Clear the file input
-      uploadedImageUrl = ""; // Reset the URL
+      try {
+        await addDoc(collection(db, `artifacts/${appId}/public/data/portfolio`), {
+          title: portfolioForm.title.value,
+          description: portfolioForm.description.value,
+          link: portfolioForm.link.value,
+          imageUrl: uploadedImageUrl,
+          linkText: portfolioForm.linkText.value || "View Project",
+        });
+        showMessage("Project added successfully!", "info");
+        portfolioForm.reset();
+        portfolioImageInput.value = ""; // Clear the file input
+        uploadedImageUrl = ""; // Reset the URL
+        imageUploadStatus.textContent = ""; // Clear status message
+        imageUploadStatus.classList.add("hidden");
+        portfolioAddButton.disabled = true; // Disable button again after submission
+        portfolioAddButton.classList.add("opacity-50", "cursor-not-allowed");
+      } catch (error) {
+        showMessage("Failed to add project: " + error.message, "error");
+      }
     });
 
     function loadPortfolio() {
@@ -160,7 +221,7 @@
             <div class="border p-4 rounded shadow mb-2">
               <p><strong>${data.title}</strong></p>
               <p>${data.description}</p>
-              ${data.imageUrl ? `<img src="${data.imageUrl}" alt="${data.title}" class="w-full h-32 object-cover mt-2 mb-2">` : ''}
+              ${data.imageUrl ? `<img src="${data.imageUrl}" alt="${data.title}" class="w-full h-32 object-cover mt-2 mb-2 rounded">` : ''}
               <a href="${data.link}" target="_blank" class="text-blue-600 hover:underline">${data.linkText}</a>
               <button onclick="deletePortfolio('${docSnap.id}')" class="text-red-600 text-sm mt-2 block">Delete</button>
             </div>
@@ -170,7 +231,12 @@
     }
 
     window.deletePortfolio = async (id) => {
-      await deleteDoc(doc(db, `artifacts/${appId}/public/data/portfolio`, id));
+      try {
+        await deleteDoc(doc(db, `artifacts/${appId}/public/data/portfolio`, id));
+        showMessage("Project deleted successfully!", "info");
+      } catch (error) {
+        showMessage("Failed to delete project: " + error.message, "error");
+      }
     };
 
     // Testimonials
@@ -179,12 +245,17 @@
 
     testimonialForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-      await addDoc(collection(db, `artifacts/${appId}/public/data/testimonials`), {
-        quote: testimonialForm.quote.value,
-        author: testimonialForm.author.value,
-        company: testimonialForm.company.value,
-      });
-      testimonialForm.reset();
+      try {
+        await addDoc(collection(db, `artifacts/${appId}/public/data/testimonials`), {
+          quote: testimonialForm.quote.value,
+          author: testimonialForm.author.value,
+          company: testimonialForm.company.value,
+        });
+        showMessage("Testimonial added successfully!", "info");
+        testimonialForm.reset();
+      } catch (error) {
+        showMessage("Failed to add testimonial: " + error.message, "error");
+      }
     });
 
     function loadTestimonials() {
@@ -204,7 +275,12 @@
     }
 
     window.deleteTestimonial = async (id) => {
-      await deleteDoc(doc(db, `artifacts/${appId}/public/data/testimonials`, id));
+      try {
+        await deleteDoc(doc(db, `artifacts/${appId}/public/data/testimonials`, id));
+        showMessage("Testimonial deleted successfully!", "info");
+      } catch (error) {
+        showMessage("Failed to delete testimonial: " + error.message, "error");
+      }
     };
 
     // Messages
@@ -227,6 +303,12 @@
   </script>
 </head>
 <body class="bg-gray-100 font-sans">
+
+  <!-- Custom Message Box -->
+  <div id="message-box" class="hidden">
+    <span id="message-text"></span>
+    <button id="close-message" class="ml-4 font-bold">&times;</button>
+  </div>
 
   <div id="login-page" class="flex justify-center items-center h-screen">
     <form id="login-form" class="bg-white p-8 rounded shadow-md w-full max-w-sm">
@@ -258,7 +340,9 @@
       <form id="portfolio-form" class="grid gap-4 max-w-md mb-4">
         <input name="title" placeholder="Project Title" required class="p-2 border rounded" />
         <input name="description" placeholder="Project Description" required class="p-2 border rounded" />
-        <input type="file" id="portfolio-image-upload" accept="image/*" class="p-2 border rounded" /> <input name="link" placeholder="Project Link" required class="p-2 border rounded" />
+        <input type="file" id="portfolio-image-upload" accept="image/*" class="p-2 border rounded" />
+        <p id="image-upload-status" class="text-sm mt-1 hidden"></p> <!-- Status message for image upload -->
+        <input name="link" placeholder="Project Link" required class="p-2 border rounded" />
         <input name="linkText" placeholder="Link Text (optional)" class="p-2 border rounded" />
         <button type="submit" class="bg-green-600 text-white p-2 rounded">Add Project</button>
       </form>
