@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prince Alex Digital - Admin Panel</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Light gray background */
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+        }
+        .bg-brand-blue {
+            background-color: #1c4ed8;
+        }
+        .text-brand-blue {
+            color: #1c4ed8;
+        }
+        .btn-primary {
+            @apply bg-brand-blue text-white px-4 py-2 rounded-md hover:bg-blue-700 transition duration-300 ease-in-out;
+        }
+        .btn-secondary {
+            @apply bg-gray-300 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-400 transition duration-300 ease-in-out;
+        }
+        .btn-danger {
+            @apply bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-300 ease-in-out;
+        }
+        input[type="text"], input[type="number"], input[type="email"], textarea {
+            @apply w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-blue;
+        }
+        .card {
+            @apply bg-white p-6 rounded-lg shadow-md mb-6;
+        }
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #1a202c; /* Dark background for login page */
+        }
+        .login-card {
+            background-color: #ffffff;
+            padding: 2.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 400px;
+        }
+    </style>
+</head>
+<body class="p-4">
+    <!-- Login Page -->
+    <div id="login-page" class="login-container hidden">
+        <div class="login-card">
+            <h2 class="text-3xl font-bold text-center text-brand-blue mb-6">Admin Login</h2>
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label for="login-email" class="block text-gray-700 text-sm font-bold mb-2">Email:</label>
+                    <input type="email" id="login-email" placeholder="admin@example.com" required>
+                </div>
+                <div>
+                    <label for="login-password" class="block text-gray-700 text-sm font-bold mb-2">Password:</label>
+                    <input type="password" id="login-password" placeholder="********" required>
+                </div>
+                <button type="submit" class="btn-primary w-full">Login</button>
+                <div id="login-message" class="mt-4 text-center hidden"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Content Page -->
+    <div id="admin-content" class="container mx-auto hidden">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-4xl font-bold text-brand-blue">Admin Panel - Prince Alex Digital</h1>
+            <button id="logout-button" class="btn-danger">Logout</button>
+        </div>
+
+        <!-- User ID Display -->
+        <div class="card text-sm text-gray-600">
+            <p><strong>Authenticated User ID:</strong> <span id="admin-user-id">Loading...</span></p>
+            <p class="text-red-500 mt-2">
+                Note: This admin panel now uses email/password authentication. Ensure you have enabled Email/Password Sign-in Method in your Firebase project.
+            </p>
+        </div>
+
+        <!-- Section: Update Statistics -->
+        <div class="card">
+            <h2 class="text-2xl font-semibold mb-4">Update Statistics</h2>
+            <form id="stats-form" class="space-y-4">
+                <div>
+                    <label for="projects" class="block text-gray-700 text-sm font-bold mb-2">Projects Delivered:</label>
+                    <input type="number" id="projects" placeholder="e.g., 150" required>
+                </div>
+                <div>
+                    <label for="clients" class="block text-gray-700 text-sm font-bold mb-2">Happy Clients:</label>
+                    <input type="number" id="clients" placeholder="e.g., 100" required>
+                </div>
+                <div>
+                    <label for="success-rate" class="block text-gray-700 text-sm font-bold mb-2">Success Rate (%):</label>
+                    <input type="text" id="success-rate" placeholder="e.g., 95%" required>
+                </div>
+                <button type="submit" class="btn-primary">Update Statistics</button>
+                <div id="stats-message" class="mt-4 text-center hidden"></div>
+            </form>
+        </div>
+
+        <!-- Section: Manage Portfolio -->
+        <div class="card">
+            <h2 class="text-2xl font-semibold mb-4">Manage Portfolio</h2>
+            <form id="portfolio-form" class="space-y-4 mb-6">
+                <input type="hidden" id="portfolio-doc-id">
+                <div>
+                    <label for="portfolio-title" class="block text-gray-700 text-sm font-bold mb-2">Project Title:</label>
+                    <input type="text" id="portfolio-title" placeholder="e.g., E-commerce Website Redesign" required>
+                </div>
+                <div>
+                    <label for="portfolio-description" class="block text-gray-700 text-sm font-bold mb-2">Description:</label>
+                    <textarea id="portfolio-description" rows="3" placeholder="A brief description of the project." required></textarea>
+                </div>
+                <div>
+                    <label for="portfolio-image-url" class="block text-gray-700 text-sm font-bold mb-2">Image URL:</label>
+                    <input type="text" id="portfolio-image-url" placeholder="e.g., https://placehold.co/600x400/..." required>
+                </div>
+                <div>
+                    <label for="portfolio-link" class="block text-gray-700 text-sm font-bold mb-2">Live Site/Details Link:</label>
+                    <input type="text" id="portfolio-link" placeholder="e.g., https://yourproject.com" required>
+                </div>
+                <div>
+                    <label for="portfolio-link-text" class="block text-gray-700 text-sm font-bold mb-2">Link Text:</label>
+                    <input type="text" id="portfolio-link-text" placeholder="e.g., View Live Site" required>
+                </div>
+                <button type="submit" class="btn-primary">Add/Update Project</button>
+                <button type="button" id="clear-portfolio-form" class="btn-secondary">Clear Form</button>
+                <div id="portfolio-message" class="mt-4 text-center hidden"></div>
+            </form>
+
+            <h3 class="text-xl font-semibold mb-3">Current Projects</h3>
+            <div id="portfolio-list" class="space-y-4">
+                <p>Loading projects...</p>
+            </div>
+        </div>
+
+        <!-- Section: Manage Testimonials -->
+        <div class="card">
+            <h2 class="text-2xl font-semibold mb-4">Manage Testimonials</h2>
+            <form id="testimonial-form" class="space-y-4 mb-6">
+                <input type="hidden" id="testimonial-doc-id">
+                <div>
+                    <label for="testimonial-quote" class="block text-gray-700 text-sm font-bold mb-2">Quote:</label>
+                    <textarea id="testimonial-quote" rows="3" placeholder="Enter client's testimonial quote" required></textarea>
+                </div>
+                <div>
+                    <label for="testimonial-author" class="block text-gray-700 text-sm font-bold mb-2">Author Name:</label>
+                    <input type="text" id="testimonial-author" placeholder="e.g., Jane Doe" required>
+                </div>
+                <div>
+                    <label for="testimonial-company" class="block text-gray-700 text-sm font-bold mb-2">Company/Title:</label>
+                    <input type="text" id="testimonial-company" placeholder="e.g., CEO, Company XYZ" required>
+                </div>
+                <button type="submit" class="btn-primary">Add/Update Testimonial</button>
+                <button type="button" id="clear-testimonial-form" class="btn-secondary">Clear Form</button>
+                <div id="testimonial-message" class="mt-4 text-center hidden"></div>
+            </form>
+
+            <h3 class="text-xl font-semibold mb-3">Current Testimonials</h3>
+            <div id="testimonial-list" class="space-y-4">
+                <p>Loading testimonials...</p>
+            </div>
+        </div>
+
+        <!-- Section: View Contact Messages -->
+        <div class="card">
+            <h2 class="text-2xl font-semibold mb-4">Contact Messages</h2>
+            <div id="messages-list" class="space-y-4">
+                <p>Loading messages...</p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+        import { getFirestore, collection, doc, getDoc, setDoc, addDoc, deleteDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+
+        // Firebase configuration (replace with your actual config if different from index.html)
+        const firebaseConfig = {
+            apiKey: "AIzaSyCW0BqYOirnrPRkgvSvtSjK2-OGVTa71uQ",
+            authDomain: "princealexdigital-4848c.firebaseapp.com",
+            projectId: "princealexdigital-4848c",
+            storageBucket: "princealexdigital-4848c.firebasestorage.app",
+            messagingSenderId: "1316427677",
+            appId: "1:1316427677:web:21bdffbf2095d1d5064174"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // Global variables for app ID and user ID
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        let userId = null; // Will be set after authentication
+
+        // Get elements for login and admin content
+        const loginPage = document.getElementById('login-page');
+        const adminContent = document.getElementById('admin-content');
+        const loginForm = document.getElementById('login-form');
+        const loginEmailInput = document.getElementById('login-email');
+        const loginPasswordInput = document.getElementById('login-password');
+        const loginMessageDiv = document.getElementById('login-message');
+        const logoutButton = document.getElementById('logout-button');
+        const adminUserIdSpan = document.getElementById('admin-user-id');
+
+        // Authentication state observer
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User is signed in.
+                userId = user.uid;
+                adminUserIdSpan.textContent = userId;
+                loginPage.classList.add('hidden');
+                adminContent.classList.remove('hidden');
+                console.log("Admin Authenticated with Firebase. User ID:", userId);
+                // Load data after authentication
+                loadStatisticsData();
+                loadPortfolioData();
+                loadTestimonialsData();
+                loadMessagesData();
+            } else {
+                // User is signed out.
+                userId = null;
+                adminUserIdSpan.textContent = "Not Authenticated";
+                loginPage.classList.remove('hidden');
+                adminContent.classList.add('hidden');
+                console.log("Admin not authenticated. Showing login page.");
+            }
+        });
+
+        // Handle login form submission
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = loginEmailInput.value;
+            const password = loginPasswordInput.value;
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                showMessage(loginMessageDiv, "Logged in successfully!", "green");
+                // onAuthStateChanged will handle showing admin content
+            } catch (error) {
+                console.error("Login error:", error);
+                let errorMessage = "Login failed. Please check your credentials.";
+                if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                    errorMessage = "Invalid email or password.";
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage = "Invalid email format.";
+                }
+                showMessage(loginMessageDiv, errorMessage, "red");
+            }
+        });
+
+        // Handle logout button click
+        logoutButton.addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+                console.log("User logged out.");
+                // onAuthStateChanged will handle showing login page
+            } catch (error) {
+                console.error("Error logging out:", error);
+                // Optionally show a message to the user
+            }
+        });
+
+        // --- Statistics Management ---
+        const statsForm = document.getElementById('stats-form');
+        const projectsInput = document.getElementById('projects');
+        const clientsInput = document.getElementById('clients');
+        const successRateInput = document.getElementById('success-rate');
+        const statsMessageDiv = document.getElementById('stats-message');
+        const statsDocRef = doc(db, `artifacts/${appId}/public/data/statistics/currentStats`);
+
+        async function loadStatisticsData() {
+            onSnapshot(statsDocRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const stats = docSnap.data();
+                    projectsInput.value = stats.projects || '';
+                    clientsInput.value = stats.clients || '';
+                    successRateInput.value = stats.successRate || '';
+                } else {
+                    console.log("No existing statistics document.");
+                }
+            }, (error) => {
+                console.error("Error loading statistics data:", error);
+            });
+        }
+
+        statsForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                await setDoc(statsDocRef, {
+                    projects: parseInt(projectsInput.value),
+                    clients: parseInt(clientsInput.value),
+                    successRate: successRateInput.value
+                });
+                showMessage(statsMessageDiv, "Statistics updated successfully!", "green");
+            } catch (error) {
+                console.error("Error updating statistics:", error);
+                showMessage(statsMessageDiv, "Failed to update statistics.", "red");
+            }
+        });
+
+        // --- Portfolio Management ---
+        const portfolioForm = document.getElementById('portfolio-form');
+        const portfolioDocIdInput = document.getElementById('portfolio-doc-id');
+        const portfolioTitleInput = document.getElementById('portfolio-title');
+        const portfolioDescriptionInput = document.getElementById('portfolio-description');
+        // Fixed the typo here: removed the extra 'document ='
+        const portfolioImageUrlInput = document.getElementById('portfolio-image-url');
+        const portfolioLinkInput = document.getElementById('portfolio-link');
+        const portfolioLinkTextInput = document.getElementById('portfolio-link-text');
+        const portfolioMessageDiv = document.getElementById('portfolio-message');
+        const portfolioList = document.getElementById('portfolio-list');
+        const clearPortfolioFormBtn = document.getElementById('clear-portfolio-form');
+
+        const portfolioCollectionRef = collection(db, `artifacts/${appId}/public/data/portfolio`);
+
+        function clearPortfolioForm() {
+            portfolioDocIdInput.value = '';
+            portfolioTitleInput.value = '';
+            portfolioDescriptionInput.value = '';
+            portfolioImageUrlInput.value = '';
+            portfolioLinkInput.value = '';
+            portfolioLinkTextInput.value = '';
+        }
+
+        clearPortfolioFormBtn.addEventListener('click', clearPortfolioForm);
+
+        async function loadPortfolioData() {
+            onSnapshot(query(portfolioCollectionRef, orderBy("timestamp", "desc")), (snapshot) => {
+                portfolioList.innerHTML = '';
+                if (snapshot.empty) {
+                    portfolioList.innerHTML = '<p>No portfolio items added yet.</p>';
+                }
+                snapshot.forEach((docItem) => {
+                    const item = docItem.data();
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'border p-4 rounded-md bg-gray-50 flex justify-between items-center';
+                    itemDiv.innerHTML = `
+                        <div>
+                            <h4 class="font-semibold text-lg">${item.title}</h4>
+                            <p class="text-gray-700 text-sm">${item.description}</p>
+                            <p class="text-gray-500 text-xs">Image: ${item.imageUrl}</p>
+                            <a href="${item.link}" target="_blank" class="text-brand-blue text-sm hover:underline">${item.linkText}</a>
+                        </div>
+                        <div>
+                            <button data-id="${docItem.id}" class="edit-portfolio-btn btn-secondary text-sm mr-2">Edit</button>
+                            <button data-id="${docItem.id}" class="delete-portfolio-btn btn-danger text-sm">Delete</button>
+                        </div>
+                    `;
+                    portfolioList.appendChild(itemDiv);
+                });
+
+                // Add event listeners for edit/delete buttons
+                portfolioList.querySelectorAll('.edit-portfolio-btn').forEach(button => {
+                    button.addEventListener('click', async () => {
+                        const id = button.dataset.id;
+                        const docSnap = await getDoc(doc(db, `artifacts/${appId}/public/data/portfolio`, id));
+                        if (docSnap.exists()) {
+                            const data = docSnap.data();
+                            portfolioDocIdInput.value = id;
+                            portfolioTitleInput.value = data.title;
+                            portfolioDescriptionInput.value = data.description;
+                            portfolioImageUrlInput.value = data.imageUrl;
+                            portfolioLinkInput.value = data.link;
+                            portfolioLinkTextInput.value = data.linkText;
+                        }
+                    });
+                });
+
+                portfolioList.querySelectorAll('.delete-portfolio-btn').forEach(button => {
+                    button.addEventListener('click', async () => {
+                        const id = button.dataset.id;
+                        if (confirm('Are you sure you want to delete this project?')) {
+                            try {
+                                await deleteDoc(doc(db, `artifacts/${appId}/public/data/portfolio`, id));
+                                showMessage(portfolioMessageDiv, "Project deleted successfully!", "green");
+                            } catch (error) {
+                                console.error("Error deleting project:", error);
+                                showMessage(portfolioMessageDiv, "Failed to delete project.", "red");
+                            }
+                        }
+                    });
+                });
+            }, (error) => {
+                console.error("Error loading portfolio data:", error);
+            });
+        }
+
+        portfolioForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = portfolioDocIdInput.value;
+            const data = {
+                title: portfolioTitleInput.value,
+                description: portfolioDescriptionInput.value,
+                imageUrl: portfolioImageUrlInput.value,
+                link: portfolioLinkInput.value,
+                linkText: portfolioLinkTextInput.value,
+                timestamp: serverTimestamp()
+            };
+
+            try {
+                if (id) {
+                    await setDoc(doc(db, `artifacts/${appId}/public/data/portfolio`, id), data);
+                    showMessage(portfolioMessageDiv, "Project updated successfully!", "green");
+                } else {
+                    await addDoc(portfolioCollectionRef, data);
+                    showMessage(portfolioMessageDiv, "Project added successfully!", "green");
+                }
+                clearPortfolioForm();
+            } catch (error) {
+                console.error("Error saving portfolio item:", error);
+                showMessage(portfolioMessageDiv, "Failed to save project.", "red");
+            }
+        });
+
+        // --- Testimonial Management ---
+        const testimonialForm = document.getElementById('testimonial-form');
+        const testimonialDocIdInput = document.getElementById('testimonial-doc-id');
+        const testimonialQuoteInput = document.getElementById('testimonial-quote');
+        const testimonialAuthorInput = document.getElementById('testimonial-author');
+        const testimonialCompanyInput = document.getElementById('testimonial-company');
+        const testimonialMessageDiv = document.getElementById('testimonial-message');
+        const testimonialList = document.getElementById('testimonial-list');
+        const clearTestimonialFormBtn = document.getElementById('clear-testimonial-form');
+
+        const testimonialsCollectionRef = collection(db, `artifacts/${appId}/public/data/testimonials`);
+
+        function clearTestimonialForm() {
+            testimonialDocIdInput.value = '';
+            testimonialQuoteInput.value = '';
+            testimonialAuthorInput.value = '';
+            testimonialCompanyInput.value = '';
+        }
+
+        clearTestimonialFormBtn.addEventListener('click', clearTestimonialForm);
+
+        async function loadTestimonialsData() {
+            onSnapshot(query(testimonialsCollectionRef, orderBy("timestamp", "desc")), (snapshot) => {
+                testimonialList.innerHTML = '';
+                if (snapshot.empty) {
+                    testimonialList.innerHTML = '<p>No testimonials added yet.</p>';
+                }
+                snapshot.forEach((docItem) => {
+                    const item = docItem.data();
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'border p-4 rounded-md bg-gray-50 flex justify-between items-center';
+                    itemDiv.innerHTML = `
+                        <div>
+                            <p class="italic text-gray-800">"${item.quote}"</p>
+                            <p class="font-semibold text-sm mt-1">- ${item.author}</p>
+                            <p class="text-gray-500 text-xs">${item.company}</p>
+                        </div>
+                        <div>
+                            <button data-id="${docItem.id}" class="edit-testimonial-btn btn-secondary text-sm mr-2">Edit</button>
+                            <button data-id="${docItem.id}" class="delete-testimonial-btn btn-danger text-sm">Delete</button>
+                        </div>
+                    `;
+                    testimonialList.appendChild(itemDiv);
+                });
+
+                // Add event listeners for edit/delete buttons
+                testimonialList.querySelectorAll('.edit-testimonial-btn').forEach(button => {
+                    button.addEventListener('click', async () => {
+                        const id = button.dataset.id;
+                        const docSnap = await getDoc(doc(db, `artifacts/${appId}/public/data/testimonials`, id));
+                        if (docSnap.exists()) {
+                            const data = docSnap.data();
+                            testimonialDocIdInput.value = id;
+                            testimonialQuoteInput.value = data.quote;
+                            testimonialAuthorInput.value = data.author;
+                            testimonialCompanyInput.value = data.company;
+                        }
+                    });
+                });
+
+                testimonialList.querySelectorAll('.delete-testimonial-btn').forEach(button => {
+                    button.addEventListener('click', async () => {
+                        const id = button.dataset.id;
+                        if (confirm('Are you sure you want to delete this testimonial?')) {
+                            try {
+                                await deleteDoc(doc(db, `artifacts/${appId}/public/data/testimonials`, id));
+                                showMessage(testimonialMessageDiv, "Testimonial deleted successfully!", "green");
+                            } catch (error) {
+                                console.error("Error deleting testimonial:", error);
+                                showMessage(testimonialMessageDiv, "Failed to delete testimonial.", "red");
+                            }
+                        }
+                    });
+                });
+            }, (error) => {
+                console.error("Error loading testimonials data:", error);
+            });
+        }
+
+        testimonialForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = testimonialDocIdInput.value;
+            const data = {
+                quote: testimonialQuoteInput.value,
+                author: testimonialAuthorInput.value,
+                company: testimonialCompanyInput.value,
+                timestamp: serverTimestamp()
+            };
+
+            try {
+                if (id) {
+                    await setDoc(doc(db, `artifacts/${appId}/public/data/testimonials`, id), data);
+                    showMessage(testimonialMessageDiv, "Testimonial updated successfully!", "green");
+                } else {
+                    await addDoc(testimonialsCollectionRef, data);
+                    showMessage(testimonialMessageDiv, "Testimonial added successfully!", "green");
+                }
+                clearTestimonialForm();
+            } catch (error) {
+                console.error("Error saving testimonial:", error);
+                showMessage(testimonialMessageDiv, "Failed to save testimonial.", "red");
+            }
+        });
+
+        // --- Contact Messages Viewing ---
+        const messagesList = document.getElementById('messages-list');
+        const messagesCollectionRef = collection(db, `artifacts/${appId}/public/data/messages`);
+
+        async function loadMessagesData() {
+            onSnapshot(query(messagesCollectionRef, orderBy("timestamp", "desc")), (snapshot) => {
+                messagesList.innerHTML = '';
+                if (snapshot.empty) {
+                    messagesList.innerHTML = '<p>No contact messages received yet.</p>';
+                }
+                snapshot.forEach((docItem) => {
+                    const message = docItem.data();
+                    const timestamp = message.timestamp ? new Date(message.timestamp.toDate()).toLocaleString() : 'N/A';
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = 'border p-4 rounded-md bg-gray-50';
+                    messageDiv.innerHTML = `
+                        <p><strong>From:</strong> ${message.fullName} (${message.emailAddress})</p>
+                        <p><strong>Message:</strong> ${message.projectDetails}</p>
+                        <p class="text-gray-500 text-sm">Received: ${timestamp}</p>
+                    `;
+                    messagesList.appendChild(messageDiv);
+                });
+            }, (error) => {
+                console.error("Error loading messages data:", error);
+            });
+        }
+
+        // Utility function for showing messages
+        function showMessage(element, message, type) {
+            element.textContent = message;
+            element.classList.remove('hidden', 'text-green-500', 'text-red-500');
+            if (type === "green") {
+                element.classList.add('text-green-500');
+            } else {
+                element.classList.add('text-red-500');
+            }
+            setTimeout(() => {
+                element.classList.add('hidden');
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
