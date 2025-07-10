@@ -62,6 +62,12 @@
             transform: scale(1.03);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
         }
+        .icon-bg-blue { background-color: #e0f2fe; } /* light blue for web design */
+        .icon-bg-green { background-color: #d1fae5; } /* light green for web hosting */
+        .icon-bg-purple { background-color: #ede9fe; } /* light purple for graphic design */
+        .icon-bg-pink { background-color: #fce7f3; } /* light pink for social media */
+        .icon-bg-orange { background-color: #fff7ed; } /* light orange for CV revamping */
+        .icon-bg-light-blue-purple { background-color: #e0f2fe; } /* light blue/purple for custom solutions */
     </style>
 </head>
 <body class="bg-white text-gray-800">
@@ -120,18 +126,78 @@
 
         <!-- About the Founder Section -->
         <section id="about" class="py-16 bg-white">
-            <div class="container mx-auto px-4 md:px-8 lg:px-16 flex flex-col md:flex-row items-center gap-12">
-                <div class="md:w-1/3 flex justify-center" data-aos="fade-right" data-aos-duration="1000">
-                    <img src="founder.jpg" alt="Alex Senerwa Keverenge" class="rounded-full shadow-xl object-cover w-64 h-64 md:w-80 md:h-80 border-4 border-brand-blue">
+            <div class="container mx-auto px-4 md:px-8 lg:px-16 text-center">
+                <h2 class="text-4xl font-bold text-brand-black mb-4" data-aos="fade-down" data-aos-duration="1000">Meet Alex Senerwa Keverenge</h2>
+                <p class="text-lg leading-relaxed text-gray-700 mb-8 max-w-3xl mx-auto" data-aos="fade-down" data-aos-duration="1000" data-aos-delay="100">
+                    A visionary digital solutions expert passionate about transforming businesses through
+                    innovative technology and design.
+                </p>
+                <div class="flex flex-col items-center" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
+                    <div class="relative mb-6">
+                        <img src="founder.jpg" alt="Alex Senerwa Keverenge" class="rounded-lg shadow-xl object-cover w-64 h-64 md:w-80 md:h-80 border-4 border-brand-blue">
+                        <div class="absolute -bottom-4 -right-4 p-3 bg-brand-blue rounded-full shadow-lg">
+                            <i data-lucide="user" class="w-8 h-8 text-white"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-3xl font-bold text-brand-black mb-2">Alex Senerwa Keverenge</h3>
+                    <p class="text-lg text-brand-blue font-medium mb-8">Founder & Digital Solutions Expert</p>
                 </div>
-                <div class="md:w-2/3 text-center md:text-left" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
-                    <h2 class="text-4xl font-bold text-brand-black mb-6">About Alex Senerwa Keverenge</h2>
-                    <p class="text-lg leading-relaxed text-gray-700 mb-4">
+                <div class="text-lg leading-relaxed text-gray-700 max-w-4xl mx-auto" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="300">
+                    <p class="mb-4">
                         Alex Senerwa Keverenge is the visionary founder of Prince Alex Digital, a brand dedicated to empowering businesses and individuals in the digital landscape. With a profound passion for technology and design, Alex has spent years honing his expertise in creating compelling online presences and effective digital strategies.
                     </p>
-                    <p class="text-lg leading-relaxed text-gray-700">
+                    <p>
                         His approach is rooted in understanding client needs and translating them into innovative, practical, and visually stunning digital solutions. Alex believes in leveraging the power of design and cutting-edge technology to drive growth, enhance brand visibility, and achieve measurable results for every client.
                     </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- New Section: Our Mission and Values -->
+        <section id="mission-values" class="py-16 bg-gray-100">
+            <div class="container mx-auto px-4 md:px-8 lg:px-16 text-center">
+                <!-- Our Mission Banner -->
+                <div class="bg-brand-blue text-white p-8 rounded-lg shadow-lg mb-12" data-aos="fade-up" data-aos-duration="1000">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4">Our Mission</h2>
+                    <p class="text-lg max-w-3xl mx-auto leading-relaxed">
+                        "To empower businesses with cutting-edge digital solutions that drive growth, enhance brand presence, and create meaningful connections with their audience."
+                    </p>
+                </div>
+
+                <!-- Core Values -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Value Card 1: Digital Excellence -->
+                    <div class="bg-white p-8 rounded-lg shadow-md flex flex-col items-center text-center" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="100">
+                        <div class="p-4 rounded-full mb-4 icon-bg-blue">
+                            <i data-lucide="award" class="w-8 h-8 text-blue-600"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-brand-black mb-2">Digital Excellence</h3>
+                        <p class="text-gray-600 leading-relaxed">
+                            Delivering high-quality digital solutions that exceed expectations
+                        </p>
+                    </div>
+
+                    <!-- Value Card 2: Client-Focused -->
+                    <div class="bg-white p-8 rounded-lg shadow-md flex flex-col items-center text-center" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="200">
+                        <div class="p-4 rounded-full mb-4 icon-bg-blue">
+                            <i data-lucide="target" class="w-8 h-8 text-blue-600"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-brand-black mb-2">Client-Focused</h3>
+                        <p class="text-gray-600 leading-relaxed">
+                            Understanding your business goals and translating them into digital success
+                        </p>
+                    </div>
+
+                    <!-- Value Card 3: Innovation -->
+                    <div class="bg-white p-8 rounded-lg shadow-md flex flex-col items-center text-center" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="300">
+                        <div class="p-4 rounded-full mb-4 icon-bg-blue">
+                            <i data-lucide="lightbulb" class="w-8 h-8 text-blue-600"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-brand-black mb-2">Innovation</h3>
+                        <p class="text-gray-600 leading-relaxed">
+                            Staying ahead of digital trends to provide cutting-edge solutions
+                        </p>
+                    </div>
                 </div>
             </div>
         </section>
@@ -143,57 +209,94 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
                     <!-- Service Card 1: Web Design & Development -->
-                    <div class="service-card bg-white p-8 rounded-lg shadow-md border-b-4 border-brand-blue flex flex-col items-center" data-aos="zoom-in" data-aos-duration="800">
-                        <div class="text-brand-blue mb-4">
-                            <i data-lucide="layout" class="w-12 h-12"></i>
+                    <div class="service-card bg-white p-8 rounded-lg shadow-md border-b-4 border-brand-blue flex flex-col items-start text-left" data-aos="zoom-in" data-aos-duration="800">
+                        <div class="p-4 rounded-full mb-4 icon-bg-blue">
+                            <i data-lucide="layout" class="w-8 h-8 text-blue-600"></i>
                         </div>
                         <h3 class="text-2xl font-semibold text-brand-black mb-3">Web Design & Development</h3>
-                        <p class="text-gray-600 leading-relaxed">Crafting visually stunning and highly functional websites tailored to your brand identity and business goals.</p>
+                        <p class="text-gray-600 leading-relaxed mb-4">Custom, responsive websites that look great and perform excellently across all devices.</p>
+                        <ul class="text-gray-700 space-y-2">
+                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> Responsive Design</li>
+                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> SEO Optimized</li>
+                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> Fast Loading</li>
+                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> Modern UI/UX</li>
+                        </ul>
                     </div>
 
-                    <!-- Service Card 2: Web Hosting & Domain Registration -->
-                    <div class="service-card bg-white p-8 rounded-lg shadow-md border-b-4 border-brand-blue flex flex-col items-center" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="100">
-                        <div class="text-brand-blue mb-4">
-                            <i data-lucide="globe" class="w-12 h-12"></i>
+                    <!-- Service Card 2: Web Hosting & Domains -->
+                    <div class="service-card bg-white p-8 rounded-lg shadow-md border-b-4 border-brand-blue flex flex-col items-start text-left" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="100">
+                        <div class="p-4 rounded-full mb-4 icon-bg-green">
+                            <i data-lucide="server" class="w-8 h-8 text-green-600"></i>
                         </div>
-                        <h3 class="text-2xl font-semibold text-brand-black mb-3">Web Hosting & Domain Registration</h3>
-                        <p class="text-gray-600 leading-relaxed">Ensuring your online presence is reliable, secure, and easily accessible with seamless hosting and domain services.</p>
+                        <h3 class="text-2xl font-semibold text-brand-black mb-3">Web Hosting & Domains</h3>
+                        <p class="text-gray-600 leading-relaxed mb-4">Reliable hosting solutions with domain registration to get your business online.</p>
+                        <ul class="text-gray-700 space-y-2">
+                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> 99.9% Uptime</li>
+                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> SSL Certificates</li>
+                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> Daily Backups</li>
+                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> 24/7 Support</li>
+                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> Monthly Web Maintenance</li>
+                        </ul>
                     </div>
 
                     <!-- Service Card 3: Graphic Design -->
-                    <div class="service-card bg-white p-8 rounded-lg shadow-md border-b-4 border-brand-blue flex flex-col items-center" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="200">
-                        <div class="text-brand-blue mb-4">
-                            <i data-lucide="palette" class="w-12 h-12"></i>
+                    <div class="service-card bg-white p-8 rounded-lg shadow-md border-b-4 border-brand-blue flex flex-col items-start text-left" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="200">
+                        <div class="p-4 rounded-full mb-4 icon-bg-purple">
+                            <i data-lucide="palette" class="w-8 h-8 text-purple-600"></i>
                         </div>
                         <h3 class="text-2xl font-semibold text-brand-black mb-3">Graphic Design</h3>
-                        <p class="text-gray-600 leading-relaxed">Creating captivating visuals, logos, and branding materials that make your business stand out.</p>
+                        <p class="text-gray-600 leading-relaxed mb-4">Professional visual identity and marketing materials that make your brand stand out.</p>
+                        <ul class="text-gray-700 space-y-2">
+                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> Logo Design</li>
+                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> Brand Identity</li>
+                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> Print Design</li>
+                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> Digital Graphics</li>
+                        </ul>
                     </div>
 
                     <!-- Service Card 4: Social Media Management -->
-                    <div class="service-card bg-white p-8 rounded-lg shadow-md border-b-4 border-brand-blue flex flex-col items-center" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="300">
-                        <div class="text-brand-blue mb-4">
-                            <i data-lucide="share-2" class="w-12 h-12"></i>
+                    <div class="service-card bg-white p-8 rounded-lg shadow-md border-b-4 border-brand-blue flex flex-col items-start text-left" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="300">
+                        <div class="p-4 rounded-full mb-4 icon-bg-pink">
+                            <i data-lucide="share-2" class="w-8 h-8 text-pink-600"></i>
                         </div>
                         <h3 class="text-2xl font-semibold text-brand-black mb-3">Social Media Management</h3>
-                        <p class="text-gray-600 leading-relaxed">Building and maintaining a strong social media presence to engage your audience and grow your brand.</p>
+                        <p class="text-gray-600 leading-relaxed mb-4">Strategic social media presence to engage your audience and grow your brand.</p>
+                        <ul class="text-gray-700 space-y-2">
+                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> Content Creation</li>
+                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> Strategy Planning</li>
+                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> Analytics</li>
+                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> Community Management</li>
+                        </ul>
                     </div>
 
                     <!-- Service Card 5: CV Revamping & Editorial Services -->
-                    <div class="service-card bg-white p-8 rounded-lg shadow-md border-b-4 border-brand-blue flex flex-col items-center" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="400">
-                        <div class="text-brand-blue mb-4">
-                            <i data-lucide="file-text" class="w-12 h-12"></i>
+                    <div class="service-card bg-white p-8 rounded-lg shadow-md border-b-4 border-brand-blue flex flex-col items-start text-left" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="400">
+                        <div class="p-4 rounded-full mb-4 icon-bg-orange">
+                            <i data-lucide="file-text" class="w-8 h-8 text-orange-600"></i>
                         </div>
-                        <h3 class="text-2xl font-semibold text-brand-black mb-3">CV Revamping & Editorial Services</h3>
-                        <p class="text-gray-600 leading-relaxed">Polishing your professional documents and content for maximum impact and clarity.</p>
+                        <h3 class="text-2xl font-semibold text-brand-black mb-3">CV Revamping & Editorial</h3>
+                        <p class="text-gray-600 leading-relaxed mb-4">Professional CV redesign and editorial services to help you land your dream job.</p>
+                        <ul class="text-gray-700 space-y-2">
+                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> Modern Templates</li>
+                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> ATS Optimization</li>
+                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> Content Writing</li>
+                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> Cover Letters</li>
+                        </ul>
                     </div>
 
                     <!-- Service Card 6: Custom Digital Solutions -->
-                    <div class="service-card bg-white p-8 rounded-lg shadow-md border-b-4 border-brand-blue flex flex-col items-center" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="500">
-                        <div class="text-brand-blue mb-4">
-                            <i data-lucide="settings" class="w-12 h-12"></i>
+                    <div class="service-card bg-white p-8 rounded-lg shadow-md border-b-4 border-brand-blue flex flex-col items-start text-left" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="500">
+                        <div class="p-4 rounded-full mb-4 icon-bg-light-blue-purple">
+                            <i data-lucide="zap" class="w-8 h-8 text-indigo-600"></i>
                         </div>
                         <h3 class="text-2xl font-semibold text-brand-black mb-3">Custom Digital Solutions</h3>
-                        <p class="text-gray-600 leading-relaxed">Developing bespoke digital tools and strategies to address your unique business challenges.</p>
+                        <p class="text-gray-600 leading-relaxed mb-4">Tailored digital solutions designed specifically for your unique business needs.</p>
+                        <ul class="text-gray-700 space-y-2">
+                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> Custom Development</li>
+                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> API Integration</li>
+                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> Automation</li>
+                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> Consulting</li>
+                        </ul>
                     </div>
 
                 </div>
@@ -270,6 +373,41 @@
             </div>
         </section>
 
+        <!-- New Section: More Projects & Statistics -->
+        <section id="more-projects-stats" class="py-16 bg-brand-blue text-white">
+            <div class="container mx-auto px-4 md:px-8 lg:px-16 text-center">
+                <!-- More Projects Coming Soon Banner -->
+                <div class="bg-blue-800 p-8 rounded-lg shadow-lg mb-12" data-aos="fade-up" data-aos-duration="1000">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4">More Projects Coming Soon</h2>
+                    <p class="text-lg mb-8 max-w-2xl mx-auto">
+                        We're constantly working on exciting new projects. Check back regularly to see our latest work,
+                        or get in touch to discuss your project requirements.
+                    </p>
+                    <a href="#contact" class="bg-brand-black text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-gray-800 transition duration-300 ease-in-out shadow-lg transform hover:scale-105">Discuss Your Project</a>
+                </div>
+
+                <!-- Statistics Section -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
+                    <div class="p-4" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="100">
+                        <div class="text-5xl font-extrabold text-white mb-2">--</div>
+                        <p class="text-lg text-blue-200">Projects Delivered (Updating Soon)</p>
+                    </div>
+                    <div class="p-4" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
+                        <div class="text-5xl font-extrabold text-white mb-2">--</div>
+                        <p class="text-lg text-blue-200">Happy Clients (Updating Soon)</p>
+                    </div>
+                    <div class="p-4" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="300">
+                        <div class="text-5xl font-extrabold text-white mb-2">--</div>
+                        <p class="text-lg text-blue-200">Success Rate (Updating Soon)</p>
+                    </div>
+                    <div class="p-4" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="400">
+                        <div class="text-5xl font-extrabold text-white mb-2">24/7</div>
+                        <p class="text-lg text-blue-200">Support</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Testimonials Section (Optional) -->
         <section id="testimonials" class="py-16 bg-gray-100">
             <div class="container mx-auto px-4 md:px-8 lg:px-16 text-center">
@@ -293,19 +431,49 @@
                     <!-- Contact Details -->
                     <div class="md:w-1/2 text-left bg-gray-100 p-8 rounded-lg shadow-md" data-aos="fade-right" data-aos-duration="1000">
                         <h3 class="text-2xl font-semibold text-brand-black mb-6">Contact Information</h3>
-                        <p class="flex items-center text-lg text-gray-700 mb-4">
-                            <i data-lucide="mail" class="w-6 h-6 mr-3 text-brand-blue"></i>
-                            Email: <a href="mailto:princealexdigital@gmail.com" class="ml-2 hover:underline">princealexdigital@gmail.com</a>
-                        </p>
-                        <p class="flex items-center text-lg text-gray-700 mb-6">
-                            <i data-lucide="phone" class="w-6 h-6 mr-3 text-brand-blue"></i>
-                            Phone: <a href="tel:+254717384875" class="ml-2 hover:underline">0717384875</a>
-                        </p>
-                        <h3 class="text-2xl font-semibold text-brand-black mb-4">Find Us</h3>
+                        <div class="space-y-6">
+                            <div class="flex items-center">
+                                <div class="p-3 bg-blue-100 rounded-full mr-4">
+                                    <i data-lucide="mail" class="w-6 h-6 text-brand-blue"></i>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-gray-800">Email</p>
+                                    <a href="mailto:princealexdigital@gmail.com" class="text-gray-700 hover:underline">princealexdigital@gmail.com</a>
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="p-3 bg-blue-100 rounded-full mr-4">
+                                    <i data-lucide="phone" class="w-6 h-6 text-brand-blue"></i>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-gray-800">Phone</p>
+                                    <a href="tel:+254717384875" class="text-gray-700 hover:underline">0717384875</a>
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="p-3 bg-blue-100 rounded-full mr-4">
+                                    <i data-lucide="map-pin" class="w-6 h-6 text-brand-blue"></i>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-gray-800">Location</p>
+                                    <p class="text-gray-700">Kenya</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="p-3 bg-blue-100 rounded-full mr-4">
+                                    <i data-lucide="clock" class="w-6 h-6 text-brand-blue"></i>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-gray-800">Business Hours</p>
+                                    <p class="text-gray-700">Mon - Sun: 8AM - 10PM</p>
+                                </div>
+                            </div>
+                        </div>
+                        <h3 class="text-2xl font-semibold text-brand-black mb-4 mt-8">Find Us</h3>
                         <!-- Google Maps Embed Placeholder -->
                         <div class="w-full h-64 bg-gray-200 rounded-lg overflow-hidden shadow-inner">
                             <iframe
-                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15959.043590012224!2d36.81228225!3d-1.286389!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f1172d84d0d5d%3A0xf57297e7f6d3d9a!2sNairobi%2C%20Kenya!5e0!3m2!1sen!2sus!4m2!3m1!1s0x182f1172d84d0d5d%3A0xf57297e7f6d3d9a!5e0!3m2!1sen!2sus!4m2!3m1!1s0x182f1172d84d0d5d%3A0xf57297e7f6d3d9a"
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15959.043590012224!2d36.81228225!3d-1.286389!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f1172d84d0d5d%3A0xf57297e7f6d3d9a!2sNairobi%2C%20Kenya!5e0!3m2!1sen!2sus!4m2!3m1!1s0x182f1172d84d0d5d%3A0xf57297e7f6d3d9a"
                                 width="100%"
                                 height="100%"
                                 style="border:0;"
@@ -318,21 +486,25 @@
 
                     <!-- Contact Form -->
                     <div class="md:w-1/2 text-left bg-gray-100 p-8 rounded-lg shadow-md" data-aos="fade-left" data-aos-duration="1000">
-                        <h3 class="text-2xl font-semibold text-brand-black mb-6">Send Us a Message</h3>
+                        <h3 class="text-2xl font-semibold text-brand-black mb-2">Send us a Message</h3>
+                        <p class="text-gray-600 mb-6">Fill out the form below and we'll get back to you within 24 hours.</p>
                         <form action="#" method="POST" class="space-y-6">
                             <div>
-                                <label for="name" class="block text-gray-700 text-sm font-bold mb-2">Name</label>
-                                <input type="text" id="name" name="name" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-brand-blue focus:border-transparent" placeholder="Your Name" required>
+                                <label for="full-name" class="block text-gray-700 text-sm font-bold mb-2">Full Name *</label>
+                                <input type="text" id="full-name" name="full-name" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-brand-blue focus:border-transparent" placeholder="Enter your full name" required>
                             </div>
                             <div>
-                                <label for="email" class="block text-gray-700 text-sm font-bold mb-2">Email</label>
-                                <input type="email" id="email" name="email" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-brand-blue focus:border-transparent" placeholder="your@example.com" required>
+                                <label for="email-address" class="block text-gray-700 text-sm font-bold mb-2">Email Address *</label>
+                                <input type="email" id="email-address" name="email-address" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-brand-blue focus:border-transparent" placeholder="Enter your email" required>
                             </div>
                             <div>
-                                <label for="message" class="block text-gray-700 text-sm font-bold mb-2">Message</label>
-                                <textarea id="message" name="message" rows="6" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-brand-blue focus:border-transparent" placeholder="Your message..." required></textarea>
+                                <label for="project-details" class="block text-gray-700 text-sm font-bold mb-2">Project Details *</label>
+                                <textarea id="project-details" name="project-details" rows="6" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-brand-blue focus:border-transparent" placeholder="Tell us about your project requirements, goals, and any specific details..." required></textarea>
                             </div>
-                            <button type="submit" class="bg-brand-blue text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-blue-700 transition duration-300 ease-in-out shadow-lg transform hover:scale-105 w-full md:w-auto">Send Message</button>
+                            <button type="submit" class="bg-brand-blue text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition duration-300 ease-in-out shadow-lg transform hover:scale-105 flex items-center justify-center">
+                                Send Message
+                                <i data-lucide="send" class="w-5 h-5 ml-2"></i>
+                            </button>
                         </form>
                     </div>
                 </div>
@@ -420,20 +592,5 @@
         id="R1TiiZ1iAxEt-Oy6PjEEF"
         defer>
     </script>
-
-<!-- Chatbase AI Assistant Script - Safe Loading -->
-<script>
-    window.addEventListener("load", function () {
-        window.chatbaseConfig = {
-            chatbotId: "R1TiiZ1iAxEt-Oy6PjEEF",
-        };
-        const script = document.createElement("script");
-        script.src = "https://www.chatbase.co/embed.min.js";
-        script.id = "chatbase-script";
-        script.defer = true;
-        document.body.appendChild(script);
-    });
-</script>
-
 </body>
 </html>
