@@ -4,16 +4,208 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prince Alex Digital - Digital Solutions That Transform Your Brand</title>
-    <!-- Tailwind CSS CDN -->
+
+    <!-- Preconnect to necessary origins for faster resource loading -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://www.chatbase.co">
+    <link rel="preconnect" href="https://www.gstatic.com"> <!-- Added for Firebase -->
+
+    <!-- Google Fonts - Inter (Preload for faster display) -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"></noscript>
+
+    <!-- Tailwind CSS CDN (Keep at top for FCP) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts - Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Lucide Icons CDN -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Font Awesome for social media icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- AOS Animate On Scroll Library -->
+
+    <!-- Font Awesome for social media icons (defer loading) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" defer>
+
+    <!-- AOS Animate On Scroll Library (defer loading) -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <!-- Firebase SDK (defer loading) -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+        import { getFirestore, collection, doc, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCW0BqYOirnrPRkgvSvtSjK2-OGVTa71uQ",
+            authDomain: "princealexdigital-4848c.firebaseapp.com",
+            projectId: "princealexdigital-4848c",
+            storageBucket: "princealexdigital-4848c.firebasestorage.app",
+            messagingSenderId: "1316427677",
+            appId: "1:1316427677:web:21bdffbf2095d1d5064174"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // Global variables for app ID and user ID
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        let userId = null; // Will be set after authentication
+
+        // Authenticate anonymously
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                userId = user.uid;
+                console.log("Authenticated with Firebase. User ID:", userId);
+                // Call functions to load data after authentication
+                loadPortfolioItems();
+                loadTestimonials();
+                loadStatistics();
+            } else {
+                try {
+                    // Sign in anonymously if not already authenticated
+                    await signInAnonymously(auth);
+                    console.log("Signed in anonymously.");
+                } catch (error) {
+                    console.error("Error signing in anonymously:", error);
+                }
+            }
+        });
+
+
+        // Function to load portfolio items
+        function loadPortfolioItems() {
+            const portfolioContainer = document.getElementById('portfolio-items-container');
+            if (!portfolioContainer) return;
+
+            const portfolioCollectionRef = collection(db, `artifacts/${appId}/public/data/portfolio`);
+
+            onSnapshot(portfolioCollectionRef, (snapshot) => {
+                portfolioContainer.innerHTML = ''; // Clear existing items
+                snapshot.forEach((doc) => {
+                    const item = doc.data();
+                    const portfolioItemHTML = `
+                        <div class="portfolio-item bg-gray-100 rounded-lg shadow-md overflow-hidden" data-aos="fade-up" data-aos-duration="1000">
+                            <img src="${item.imageUrl || 'https://placehold.co/600x400/1c4ed8/ffffff?text=Project+Image'}" alt="${item.title} Mockup" class="w-full h-48 object-cover" loading="lazy" width="600" height="400">
+                            <div class="p-6">
+                                <h3 class="text-xl font-semibold text-brand-black mb-2">${item.title}</h3>
+                                <p class="text-gray-600 mb-4">${item.description}</p>
+                                <a href="${item.link}" target="_blank" class="text-brand-blue hover:underline font-medium">${item.linkText || 'View Details'}</a>
+                            </div>
+                        </div>
+                    `;
+                    portfolioContainer.insertAdjacentHTML('beforeend', portfolioItemHTML);
+                });
+            }, (error) => {
+                console.error("Error fetching portfolio items:", error);
+            });
+        }
+
+        // Function to load testimonials
+        function loadTestimonials() {
+            const testimonialText = document.getElementById('testimonial-text');
+            const testimonialAuthor = document.getElementById('testimonial-author');
+            const testimonialCompany = document.getElementById('testimonial-company');
+
+            if (!testimonialText || !testimonialAuthor || !testimonialCompany) return;
+
+            const testimonialsCollectionRef = collection(db, `artifacts/${appId}/public/data/testimonials`);
+
+            // For simplicity, we'll just display the latest testimonial
+            // In a real app, you might cycle through them or have a dedicated section for all.
+            onSnapshot(testimonialsCollectionRef, (snapshot) => {
+                if (!snapshot.empty) {
+                    // Get the last testimonial added (assuming order by timestamp if added)
+                    const latestTestimonialDoc = snapshot.docs[snapshot.docs.length - 1];
+                    const testimonial = latestTestimonialDoc.data();
+                    testimonialText.textContent = `"${testimonial.quote}"`;
+                    testimonialAuthor.textContent = `- ${testimonial.author}`;
+                    testimonialCompany.textContent = testimonial.company;
+                } else {
+                    testimonialText.textContent = "No testimonials yet. Be the first!";
+                    testimonialAuthor.textContent = "";
+                    testimonialCompany.textContent = "";
+                }
+            }, (error) => {
+                console.error("Error fetching testimonials:", error);
+            });
+        }
+
+        // Function to load statistics
+        function loadStatistics() {
+            const projectsDelivered = document.getElementById('projects-delivered');
+            const happyClients = document.getElementById('happy-clients');
+            const successRate = document.getElementById('success-rate');
+
+            if (!projectsDelivered || !happyClients || !successRate) return;
+
+            const statsDocRef = doc(db, `artifacts/${appId}/public/data/statistics/currentStats`);
+
+            onSnapshot(statsDocRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const stats = docSnap.data();
+                    projectsDelivered.textContent = stats.projects || '--';
+                    happyClients.textContent = stats.clients || '--';
+                    successRate.textContent = stats.successRate || '--';
+                } else {
+                    projectsDelivered.textContent = '--';
+                    happyClients.textContent = '--';
+                    successRate.textContent = '--';
+                    console.log("No statistics data found.");
+                }
+            }, (error) => {
+                console.error("Error fetching statistics:", error);
+            });
+        }
+
+        // Handle contact form submission
+        document.addEventListener('DOMContentLoaded', () => {
+            const contactForm = document.getElementById('contact-form');
+            const contactMessageDiv = document.getElementById('contact-message');
+
+            if (contactForm) {
+                contactForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+
+                    const fullName = document.getElementById('full-name').value;
+                    const emailAddress = document.getElementById('email-address').value;
+                    const projectDetails = document.getElementById('project-details').value;
+
+                    if (!fullName || !emailAddress || !projectDetails) {
+                        contactMessageDiv.textContent = "Please fill in all fields.";
+                        contactMessageDiv.classList.remove('hidden', 'text-green-500');
+                        contactMessageDiv.classList.add('text-red-500');
+                        return;
+                    }
+
+                    try {
+                        await addDoc(collection(db, `artifacts/${appId}/public/data/messages`), {
+                            fullName: fullName,
+                            emailAddress: emailAddress,
+                            projectDetails: projectDetails,
+                            timestamp: serverTimestamp()
+                        });
+
+                        contactForm.reset();
+                        contactMessageDiv.textContent = "Your message has been sent successfully!";
+                        contactMessageDiv.classList.remove('hidden', 'text-red-500');
+                        contactMessageDiv.classList.add('text-green-500');
+                        setTimeout(() => {
+                            contactMessageDiv.classList.add('hidden');
+                        }, 5000); // Hide message after 5 seconds
+                    } catch (error) {
+                        console.error("Error sending message:", error);
+                        contactMessageDiv.textContent = "Failed to send message. Please try again.";
+                        contactMessageDiv.classList.remove('hidden', 'text-green-500');
+                        contactMessageDiv.classList.add('text-red-500');
+                    }
+                });
+            }
+        });
+    </script>
+
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -77,11 +269,11 @@
         <nav class="container mx-auto flex justify-between items-center">
             <!-- Logo -->
             <a href="#hero" class="text-2xl font-bold text-white flex items-center">
-                <img src="mylogo.png" alt="Prince Alex Digital Logo" class="mr-2 rounded-full w-10 h-10 object-contain">
+                <img src="mylogo.png" alt="Prince Alex Digital Logo" class="mr-2 rounded-full w-10 h-10 object-contain" loading="lazy" width="40" height="40">
                 Prince Alex Digital
             </a>
             <!-- Mobile Menu Button -->
-            <div class="md:hidden">
+            <div class="block md:hidden">
                 <button id="mobile-menu-button" class="text-white focus:outline-none">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
@@ -90,21 +282,21 @@
             </div>
             <!-- Desktop Navigation -->
             <ul class="hidden md:flex space-x-6 text-lg">
-                <li><a href="#hero" class="hover:text-brand-blue transition duration-300">Home</a></li>
-                <li><a href="#about" class="hover:text-brand-blue transition duration-300">About</a></li>
-                <li><a href="#services" class="hover:text-brand-blue transition duration-300">Services</a></li>
-                <li><a href="#portfolio" class="hover:text-brand-blue transition duration-300">Portfolio</a></li>
-                <li><a href="#contact" class="hover:text-brand-blue transition duration-300">Contact</a></li>
+                <li><a href="#hero" class="nav-link hover:text-brand-blue transition duration-300">Home</a></li>
+                <li><a href="#about" class="nav-link hover:text-brand-blue transition duration-300">About</a></li>
+                <li><a href="#services" class="nav-link hover:text-brand-blue transition duration-300">Services</a></li>
+                <li><a href="#portfolio" class="nav-link hover:text-brand-blue transition duration-300">Portfolio</a></li>
+                <li><a href="#contact" class="nav-link hover:text-brand-blue transition duration-300">Contact</a></li>
             </ul>
         </nav>
         <!-- Mobile Menu Overlay -->
         <div id="mobile-menu" class="md:hidden hidden bg-brand-black absolute top-full left-0 w-full py-4 shadow-lg">
             <ul class="flex flex-col items-center space-y-4">
-                <li><a href="#hero" class="block text-white text-lg hover:text-brand-blue transition duration-300 py-2" onclick="toggleMobileMenu()">Home</a></li>
-                <li><a href="#about" class="block text-white text-lg hover:text-brand-blue transition duration-300 py-2" onclick="toggleMobileMenu()">About</a></li>
-                <li><a href="#services" class="block text-white text-lg hover:text-brand-blue transition duration-300 py-2" onclick="toggleMobileMenu()">Services</a></li>
-                <li><a href="#portfolio" class="block text-white text-lg hover:text-brand-blue transition duration-300 py-2" onclick="toggleMobileMenu()">Portfolio</a></li>
-                <li><a href="#contact" class="block text-white text-lg hover:text-brand-blue transition duration-300 py-2" onclick="toggleMobileMenu()">Contact</a></li>
+                <li><a href="#hero" class="nav-link block text-white text-lg hover:text-brand-blue transition duration-300 py-2" onclick="toggleMobileMenu()">Home</a></li>
+                <li><a href="#about" class="nav-link block text-white text-lg hover:text-brand-blue transition duration-300 py-2" onclick="toggleMobileMenu()">About</a></li>
+                <li><a href="#services" class="nav-link block text-white text-lg hover:text-brand-blue transition duration-300 py-2" onclick="toggleMobileMenu()">Services</a></li>
+                <li><a href="#portfolio" class="nav-link block text-white text-lg hover:text-brand-blue transition duration-300 py-2" onclick="toggleMobileMenu()">Portfolio</a></li>
+                <li><a href="#contact" class="nav-link block text-white text-lg hover:text-brand-blue transition duration-300 py-2" onclick="toggleMobileMenu()">Contact</a></li>
             </ul>
         </div>
     </header>
@@ -117,10 +309,10 @@
             <div class="absolute inset-0 bg-gradient-to-r from-brand-black to-transparent opacity-70"></div>
 
             <div class="relative z-10 text-center px-4" data-aos="fade-up" data-aos-duration="1000">
-                <img src="mylogo.png" alt="Prince Alex Digital Logo" class="mx-auto mb-6 rounded-full shadow-lg w-24 h-24 object-contain">
+                <img src="mylogo.png" alt="Prince Alex Digital Logo" class="mx-auto mb-6 rounded-full shadow-lg w-24 h-24 object-contain" loading="lazy" width="96" height="96">
                 <h1 class="text-4xl md:text-6xl font-extrabold leading-tight mb-4">Digital Solutions That Transform Your Brand</h1>
                 <p class="text-lg md:text-xl max-w-2xl mx-auto mb-8">Led by Alex Senerwa, we bring powerful design and tech together to grow your business online.</p>
-                <a href="#contact" class="bg-brand-blue text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-blue-700 transition duration-300 ease-in-out shadow-lg transform hover:scale-105">Get Started</a>
+                <a href="#contact" class="nav-link bg-brand-blue text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-blue-700 transition duration-300 ease-in-out shadow-lg transform hover:scale-105">Get Started</a>
             </div>
         </section>
 
@@ -134,10 +326,7 @@
                 </p>
                 <div class="flex flex-col items-center" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
                     <div class="relative mb-6">
-                        <img src="founder.jpg" alt="Alex Senerwa Keverenge" class="rounded-lg shadow-xl object-cover w-64 h-64 md:w-80 md:h-80 border-4 border-brand-blue">
-                        <div class="absolute -bottom-4 -right-4 p-3 bg-brand-blue rounded-full shadow-lg">
-                            <i data-lucide="user" class="w-8 h-8 text-white"></i>
-                        </div>
+                        <img src="founder.jpg" alt="Alex Senerwa Keverenge" class="rounded-lg shadow-xl object-cover w-64 h-64 md:w-80 md:h-80 border-4 border-brand-blue" loading="lazy" width="320" height="320">
                     </div>
                     <h3 class="text-3xl font-bold text-brand-black mb-2">Alex Senerwa Keverenge</h3>
                     <p class="text-lg text-brand-blue font-medium mb-8">Founder & Digital Solutions Expert</p>
@@ -307,68 +496,9 @@
         <section id="portfolio" class="py-16 bg-white">
             <div class="container mx-auto px-4 md:px-8 lg:px-16 text-center">
                 <h2 class="text-4xl font-bold text-brand-black mb-12" data-aos="fade-down" data-aos-duration="1000">Our Recent Work</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-
-                    <!-- Portfolio Item 1 -->
-                    <div class="portfolio-item bg-gray-100 rounded-lg shadow-md overflow-hidden" data-aos="fade-up" data-aos-duration="1000">
-                        <img src="https://placehold.co/600x400/1c4ed8/ffffff?text=Project+1" alt="Project 1 Mockup" class="w-full h-48 object-cover">
-                        <div class="p-6">
-                            <h3 class="text-xl font-semibold text-brand-black mb-2">E-commerce Website Redesign</h3>
-                            <p class="text-gray-600 mb-4">A modern, responsive e-commerce platform with enhanced user experience.</p>
-                            <a href="#" class="text-brand-blue hover:underline font-medium">View Details</a>
-                        </div>
-                    </div>
-
-                    <!-- Portfolio Item 2 -->
-                    <div class="portfolio-item bg-gray-100 rounded-lg shadow-md overflow-hidden" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="100">
-                        <img src="https://placehold.co/600x400/1c4ed8/ffffff?text=Project+2" alt="Project 2 Mockup" class="w-full h-48 object-cover">
-                        <div class="p-6">
-                            <h3 class="text-xl font-semibold text-brand-black mb-2">Brand Identity & Logo Design</h3>
-                            <p class="text-gray-600 mb-4">Developed a fresh and memorable brand identity for a startup.</p>
-                            <a href="#" class="text-brand-blue hover:underline font-medium">View Details</a>
-                        </div>
-                    </div>
-
-                    <!-- Portfolio Item 3 -->
-                    <div class="portfolio-item bg-gray-100 rounded-lg shadow-md overflow-hidden" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
-                        <img src="https://placehold.co/600x400/1c4ed8/ffffff?text=Project+3" alt="Project 3 Mockup" class="w-full h-48 object-cover">
-                        <div class="p-6">
-                            <h3 class="text-xl font-semibold text-brand-black mb-2">Social Media Campaign</h3>
-                            <p class="text-gray-600 mb-4">Executed a successful social media campaign increasing engagement by 40%.</p>
-                            <a href="#" class="text-brand-blue hover:underline font-medium">View Details</a>
-                        </div>
-                    </div>
-
-                    <!-- Portfolio Item 4 -->
-                    <div class="portfolio-item bg-gray-100 rounded-lg shadow-md overflow-hidden" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="300">
-                        <img src="https://placehold.co/600x400/1c4ed8/ffffff?text=Project+4" alt="Project 4 Mockup" class="w-full h-48 object-cover">
-                        <div class="p-6">
-                            <h3 class="text-xl font-semibold text-brand-black mb-2">Custom Web Application</h3>
-                            <p class="text-gray-600 mb-4">Developed a tailored web application to streamline client operations.</p>
-                            <a href="#" class="text-brand-blue hover:underline font-medium">View Details</a>
-                        </div>
-                    </div>
-
-                    <!-- Portfolio Item 5 -->
-                    <div class="portfolio-item bg-gray-100 rounded-lg shadow-md overflow-hidden" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="400">
-                        <img src="https://placehold.co/600x400/1c4ed8/ffffff?text=Project+5" alt="Project 5 Mockup" class="w-full h-48 object-cover">
-                        <div class="p-6">
-                            <h3 class="text-xl font-semibold text-brand-black mb-2">Digital Marketing Strategy</h3>
-                            <p class="text-gray-600 mb-4">Comprehensive digital marketing strategy for a new product launch.</p>
-                            <a href="#" class="text-brand-blue hover:underline font-medium">View Details</a>
-                        </div>
-                    </div>
-
-                    <!-- Portfolio Item 6 -->
-                    <div class="portfolio-item bg-gray-100 rounded-lg shadow-md overflow-hidden" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="500">
-                        <img src="https://placehold.co/600x400/1c4ed8/ffffff?text=Project+6" alt="Project 6 Mockup" class="w-full h-48 object-cover">
-                        <div class="p-6">
-                            <h3 class="text-xl font-semibold text-brand-black mb-2">CV & Resume Optimization</h3>
-                            <p class="text-gray-600 mb-4">Helped clients land interviews with professionally revamped CVs.</p>
-                            <a href="#" class="text-brand-blue hover:underline font-medium">View Details</a>
-                        </div>
-                    </div>
-
+                <div id="portfolio-items-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Portfolio items will be loaded here from Firestore -->
+                    <p>Loading portfolio items...</p>
                 </div>
             </div>
         </section>
@@ -383,22 +513,22 @@
                         We're constantly working on exciting new projects. Check back regularly to see our latest work,
                         or get in touch to discuss your project requirements.
                     </p>
-                    <a href="#contact" class="bg-brand-black text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-gray-800 transition duration-300 ease-in-out shadow-lg transform hover:scale-105">Discuss Your Project</a>
+                    <a href="#contact" class="nav-link bg-brand-black text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-gray-800 transition duration-300 ease-in-out shadow-lg transform hover:scale-105">Discuss Your Project</a>
                 </div>
 
                 <!-- Statistics Section -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
                     <div class="p-4" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="100">
-                        <div class="text-5xl font-extrabold text-white mb-2">--</div>
-                        <p class="text-lg text-blue-200">Projects Delivered (Updating Soon)</p>
+                        <div id="projects-delivered" class="text-5xl font-extrabold text-white mb-2">--</div>
+                        <p class="text-lg text-blue-200">Projects Delivered</p>
                     </div>
                     <div class="p-4" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
-                        <div class="text-5xl font-extrabold text-white mb-2">--</div>
-                        <p class="text-lg text-blue-200">Happy Clients (Updating Soon)</p>
+                        <div id="happy-clients" class="text-5xl font-extrabold text-white mb-2">--</div>
+                        <p class="text-lg text-blue-200">Happy Clients</p>
                     </div>
                     <div class="p-4" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="300">
-                        <div class="text-5xl font-extrabold text-white mb-2">--</div>
-                        <p class="text-lg text-blue-200">Success Rate (Updating Soon)</p>
+                        <div id="success-rate" class="text-5xl font-extrabold text-white mb-2">--</div>
+                        <p class="text-lg text-blue-200">Success Rate</p>
                     </div>
                     <div class="p-4" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="400">
                         <div class="text-5xl font-extrabold text-white mb-2">24/7</div>
@@ -413,11 +543,11 @@
             <div class="container mx-auto px-4 md:px-8 lg:px-16 text-center">
                 <h2 class="text-4xl font-bold text-brand-black mb-12" data-aos="fade-down" data-aos-duration="1000">What Our Clients Say</h2>
                 <div class="max-w-3xl mx-auto" data-aos="fade-up" data-aos-duration="1000">
-                    <p class="text-lg text-gray-700 italic mb-6">
-                        "Prince Alex Digital transformed our online presence. Their expertise in web design and social media management is unparalleled. Highly recommend!"
+                    <p id="testimonial-text" class="text-lg text-gray-700 italic mb-6">
+                        Loading testimonials...
                     </p>
-                    <p class="font-semibold text-brand-black">- Satisfied Client Name</p>
-                    <p class="text-gray-500">CEO, Company XYZ</p>
+                    <p id="testimonial-author" class="font-semibold text-brand-black"></p>
+                    <p id="testimonial-company" class="text-gray-500"></p>
                     <p class="mt-8 text-gray-600">More testimonials coming soon!</p>
                 </div>
             </div>
@@ -488,7 +618,7 @@
                     <div class="md:w-1/2 text-left bg-gray-100 p-8 rounded-lg shadow-md" data-aos="fade-left" data-aos-duration="1000">
                         <h3 class="text-2xl font-semibold text-brand-black mb-2">Send us a Message</h3>
                         <p class="text-gray-600 mb-6">Fill out the form below and we'll get back to you within 24 hours.</p>
-                        <form action="#" method="POST" class="space-y-6">
+                        <form id="contact-form" action="#" method="POST" class="space-y-6">
                             <div>
                                 <label for="full-name" class="block text-gray-700 text-sm font-bold mb-2">Full Name *</label>
                                 <input type="text" id="full-name" name="full-name" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-brand-blue focus:border-transparent" placeholder="Enter your full name" required>
@@ -505,6 +635,7 @@
                                 Send Message
                                 <i data-lucide="send" class="w-5 h-5 ml-2"></i>
                             </button>
+                            <div id="contact-message" class="mt-4 text-center hidden"></div>
                         </form>
                     </div>
                 </div>
@@ -518,17 +649,17 @@
             <div class="flex flex-col md:flex-row justify-between items-center mb-8">
                 <!-- Logo -->
                 <a href="#hero" class="text-2xl font-bold text-white flex items-center mb-4 md:mb-0">
-                    <img src="mylogo.png" alt="Prince Alex Digital Logo" class="mr-2 rounded-full w-10 h-10 object-contain">
+                    <img src="mylogo.png" alt="Prince Alex Digital Logo" class="mr-2 rounded-full w-10 h-10 object-contain" loading="lazy" width="40" height="40">
                     Prince Alex Digital
                 </a>
 
                 <!-- Quick Navigation Links -->
                 <ul class="flex flex-wrap justify-center md:justify-start space-x-6 text-lg mb-4 md:mb-0">
-                    <li><a href="#hero" class="hover:text-brand-blue transition duration-300">Home</a></li>
-                    <li><a href="#about" class="hover:text-brand-blue transition duration-300">About</a></li>
-                    <li><a href="#services" class="hover:text-brand-blue transition duration-300">Services</a></li>
-                    <li><a href="#portfolio" class="hover:text-brand-blue transition duration-300">Portfolio</a></li>
-                    <li><a href="#contact" class="hover:text-brand-blue transition duration-300">Contact</a></li>
+                    <li><a href="#hero" class="nav-link hover:text-brand-blue transition duration-300">Home</a></li>
+                    <li><a href="#about" class="nav-link hover:text-brand-blue transition duration-300">About</a></li>
+                    <li><a href="#services" class="nav-link hover:text-brand-blue transition duration-300">Services</a></li>
+                    <li><a href="#portfolio" class="nav-link hover:text-brand-blue transition duration-300">Portfolio</a></li>
+                    <li><a href="#contact" class="nav-link hover:text-brand-blue transition duration-300">Contact</a></li>
                 </ul>
 
                 <!-- Social Media Icons -->
@@ -552,45 +683,72 @@
     </footer>
 
     <!-- AOS Initialization -->
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js" defer></script>
+    <!-- Lucide Icons CDN (defer loading) -->
+    <script src="https://unpkg.com/lucide@latest" defer></script>
     <script>
-        AOS.init({
-            once: true, // whether animation should happen only once - while scrolling down
-            mirror: false, // whether elements should animate out while scrolling past them
-            duration: 1000, // values from 0 to 3000, with step 50ms
-            easing: 'ease-out-cubic', // default easing for AOS animations
-        });
+        // Use DOMContentLoaded to ensure all scripts and elements are loaded before execution
+        document.addEventListener('DOMContentLoaded', () => {
+            AOS.init({
+                once: true, // whether animation should happen only once - while scrolling down
+                mirror: false, // whether elements should animate out while scrolling past them
+                duration: 1000, // values from 0 to 3000, with step 50ms
+                easing: 'ease-out-cubic', // default easing for AOS animations
+            });
 
-        // Initialize Lucide icons
-        lucide.createIcons();
-
-        // Mobile menu toggle functionality
-        const mobileMenuButton = document.getElementById('mobile-menu-button');
-        const mobileMenu = document.getElementById('mobile-menu');
-
-        function toggleMobileMenu() {
-            mobileMenu.classList.toggle('hidden');
-        }
-
-        mobileMenuButton.addEventListener('click', toggleMobileMenu);
-
-        // Close mobile menu when clicking outside (optional, but good UX)
-        document.addEventListener('click', function(event) {
-            if (!mobileMenu.contains(event.target) && !mobileMenuButton.contains(event.target) && !mobileMenu.classList.contains('hidden')) {
-                mobileMenu.classList.add('hidden');
+            // Initialize Lucide icons
+            // Check if lucide is defined before calling createIcons
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            } else {
+                console.warn("Lucide library not found. Icons may not render correctly.");
             }
+
+            // Mobile menu toggle functionality
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            function toggleMobileMenu() {
+                mobileMenu.classList.toggle('hidden');
+            }
+
+            mobileMenuButton.addEventListener('click', toggleMobileMenu);
+
+            // Close mobile menu when clicking outside (optional, but good UX)
+            document.addEventListener('click', function(event) {
+                if (!mobileMenu.contains(event.target) && !mobileMenuButton.contains(event.target) && !mobileMenu.classList.contains('hidden')) {
+                    mobileMenu.classList.add('hidden');
+                }
+            });
+
+            // Smooth scroll without hash in URL
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault(); // Prevent default anchor click behavior
+
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+
+                    if (targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
         });
     </script>
     <!-- Chatbase AI Assistant Script -->
-    <script>
-        window.chatbaseConfig = {
-            chatbotId: "R1TiiZ1iAxEt-Oy6PjEEF",
-        }
-    </script>
     <script
         src="https://www.chatbase.co/embed.min.js"
         id="R1TiiZ1iAxEt-Oy6PjEEF"
         defer>
+    </script>
+    <script>
+        // Ensure chatbaseConfig is defined before the chatbase script loads
+        window.chatbaseConfig = {
+            chatbotId: "R1TiiZ1iAxEt-Oy6PjEEF",
+        };
     </script>
 </body>
 </html>
