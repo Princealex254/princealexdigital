@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,12 +24,18 @@
       deleteDoc,
       updateDoc,
     } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+    import {
+      getStorage,
+      ref,
+      uploadBytes,
+      getDownloadURL,
+    } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-storage.js"; // Import Firebase Storage
 
     const firebaseConfig = {
       apiKey: "AIzaSyCW0BqYOirnrPRkgvSvtSjK2-OGVTa71uQ",
       authDomain: "princealexdigital-4848c.firebaseapp.com",
       projectId: "princealexdigital-4848c",
-      storageBucket: "princealexdigital-4848c.appspot.com",
+      storageBucket: "princealexdigital-4848c.appspot.com", // Make sure this is present
       messagingSenderId: "1316427677",
       appId: "1:1316427677:web:21bdffbf2095d1d5064174"
     };
@@ -38,6 +43,7 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
+    const storage = getStorage(app); // Initialize Firebase Storage
     const appId = "default-app-id";
 
     const loginForm = document.getElementById("login-form");
@@ -109,17 +115,39 @@
     // Portfolio
     const portfolioList = document.getElementById("portfolio-list");
     const portfolioForm = document.getElementById("portfolio-form");
+    const portfolioImageInput = document.getElementById("portfolio-image-upload"); // New image input
+    let uploadedImageUrl = ""; // To store the URL after upload
+
+    portfolioImageInput.addEventListener("change", async (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const storageRef = ref(storage, `portfolio-images/${file.name}`);
+        try {
+          await uploadBytes(storageRef, file);
+          uploadedImageUrl = await getDownloadURL(storageRef);
+          alert("Image uploaded successfully!");
+        } catch (error) {
+          alert("Image upload failed: " + error.message);
+        }
+      }
+    });
 
     portfolioForm.addEventListener("submit", async (e) => {
       e.preventDefault();
+      if (!uploadedImageUrl) {
+        alert("Please upload an image first.");
+        return;
+      }
       await addDoc(collection(db, `artifacts/${appId}/public/data/portfolio`), {
         title: portfolioForm.title.value,
         description: portfolioForm.description.value,
         link: portfolioForm.link.value,
-        imageUrl: portfolioForm.imageUrl.value,
+        imageUrl: uploadedImageUrl, // Use the uploaded URL
         linkText: portfolioForm.linkText.value || "View Project",
       });
       portfolioForm.reset();
+      portfolioImageInput.value = ""; // Clear the file input
+      uploadedImageUrl = ""; // Reset the URL
     });
 
     function loadPortfolio() {
@@ -132,7 +160,9 @@
             <div class="border p-4 rounded shadow mb-2">
               <p><strong>${data.title}</strong></p>
               <p>${data.description}</p>
-              <button onclick="deletePortfolio('${docSnap.id}')" class="text-red-600 text-sm mt-2">Delete</button>
+              ${data.imageUrl ? `<img src="${data.imageUrl}" alt="${data.title}" class="w-full h-32 object-cover mt-2 mb-2">` : ''}
+              <a href="${data.link}" target="_blank" class="text-blue-600 hover:underline">${data.linkText}</a>
+              <button onclick="deletePortfolio('${docSnap.id}')" class="text-red-600 text-sm mt-2 block">Delete</button>
             </div>
           `;
         });
@@ -228,10 +258,9 @@
       <form id="portfolio-form" class="grid gap-4 max-w-md mb-4">
         <input name="title" placeholder="Project Title" required class="p-2 border rounded" />
         <input name="description" placeholder="Project Description" required class="p-2 border rounded" />
-        <input name="imageUrl" placeholder="Image URL" required class="p-2 border rounded" />
-        <input name="link" placeholder="Project Link" required class="p-2 border rounded" />
+        <input type="file" id="portfolio-image-upload" accept="image/*" class="p-2 border rounded" /> <input name="link" placeholder="Project Link" required class="p-2 border rounded" />
         <input name="linkText" placeholder="Link Text (optional)" class="p-2 border rounded" />
-        <button class="bg-green-600 text-white p-2 rounded">Add Project</button>
+        <button type="submit" class="bg-green-600 text-white p-2 rounded">Add Project</button>
       </form>
       <div id="portfolio-list"></div>
     </section>
