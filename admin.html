@@ -1,6 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prince Alex Digital - Admin Panel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f9fafb;
+      color: #1f2937;
+    }
+    .bg-brand {
+      background-color: #1c4ed8;
+    }
+    .text-brand {
+      color: #1c4ed8;
+    }
+    .card {
+      @apply bg-white rounded-2xl shadow-xl p-6 mb-8;
+    }
+    .btn {
+      @apply rounded-lg px-5 py-2 font-medium transition duration-300 ease-in-out;
+    }
+    .btn-primary {
+      @apply bg-brand text-white hover:bg-blue-700 shadow-md;
+    }
+    .btn-secondary {
+      @apply bg-gray-100 text-gray-800 hover:bg-gray-200 shadow-sm;
+    }
+    .btn-danger {
+      @apply bg-red-600 text-white hover:bg-red-700 shadow-md;
+    }
+    input, textarea {
+      @apply w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand focus:outline-none;
+    }
+    .list-item {
+      @apply bg-gray-50 border border-gray-200 p-5 rounded-xl flex flex-col md:flex-row justify-between gap-4;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prince Alex Digital - Admin Panel</title>
@@ -612,5 +659,9 @@
             }
         });
     </script>
+</body>
+</html>
+
+
 </body>
 </html>
