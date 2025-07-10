@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,6 +6,7 @@
   <title>Admin Dashboard - Prince Alex Digital</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script type="module">
+    // Import Firebase services
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
     import {
       getAuth,
@@ -24,8 +24,16 @@
       addDoc,
       deleteDoc,
       updateDoc,
+      serverTimestamp, // Import serverTimestamp for consistent timestamps
     } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+    import {
+      getStorage,
+      ref,
+      uploadBytes,
+      getDownloadURL,
+    } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-storage.js"; // Import Firebase Storage
 
+    // Firebase configuration (from your provided code)
     const firebaseConfig = {
       apiKey: "AIzaSyCW0BqYOirnrPRkgvSvtSjK2-OGVTa71uQ",
       authDomain: "princealexdigital-4848c.firebaseapp.com",
@@ -35,42 +43,69 @@
       appId: "1:1316427677:web:21bdffbf2095d1d5064174"
     };
 
+    // Initialize Firebase services
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
-    const appId = "default-app-id";
+    const storage = getStorage(app); // Initialize Firebase Storage
 
+    // Get the dynamic app ID from the environment if available, otherwise use a default
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+    // DOM elements
     const loginForm = document.getElementById("login-form");
     const dashboard = document.getElementById("dashboard");
     const loginPage = document.getElementById("login-page");
     const logoutBtn = document.getElementById("logout-btn");
+    const loadingIndicator = document.getElementById("loading-indicator"); // Loading indicator element
 
-    loginForm.addEventListener("submit", (e) => {
+    // Function to show loading indicator
+    function showLoading() {
+      loadingIndicator.classList.remove("hidden");
+    }
+
+    // Function to hide loading indicator
+    function hideLoading() {
+      loadingIndicator.classList.add("hidden");
+    }
+
+    // --- Authentication Logic ---
+    loginForm.addEventListener("submit", async (e) => {
       e.preventDefault();
+      showLoading(); // Show loading indicator
       const email = loginForm.email.value;
       const password = loginForm.password.value;
 
-      signInWithEmailAndPassword(auth, email, password)
-        .then(() => {
-          loginPage.classList.add("hidden");
-          dashboard.classList.remove("hidden");
-        })
-        .catch((error) => {
-          alert("Login failed: " + error.message);
-        });
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        // UI update handled by onAuthStateChanged
+      } catch (error) {
+        // Use a custom modal or message box instead of alert()
+        displayMessage("Login failed: " + error.message, "error");
+      } finally {
+        hideLoading(); // Hide loading indicator
+      }
     });
 
-    logoutBtn.addEventListener("click", () => {
-      signOut(auth).then(() => {
-        dashboard.classList.add("hidden");
-        loginPage.classList.remove("hidden");
-      });
+    logoutBtn.addEventListener("click", async () => {
+      showLoading(); // Show loading indicator
+      try {
+        await signOut(auth);
+        // UI update handled by onAuthStateChanged
+      } catch (error) {
+        console.error("Error logging out:", error);
+        displayMessage("Logout failed: " + error.message, "error");
+      } finally {
+        hideLoading(); // Hide loading indicator
+      }
     });
 
+    // Listen for authentication state changes
     onAuthStateChanged(auth, (user) => {
       if (user) {
         loginPage.classList.add("hidden");
         dashboard.classList.remove("hidden");
+        // Load data only after successful login
         loadStats();
         loadPortfolio();
         loadTestimonials();
@@ -81,19 +116,45 @@
       }
     });
 
-    // Stats update
+    // --- Custom Message Box (instead of alert) ---
+    const messageBox = document.createElement('div');
+    messageBox.className = 'fixed top-4 right-4 bg-blue-500 text-white p-3 rounded shadow-lg hidden z-50';
+    document.body.appendChild(messageBox);
+
+    function displayMessage(message, type = 'info') {
+      messageBox.textContent = message;
+      messageBox.className = `fixed top-4 right-4 p-3 rounded shadow-lg z-50 ${
+        type === 'error' ? 'bg-red-500' : 'bg-blue-500'
+      }`;
+      messageBox.classList.remove('hidden');
+      setTimeout(() => {
+        messageBox.classList.add('hidden');
+      }, 3000); // Hide after 3 seconds
+    }
+
+
+    // --- Statistics Update Logic ---
     const statForm = document.getElementById("stats-form");
     statForm.addEventListener("submit", async (e) => {
       e.preventDefault();
+      showLoading(); // Show loading indicator
       const statsRef = doc(db, `artifacts/${appId}/public/data/statistics/currentStats`);
-      await setDoc(statsRef, {
-        projects: statForm.projects.value,
-        clients: statForm.clients.value,
-        successRate: statForm.success.value,
-      });
-      alert("Statistics updated!");
+      try {
+        await setDoc(statsRef, {
+          projects: statForm.projects.value,
+          clients: statForm.clients.value,
+          successRate: statForm.success.value,
+        });
+        displayMessage("Statistics updated successfully!");
+      } catch (error) {
+        console.error("Error updating statistics:", error);
+        displayMessage("Failed to update statistics: " + error.message, "error");
+      } finally {
+        hideLoading(); // Hide loading indicator
+      }
     });
 
+    // Load statistics on dashboard display
     function loadStats() {
       const statsRef = doc(db, `artifacts/${appId}/public/data/statistics/currentStats`);
       onSnapshot(statsRef, (docSnap) => {
@@ -103,153 +164,276 @@
           statForm.clients.value = data.clients || "";
           statForm.success.value = data.successRate || "";
         }
+      }, (error) => {
+        console.error("Error loading statistics:", error);
       });
     }
 
-    // Portfolio
+    // --- Portfolio Management Logic ---
     const portfolioList = document.getElementById("portfolio-list");
     const portfolioForm = document.getElementById("portfolio-form");
+    const imageUploadInput = document.getElementById("imageUpload"); // Get the new file input
 
     portfolioForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-      await addDoc(collection(db, `artifacts/${appId}/public/data/portfolio`), {
-        title: portfolioForm.title.value,
-        description: portfolioForm.description.value,
-        link: portfolioForm.link.value,
-        imageUrl: portfolioForm.imageUrl.value,
-        linkText: portfolioForm.linkText.value || "View Project",
-      });
-      portfolioForm.reset();
+      showLoading(); // Show loading indicator
+
+      const title = portfolioForm.title.value;
+      const description = portfolioForm.description.value;
+      const link = portfolioForm.link.value;
+      const linkText = portfolioForm.linkText.value || "View Project";
+      const imageFile = imageUploadInput.files[0]; // Get the selected image file
+
+      let imageUrl = ''; // Variable to store the download URL
+
+      if (imageFile) {
+        // Create a unique file name for the image in Firebase Storage
+        const fileName = `${Date.now()}_${imageFile.name}`;
+        const storageRef = ref(storage, `artifacts/${appId}/public/images/portfolio/${fileName}`);
+
+        try {
+          // Upload the image file
+          const snapshot = await uploadBytes(storageRef, imageFile);
+          // Get the public download URL
+          imageUrl = await getDownloadURL(snapshot.ref);
+          displayMessage("Image uploaded successfully!");
+        } catch (error) {
+          console.error("Error uploading image:", error);
+          displayMessage("Image upload failed: " + error.message, "error");
+          hideLoading(); // Hide loading even if image upload fails
+          return; // Stop the function if image upload fails
+        }
+      } else {
+        // If no image is selected, use a placeholder or handle as needed
+        // For now, it will just be an empty string if no file is chosen.
+        // You might want to add validation here to require an image.
+        displayMessage("No image selected. Adding project without an image.", "info");
+      }
+
+      // Add project data to Firestore, including the image URL
+      try {
+        await addDoc(collection(db, `artifacts/${appId}/public/data/portfolio`), {
+          title: title,
+          description: description,
+          link: link,
+          imageUrl: imageUrl, // Save the obtained image URL
+          linkText: linkText,
+          createdAt: serverTimestamp() // Add a timestamp for ordering if needed
+        });
+        displayMessage("Project added successfully!");
+        portfolioForm.reset(); // Clear the form fields
+        imageUploadInput.value = ''; // Clear the file input
+      } catch (error) {
+        console.error("Error adding project to Firestore:", error);
+        displayMessage("Failed to add project: " + error.message, "error");
+      } finally {
+        hideLoading(); // Hide loading indicator
+      }
     });
 
+    // Load portfolio projects
     function loadPortfolio() {
       const portfolioRef = collection(db, `artifacts/${appId}/public/data/portfolio`);
+      // You might want to order them, e.g., by createdAt timestamp
+      // const q = query(portfolioRef, orderBy("createdAt", "desc")); // Removed orderBy as per instructions
       onSnapshot(portfolioRef, (snapshot) => {
-        portfolioList.innerHTML = "";
+        portfolioList.innerHTML = ""; // Clear current list
         snapshot.forEach((docSnap) => {
           const data = docSnap.data();
           portfolioList.innerHTML += `
-            <div class="border p-4 rounded shadow mb-2">
-              <p><strong>${data.title}</strong></p>
-              <p>${data.description}</p>
-              <button onclick="deletePortfolio('${docSnap.id}')" class="text-red-600 text-sm mt-2">Delete</button>
+            <div class="border p-4 rounded-lg shadow mb-4 bg-white flex flex-col md:flex-row items-center">
+              ${data.imageUrl ? `<img src="${data.imageUrl}" alt="${data.title}" class="w-full md:w-32 h-32 object-cover rounded-md mr-4 mb-4 md:mb-0">` : ''}
+              <div class="flex-grow">
+                <p class="text-lg font-semibold">${data.title}</p>
+                <p class="text-gray-600 mb-2">${data.description}</p>
+                <a href="${data.link}" target="_blank" class="text-blue-600 hover:underline">${data.linkText}</a>
+              </div>
+              <button onclick="deletePortfolio('${docSnap.id}')" class="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 mt-4 md:mt-0 md:ml-4">Delete</button>
             </div>
           `;
         });
+      }, (error) => {
+        console.error("Error loading portfolio:", error);
       });
     }
 
+    // Global function to delete portfolio item (accessible from HTML)
     window.deletePortfolio = async (id) => {
-      await deleteDoc(doc(db, `artifacts/${appId}/public/data/portfolio`, id));
+      showLoading(); // Show loading indicator
+      try {
+        await deleteDoc(doc(db, `artifacts/${appId}/public/data/portfolio`, id));
+        displayMessage("Project deleted successfully!");
+      } catch (error) {
+        console.error("Error deleting portfolio item:", error);
+        displayMessage("Failed to delete project: " + error.message, "error");
+      } finally {
+        hideLoading(); // Hide loading indicator
+      }
     };
 
-    // Testimonials
+    // --- Testimonials Management Logic ---
     const testimonialForm = document.getElementById("testimonial-form");
     const testimonialList = document.getElementById("testimonial-list");
 
     testimonialForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-      await addDoc(collection(db, `artifacts/${appId}/public/data/testimonials`), {
-        quote: testimonialForm.quote.value,
-        author: testimonialForm.author.value,
-        company: testimonialForm.company.value,
-      });
-      testimonialForm.reset();
+      showLoading(); // Show loading indicator
+      try {
+        await addDoc(collection(db, `artifacts/${appId}/public/data/testimonials`), {
+          quote: testimonialForm.quote.value,
+          author: testimonialForm.author.value,
+          company: testimonialForm.company.value,
+          createdAt: serverTimestamp() // Add timestamp
+        });
+        displayMessage("Testimonial added successfully!");
+        testimonialForm.reset();
+      } catch (error) {
+        console.error("Error adding testimonial:", error);
+        displayMessage("Failed to add testimonial: " + error.message, "error");
+      } finally {
+        hideLoading(); // Hide loading indicator
+      }
     });
 
+    // Load testimonials
     function loadTestimonials() {
       const ref = collection(db, `artifacts/${appId}/public/data/testimonials`);
+      // const q = query(ref, orderBy("createdAt", "desc")); // Removed orderBy as per instructions
       onSnapshot(ref, (snapshot) => {
         testimonialList.innerHTML = "";
         snapshot.forEach((docSnap) => {
           const data = docSnap.data();
           testimonialList.innerHTML += `
-            <div class="border p-4 rounded shadow mb-2">
-              <p>"${data.quote}" - ${data.author}, ${data.company}</p>
-              <button onclick="deleteTestimonial('${docSnap.id}')" class="text-red-600 text-sm mt-2">Delete</button>
+            <div class="border p-4 rounded-lg shadow mb-4 bg-white">
+              <p class="italic">"${data.quote}"</p>
+              <p class="text-gray-700 mt-2">- ${data.author}, <span class="font-semibold">${data.company}</span></p>
+              <button onclick="deleteTestimonial('${docSnap.id}')" class="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 mt-2">Delete</button>
             </div>
           `;
         });
+      }, (error) => {
+        console.error("Error loading testimonials:", error);
       });
     }
 
+    // Global function to delete testimonial (accessible from HTML)
     window.deleteTestimonial = async (id) => {
-      await deleteDoc(doc(db, `artifacts/${appId}/public/data/testimonials`, id));
+      showLoading(); // Show loading indicator
+      try {
+        await deleteDoc(doc(db, `artifacts/${appId}/public/data/testimonials`, id));
+        displayMessage("Testimonial deleted successfully!");
+      } catch (error) {
+        console.error("Error deleting testimonial:", error);
+        displayMessage("Failed to delete testimonial: " + error.message, "error");
+      } finally {
+        hideLoading(); // Hide loading indicator
+      }
     };
 
-    // Messages
+    // --- Messages Display Logic ---
     function loadMessages() {
       const ref = collection(db, `artifacts/${appId}/public/data/messages`);
+      // const q = query(ref, orderBy("createdAt", "desc")); // Assuming messages have a timestamp
       const container = document.getElementById("messages-list");
       onSnapshot(ref, (snapshot) => {
         container.innerHTML = "";
+        if (snapshot.empty) {
+          container.innerHTML = '<p class="text-gray-500">No messages received yet.</p>';
+          return;
+        }
         snapshot.forEach((docSnap) => {
           const m = docSnap.data();
+          // Format timestamp if available
+          const messageDate = m.createdAt ? new Date(m.createdAt.toDate()).toLocaleString() : 'N/A';
           container.innerHTML += `
-            <div class="border p-4 rounded shadow mb-2">
-              <p><strong>${m.fullName}</strong> (${m.emailAddress})</p>
-              <p>${m.projectDetails}</p>
+            <div class="border p-4 rounded-lg shadow mb-4 bg-white">
+              <p class="text-lg font-semibold">${m.fullName} (<a href="mailto:${m.emailAddress}" class="text-blue-600 hover:underline">${m.emailAddress}</a>)</p>
+              <p class="text-gray-700 mt-1">${m.projectDetails}</p>
+              <p class="text-sm text-gray-500 mt-2">Received: ${messageDate}</p>
             </div>
           `;
         });
+      }, (error) => {
+        console.error("Error loading messages:", error);
       });
     }
   </script>
 </head>
 <body class="bg-gray-100 font-sans">
 
+  <!-- Loading Indicator -->
+  <div id="loading-indicator" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 hidden">
+    <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4"></div>
+    <style>
+      .loader {
+        border-top-color: #3498db; /* Blue */
+        -webkit-animation: spinner 1.5s linear infinite;
+        animation: spinner 1.5s linear infinite;
+      }
+      @-webkit-keyframes spinner {
+        0% { -webkit-transform: rotate(0deg); }
+        100% { -webkit-transform: rotate(360deg); }
+      }
+      @keyframes spinner {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
+  </div>
+
   <div id="login-page" class="flex justify-center items-center h-screen">
-    <form id="login-form" class="bg-white p-8 rounded shadow-md w-full max-w-sm">
+    <form id="login-form" class="bg-white p-8 rounded-lg shadow-md w-full max-w-sm">
       <h2 class="text-2xl font-bold text-center mb-6">Admin Login</h2>
-      <input name="email" type="email" placeholder="Email" required class="w-full mb-4 p-2 border rounded" />
-      <input name="password" type="password" placeholder="Password" required class="w-full mb-6 p-2 border rounded" />
-      <button type="submit" class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700">Login</button>
+      <input name="email" type="email" placeholder="Email" required class="w-full mb-4 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      <input name="password" type="password" placeholder="Password" required class="w-full mb-6 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      <button type="submit" class="w-full bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 transition duration-300">Login</button>
     </form>
   </div>
 
-  <div id="dashboard" class="hidden p-6 space-y-10">
-    <div class="flex justify-between items-center">
-      <h1 class="text-3xl font-bold">Admin Dashboard</h1>
-      <button id="logout-btn" class="bg-red-500 text-white px-4 py-2 rounded">Logout</button>
+  <div id="dashboard" class="hidden p-6 space-y-10 max-w-4xl mx-auto">
+    <div class="flex justify-between items-center bg-white p-4 rounded-lg shadow">
+      <h1 class="text-3xl font-bold text-gray-800">Admin Dashboard</h1>
+      <button id="logout-btn" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-300">Logout</button>
     </div>
 
-    <section>
-      <h2 class="text-xl font-semibold mb-2">Update Website Statistics</h2>
+    <section class="bg-white p-6 rounded-lg shadow">
+      <h2 class="text-xl font-semibold mb-4 text-gray-800">Update Website Statistics</h2>
       <form id="stats-form" class="grid gap-4 max-w-md">
-        <input name="projects" placeholder="Projects Delivered" required class="p-2 border rounded" />
-        <input name="clients" placeholder="Happy Clients" required class="p-2 border rounded" />
-        <input name="success" placeholder="Success Rate" required class="p-2 border rounded" />
-        <button class="bg-blue-600 text-white p-2 rounded">Update Stats</button>
+        <input name="projects" placeholder="Projects Delivered" required class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        <input name="clients" placeholder="Happy Clients" required class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        <input name="success" placeholder="Success Rate" required class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        <button class="bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 transition duration-300">Update Stats</button>
       </form>
     </section>
 
-    <section>
-      <h2 class="text-xl font-semibold mb-2">Manage Portfolio Projects</h2>
-      <form id="portfolio-form" class="grid gap-4 max-w-md mb-4">
-        <input name="title" placeholder="Project Title" required class="p-2 border rounded" />
-        <input name="description" placeholder="Project Description" required class="p-2 border rounded" />
-        <input name="imageUrl" placeholder="Image URL" required class="p-2 border rounded" />
-        <input name="link" placeholder="Project Link" required class="p-2 border rounded" />
-        <input name="linkText" placeholder="Link Text (optional)" class="p-2 border rounded" />
-        <button class="bg-green-600 text-white p-2 rounded">Add Project</button>
+    <section class="bg-white p-6 rounded-lg shadow">
+      <h2 class="text-xl font-semibold mb-4 text-gray-800">Manage Portfolio Projects</h2>
+      <form id="portfolio-form" class="grid gap-4 max-w-md mb-6">
+        <input name="title" placeholder="Project Title" required class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" />
+        <input name="description" placeholder="Project Description" required class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" />
+        <!-- New file input for image upload -->
+        <input type="file" id="imageUpload" accept="image/*" class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" />
+        <input name="link" placeholder="Project Link (URL)" required class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" />
+        <input name="linkText" placeholder="Link Text (e.g., 'View Project')" class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" />
+        <button class="bg-green-600 text-white p-2 rounded-md hover:bg-green-700 transition duration-300">Add Project</button>
       </form>
-      <div id="portfolio-list"></div>
+      <div id="portfolio-list" class="space-y-4"></div>
     </section>
 
-    <section>
-      <h2 class="text-xl font-semibold mb-2">Manage Client Testimonials</h2>
-      <form id="testimonial-form" class="grid gap-4 max-w-md mb-4">
-        <textarea name="quote" placeholder="Client Quote" required class="p-2 border rounded"></textarea>
-        <input name="author" placeholder="Author" required class="p-2 border rounded" />
-        <input name="company" placeholder="Company" required class="p-2 border rounded" />
-        <button class="bg-green-600 text-white p-2 rounded">Add Testimonial</button>
+    <section class="bg-white p-6 rounded-lg shadow">
+      <h2 class="text-xl font-semibold mb-4 text-gray-800">Manage Client Testimonials</h2>
+      <form id="testimonial-form" class="grid gap-4 max-w-md mb-6">
+        <textarea name="quote" placeholder="Client Quote" required class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 h-24 resize-y"></textarea>
+        <input name="author" placeholder="Author" required class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" />
+        <input name="company" placeholder="Company" required class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" />
+        <button class="bg-green-600 text-white p-2 rounded-md hover:bg-green-700 transition duration-300">Add Testimonial</button>
       </form>
-      <div id="testimonial-list"></div>
+      <div id="testimonial-list" class="space-y-4"></div>
     </section>
 
-    <section>
-      <h2 class="text-xl font-semibold mb-2">Received Contact Messages</h2>
-      <div id="messages-list"></div>
+    <section class="bg-white p-6 rounded-lg shadow">
+      <h2 class="text-xl font-semibold mb-4 text-gray-800">Received Contact Messages</h2>
+      <div id="messages-list" class="space-y-4"></div>
     </section>
   </div>
 </body>
