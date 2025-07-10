@@ -5,29 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prince Alex Digital - Digital Solutions That Transform Your Brand</title>
 
-    <!-- Preconnect to necessary origins for faster resource loading -->
     <link rel="preconnect" href="https://cdn.tailwindcss.com">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://unpkg.com">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link rel="preconnect" href="https://www.chatbase.co">
-    <link rel="preconnect" href="https://www.gstatic.com"> <!-- Added for Firebase -->
-
-    <!-- Google Fonts - Inter (Preload for faster display) -->
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preconnect" href="https://www.gstatic.com"> <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"></noscript>
 
-    <!-- Tailwind CSS CDN (Keep at top for FCP) -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Font Awesome for social media icons (defer loading) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" defer>
 
-    <!-- AOS Animate On Scroll Library (defer loading) -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
-    <!-- Firebase SDK (defer loading) -->
     <script type="module">
         // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
@@ -88,9 +80,8 @@
                     const item = doc.data();
                     const portfolioItemHTML = `
                         <div class="portfolio-item bg-gray-100 rounded-lg shadow-md overflow-hidden" data-aos="fade-up" data-aos-duration="1000">
-                            <img src="${item.imageUrl || 'https://placehold.co/600x400/1c4ed8/ffffff?text=Project+Image'}" alt="${item.title} Mockup" class="w-full h-48 object-cover" loading="lazy" width="600" height="400">
-                            <div class="p-6">
-                                <h3 class="text-xl font-semibold text-brand-black mb-2">${item.title}</h3>
+                            <div class="p-6 text-center">
+                                <h3 class="text-5xl md:text-6xl font-extrabold text-brand-blue mb-4">${item.title}</h3>
                                 <p class="text-gray-600 mb-4">${item.description}</p>
                                 <a href="${item.link}" target="_blank" class="text-brand-blue hover:underline font-medium">${item.linkText || 'View Details'}</a>
                             </div>
@@ -264,15 +255,12 @@
 </head>
 <body class="bg-white text-gray-800">
 
-    <!-- Header & Navigation -->
     <header class="bg-brand-black text-white p-4 shadow-lg fixed w-full z-50">
         <nav class="container mx-auto flex justify-between items-center">
-            <!-- Logo -->
             <a href="#hero" class="text-2xl font-bold text-white flex items-center">
                 <img src="mylogo.png" alt="Prince Alex Digital Logo" class="mr-2 rounded-full w-10 h-10 object-contain" loading="lazy" width="40" height="40">
                 Prince Alex Digital
             </a>
-            <!-- Mobile Menu Button -->
             <div class="block md:hidden">
                 <button id="mobile-menu-button" class="text-white focus:outline-none">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -280,7 +268,6 @@
                     </svg>
                 </button>
             </div>
-            <!-- Desktop Navigation -->
             <ul class="hidden md:flex space-x-6 text-lg">
                 <li><a href="#hero" class="nav-link hover:text-brand-blue transition duration-300">Home</a></li>
                 <li><a href="#about" class="nav-link hover:text-brand-blue transition duration-300">About</a></li>
@@ -289,7 +276,6 @@
                 <li><a href="#contact" class="nav-link hover:text-brand-blue transition duration-300">Contact</a></li>
             </ul>
         </nav>
-        <!-- Mobile Menu Overlay -->
         <div id="mobile-menu" class="md:hidden hidden bg-brand-black absolute top-full left-0 w-full py-4 shadow-lg">
             <ul class="flex flex-col items-center space-y-4">
                 <li><a href="#hero" class="nav-link block text-white text-lg hover:text-brand-blue transition duration-300 py-2" onclick="toggleMobileMenu()">Home</a></li>
@@ -302,9 +288,7 @@
     </header>
 
     <main>
-        <!-- Hero Section -->
         <section id="hero" class="relative bg-brand-black text-white h-screen flex items-center justify-center overflow-hidden">
-            <!-- Background Image/Overlay -->
             <div class="absolute inset-0 bg-cover bg-center opacity-30" style="background-image: url('background.jpg');"></div>
             <div class="absolute inset-0 bg-gradient-to-r from-brand-black to-transparent opacity-70"></div>
 
@@ -316,7 +300,6 @@
             </div>
         </section>
 
-        <!-- About the Founder Section -->
         <section id="about" class="py-16 bg-white">
             <div class="container mx-auto px-4 md:px-8 lg:px-16 text-center">
                 <h2 class="text-4xl font-bold text-brand-black mb-4" data-aos="fade-down" data-aos-duration="1000">Meet Alex Senerwa Keverenge</h2>
@@ -342,10 +325,8 @@
             </div>
         </section>
 
-        <!-- New Section: Our Mission and Values -->
         <section id="mission-values" class="py-16 bg-gray-100">
             <div class="container mx-auto px-4 md:px-8 lg:px-16 text-center">
-                <!-- Our Mission Banner -->
                 <div class="bg-brand-blue text-white p-8 rounded-lg shadow-lg mb-12" data-aos="fade-up" data-aos-duration="1000">
                     <h2 class="text-3xl md:text-4xl font-bold mb-4">Our Mission</h2>
                     <p class="text-lg max-w-3xl mx-auto leading-relaxed">
@@ -353,9 +334,7 @@
                     </p>
                 </div>
 
-                <!-- Core Values -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <!-- Value Card 1: Digital Excellence -->
                     <div class="bg-white p-8 rounded-lg shadow-md flex flex-col items-center text-center" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="100">
                         <div class="p-4 rounded-full mb-4 icon-bg-blue">
                             <i data-lucide="award" class="w-8 h-8 text-blue-600"></i>
@@ -366,7 +345,6 @@
                         </p>
                     </div>
 
-                    <!-- Value Card 2: Client-Focused -->
                     <div class="bg-white p-8 rounded-lg shadow-md flex flex-col items-center text-center" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="200">
                         <div class="p-4 rounded-full mb-4 icon-bg-blue">
                             <i data-lucide="target" class="w-8 h-8 text-blue-600"></i>
@@ -377,7 +355,6 @@
                         </p>
                     </div>
 
-                    <!-- Value Card 3: Innovation -->
                     <div class="bg-white p-8 rounded-lg shadow-md flex flex-col items-center text-center" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="300">
                         <div class="p-4 rounded-full mb-4 icon-bg-blue">
                             <i data-lucide="lightbulb" class="w-8 h-8 text-blue-600"></i>
@@ -391,13 +368,11 @@
             </div>
         </section>
 
-        <!-- Services Offered Section -->
         <section id="services" class="py-16 bg-gray-100">
             <div class="container mx-auto px-4 md:px-8 lg:px-16 text-center">
                 <h2 class="text-4xl font-bold text-brand-black mb-12" data-aos="fade-down" data-aos-duration="1000">Our Digital Services</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
-                    <!-- Service Card 1: Web Design & Development -->
                     <div class="service-card bg-white p-8 rounded-lg shadow-md border-b-4 border-brand-blue flex flex-col items-start text-left" data-aos="zoom-in" data-aos-duration="800">
                         <div class="p-4 rounded-full mb-4 icon-bg-blue">
                             <i data-lucide="layout" class="w-8 h-8 text-blue-600"></i>
@@ -412,7 +387,6 @@
                         </ul>
                     </div>
 
-                    <!-- Service Card 2: Web Hosting & Domains -->
                     <div class="service-card bg-white p-8 rounded-lg shadow-md border-b-4 border-brand-blue flex flex-col items-start text-left" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="100">
                         <div class="p-4 rounded-full mb-4 icon-bg-green">
                             <i data-lucide="server" class="w-8 h-8 text-green-600"></i>
@@ -428,7 +402,6 @@
                         </ul>
                     </div>
 
-                    <!-- Service Card 3: Graphic Design -->
                     <div class="service-card bg-white p-8 rounded-lg shadow-md border-b-4 border-brand-blue flex flex-col items-start text-left" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="200">
                         <div class="p-4 rounded-full mb-4 icon-bg-purple">
                             <i data-lucide="palette" class="w-8 h-8 text-purple-600"></i>
@@ -443,7 +416,6 @@
                         </ul>
                     </div>
 
-                    <!-- Service Card 4: Social Media Management -->
                     <div class="service-card bg-white p-8 rounded-lg shadow-md border-b-4 border-brand-blue flex flex-col items-start text-left" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="300">
                         <div class="p-4 rounded-full mb-4 icon-bg-pink">
                             <i data-lucide="share-2" class="w-8 h-8 text-pink-600"></i>
@@ -458,7 +430,6 @@
                         </ul>
                     </div>
 
-                    <!-- Service Card 5: CV Revamping & Editorial Services -->
                     <div class="service-card bg-white p-8 rounded-lg shadow-md border-b-4 border-brand-blue flex flex-col items-start text-left" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="400">
                         <div class="p-4 rounded-full mb-4 icon-bg-orange">
                             <i data-lucide="file-text" class="w-8 h-8 text-orange-600"></i>
@@ -473,7 +444,6 @@
                         </ul>
                     </div>
 
-                    <!-- Service Card 6: Custom Digital Solutions -->
                     <div class="service-card bg-white p-8 rounded-lg shadow-md border-b-4 border-brand-blue flex flex-col items-start text-left" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="500">
                         <div class="p-4 rounded-full mb-4 icon-bg-light-blue-purple">
                             <i data-lucide="zap" class="w-8 h-8 text-indigo-600"></i>
@@ -492,21 +462,17 @@
             </div>
         </section>
 
-        <!-- Portfolio / Showcase Section -->
         <section id="portfolio" class="py-16 bg-white">
             <div class="container mx-auto px-4 md:px-8 lg:px-16 text-center">
                 <h2 class="text-4xl font-bold text-brand-black mb-12" data-aos="fade-down" data-aos-duration="1000">Our Recent Work</h2>
                 <div id="portfolio-items-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <!-- Portfolio items will be loaded here from Firestore -->
                     <p>Loading portfolio items...</p>
                 </div>
             </div>
         </section>
 
-        <!-- New Section: More Projects & Statistics -->
         <section id="more-projects-stats" class="py-16 bg-brand-blue text-white">
             <div class="container mx-auto px-4 md:px-8 lg:px-16 text-center">
-                <!-- More Projects Coming Soon Banner -->
                 <div class="bg-blue-800 p-8 rounded-lg shadow-lg mb-12" data-aos="fade-up" data-aos-duration="1000">
                     <h2 class="text-3xl md:text-4xl font-bold mb-4">More Projects Coming Soon</h2>
                     <p class="text-lg mb-8 max-w-2xl mx-auto">
@@ -516,7 +482,6 @@
                     <a href="#contact" class="nav-link bg-brand-black text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-gray-800 transition duration-300 ease-in-out shadow-lg transform hover:scale-105">Discuss Your Project</a>
                 </div>
 
-                <!-- Statistics Section -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
                     <div class="p-4" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="100">
                         <div id="projects-delivered" class="text-5xl font-extrabold text-white mb-2">--</div>
@@ -538,7 +503,6 @@
             </div>
         </section>
 
-        <!-- Testimonials Section (Optional) -->
         <section id="testimonials" class="py-16 bg-gray-100">
             <div class="container mx-auto px-4 md:px-8 lg:px-16 text-center">
                 <h2 class="text-4xl font-bold text-brand-black mb-12" data-aos="fade-down" data-aos-duration="1000">What Our Clients Say</h2>
@@ -553,12 +517,10 @@
             </div>
         </section>
 
-        <!-- Contact Section -->
         <section id="contact" class="py-16 bg-white">
             <div class="container mx-auto px-4 md:px-8 lg:px-16 text-center">
                 <h2 class="text-4xl font-bold text-brand-black mb-12" data-aos="fade-down" data-aos-duration="1000">Get In Touch</h2>
                 <div class="flex flex-col md:flex-row gap-12 justify-center items-start">
-                    <!-- Contact Details -->
                     <div class="md:w-1/2 text-left bg-gray-100 p-8 rounded-lg shadow-md" data-aos="fade-right" data-aos-duration="1000">
                         <h3 class="text-2xl font-semibold text-brand-black mb-6">Contact Information</h3>
                         <div class="space-y-6">
@@ -600,7 +562,6 @@
                             </div>
                         </div>
                         <h3 class="text-2xl font-semibold text-brand-black mb-4 mt-8">Find Us</h3>
-                        <!-- Google Maps Embed Placeholder -->
                         <div class="w-full h-64 bg-gray-200 rounded-lg overflow-hidden shadow-inner">
                             <iframe
                                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15959.043590012224!2d36.81228225!3d-1.286389!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f1172d84d0d5d%3A0xf57297e7f6d3d9a!2sNairobi%2C%20Kenya!5e0!3m2!1sen!2sus!4m2!3m1!1s0x182f1172d84d0d5d%3A0xf57297e7f6d3d9a"
@@ -614,7 +575,6 @@
                         </div>
                     </div>
 
-                    <!-- Contact Form -->
                     <div class="md:w-1/2 text-left bg-gray-100 p-8 rounded-lg shadow-md" data-aos="fade-left" data-aos-duration="1000">
                         <h3 class="text-2xl font-semibold text-brand-black mb-2">Send us a Message</h3>
                         <p class="text-gray-600 mb-6">Fill out the form below and we'll get back to you within 24 hours.</p>
@@ -643,17 +603,14 @@
         </section>
     </main>
 
-    <!-- Footer -->
     <footer class="bg-brand-black text-white py-10">
         <div class="container mx-auto px-4 md:px-8 lg:px-16 text-center">
             <div class="flex flex-col md:flex-row justify-between items-center mb-8">
-                <!-- Logo -->
                 <a href="#hero" class="text-2xl font-bold text-white flex items-center mb-4 md:mb-0">
                     <img src="mylogo.png" alt="Prince Alex Digital Logo" class="mr-2 rounded-full w-10 h-10 object-contain" loading="lazy" width="40" height="40">
                     Prince Alex Digital
                 </a>
 
-                <!-- Quick Navigation Links -->
                 <ul class="flex flex-wrap justify-center md:justify-start space-x-6 text-lg mb-4 md:mb-0">
                     <li><a href="#hero" class="nav-link hover:text-brand-blue transition duration-300">Home</a></li>
                     <li><a href="#about" class="nav-link hover:text-brand-blue transition duration-300">About</a></li>
@@ -662,29 +619,23 @@
                     <li><a href="#contact" class="nav-link hover:text-brand-blue transition duration-300">Contact</a></li>
                 </ul>
 
-                <!-- Social Media Icons -->
                 <div class="flex space-x-6 text-2xl">
                     <a href="https://www.facebook.com/princealexdigital" target="_blank" aria-label="Facebook" class="hover:text-brand-blue transition duration-300">
                         <i class="fab fa-facebook"></i>
                     </a>
-                    <!-- Placeholder for TikTok if available -->
                     <a href="#" target="_blank" aria-label="TikTok" class="hover:text-brand-blue transition duration-300">
                         <i class="fab fa-tiktok"></i>
                     </a>
-                    <!-- Add more social media icons as needed -->
-                </div>
+                    </div>
             </div>
 
             <hr class="border-gray-700 mb-8">
 
-            <!-- Copyright Notice -->
-            <p class="text-gray-400 text-sm">&copy; 2025 Prince Alex Digital. All rights reserved.</p>
+            <p class="text-gray-400 text-sm">© 2025 Prince Alex Digital. All rights reserved.</p>
         </div>
     </footer>
 
-    <!-- AOS Initialization -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js" defer></script>
-    <!-- Lucide Icons CDN (defer loading) -->
     <script src="https://unpkg.com/lucide@latest" defer></script>
     <script>
         // Use DOMContentLoaded to ensure all scripts and elements are loaded before execution
@@ -738,7 +689,6 @@
             });
         });
     </script>
-    <!-- Chatbase AI Assistant Script -->
     <script
         src="https://www.chatbase.co/embed.min.js"
         id="R1TiiZ1iAxEt-Oy6PjEEF"
