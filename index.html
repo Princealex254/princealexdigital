@@ -158,19 +158,16 @@
 
             if (contactForm) {
                 contactForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
+                    // Prevent default form submission ONLY if using Firebase for submission
+                    // If using FormSubmit, we want the default submission to happen
+                    // e.preventDefault(); // Comment this out for FormSubmit
 
                     const fullName = document.getElementById('full-name').value;
                     const emailAddress = document.getElementById('email-address').value;
                     const projectDetails = document.getElementById('project-details').value;
 
-                    if (!fullName || !emailAddress || !projectDetails) {
-                        contactMessageDiv.textContent = "Please fill in all fields.";
-                        contactMessageDiv.classList.remove('hidden', 'text-green-500');
-                        contactMessageDiv.classList.add('text-red-500');
-                        return;
-                    }
-
+                    // This part for Firebase storage is now separate from the email sending via FormSubmit
+                    // You can keep it if you want to store messages in Firebase AND send email via FormSubmit
                     try {
                         await addDoc(collection(db, `artifacts/${appId}/public/data/messages`), {
                             fullName: fullName,
@@ -179,7 +176,7 @@
                             timestamp: serverTimestamp()
                         });
 
-                        contactForm.reset();
+                        // contactForm.reset(); // FormSubmit will handle this
                         contactMessageDiv.textContent = "Your message has been sent successfully!";
                         contactMessageDiv.classList.remove('hidden', 'text-red-500');
                         contactMessageDiv.classList.add('text-green-500');
@@ -187,8 +184,8 @@
                             contactMessageDiv.classList.add('hidden');
                         }, 5000); // Hide message after 5 seconds
                     } catch (error) {
-                        console.error("Error sending message:", error);
-                        contactMessageDiv.textContent = "Failed to send message. Please try again.";
+                        console.error("Error saving message to Firebase:", error);
+                        contactMessageDiv.textContent = "Failed to save message. Please try again.";
                         contactMessageDiv.classList.remove('hidden', 'text-green-500');
                         contactMessageDiv.classList.add('text-red-500');
                     }
@@ -578,7 +575,10 @@
                     <div class="md:w-1/2 text-left bg-gray-100 p-8 rounded-lg shadow-md" data-aos="fade-left" data-aos-duration="1000">
                         <h3 class="text-2xl font-semibold text-brand-black mb-2">Send us a Message</h3>
                         <p class="text-gray-600 mb-6">Fill out the form below and we'll get back to you within 24 hours.</p>
-                        <form id="contact-form" action="#" method="POST" class="space-y-6">
+                        <form id="contact-form" action="https://formsubmit.co/princealexdigital@gmail.com" method="POST" class="space-y-6">
+                            <input type="hidden" name="_subject" value="New Contact Message from Prince Alex Website">
+                            <input type="hidden" name="_template" value="table">
+                            <input type="hidden" name="_captcha" value="false">
                             <div>
                                 <label for="full-name" class="block text-gray-700 text-sm font-bold mb-2">Full Name *</label>
                                 <input type="text" id="full-name" name="full-name" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-brand-blue focus:border-transparent" placeholder="Enter your full name" required>
