@@ -85,7 +85,7 @@
                     const item = doc.data();
                     const portfolioItemHTML = `
                         <div class="portfolio-item bg-gray-100 rounded-lg shadow-md overflow-hidden" data-aos="fade-up" data-aos-duration="1000">
-                            <img src="${item.imageUrl || 'https://placehold.co/600x400/1c4ed8/ffffff?text=Project+Image'}" alt="${item.title} Mockup" class="w-full h-48 object-cover" loading="lazy" width="600" height="400">
+                            <!-- Removed image tag as per user request -->
                             <div class="p-6 text-center">
                                 <h3 class="text-xl md:text-2xl font-semibold text-brand-blue mb-4">${item.title}</h3> <!-- Adjusted font size -->
                                 <p class="text-base text-gray-600 mb-4">${item.description}</p> <!-- Adjusted font size -->
@@ -134,7 +134,7 @@
         function loadStatistics() {
             const projectsDelivered = document.getElementById('projects-delivered');
             const happyClients = document.getElementById('happy-clients');
-            const successRate = document.getElementById('success-rate');
+            const successRate = document = document.getElementById('success-rate');
 
             if (!projectsDelivered || !happyClients || !successRate) return;
 
