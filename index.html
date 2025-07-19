@@ -80,10 +80,9 @@
                     const item = doc.data();
                     const portfolioItemHTML = `
                         <div class="portfolio-item bg-gray-100 rounded-lg shadow-md overflow-hidden" data-aos="fade-up" data-aos-duration="1000">
-                            <div class="p-6 text-center">
-                                <h3 class="text-5xl md:text-6xl font-extrabold text-brand-blue mb-4">${item.title}</h3>
-                                <p class="text-gray-600 mb-4">${item.description}</p>
-                                <a href="${item.link}" target="_blank" class="text-brand-blue hover:underline font-medium">${item.linkText || 'View Details'}</a>
+                            <img src="${item.imageUrl || 'https://placehold.co/600x400/1c4ed8/ffffff?text=Project+Image'}" alt="${item.title} Mockup" class="w-full h-48 object-cover" loading="lazy" width="600" height="400">
+                            <div class="p-6">
+                                <h3 class="text-lg font-semibold text-brand-black mb-2">${item.title}</h3> <p class="text-sm text-gray-600 mb-4">${item.description}</p> <a href="${item.link}" target="_blank" class="text-brand-blue hover:underline font-medium">${item.linkText || 'View Details'}</a>
                             </div>
                         </div>
                     `;
@@ -158,16 +157,19 @@
 
             if (contactForm) {
                 contactForm.addEventListener('submit', async (e) => {
-                    // Prevent default form submission ONLY if using Firebase for submission
-                    // If using FormSubmit, we want the default submission to happen
-                    // e.preventDefault(); // Comment this out for FormSubmit
+                    e.preventDefault();
 
                     const fullName = document.getElementById('full-name').value;
                     const emailAddress = document.getElementById('email-address').value;
                     const projectDetails = document.getElementById('project-details').value;
 
-                    // This part for Firebase storage is now separate from the email sending via FormSubmit
-                    // You can keep it if you want to store messages in Firebase AND send email via FormSubmit
+                    if (!fullName || !emailAddress || !projectDetails) {
+                        contactMessageDiv.textContent = "Please fill in all fields.";
+                        contactMessageDiv.classList.remove('hidden', 'text-green-500');
+                        contactMessageDiv.classList.add('text-red-500');
+                        return;
+                    }
+
                     try {
                         await addDoc(collection(db, `artifacts/${appId}/public/data/messages`), {
                             fullName: fullName,
@@ -176,7 +178,7 @@
                             timestamp: serverTimestamp()
                         });
 
-                        // contactForm.reset(); // FormSubmit will handle this
+                        contactForm.reset();
                         contactMessageDiv.textContent = "Your message has been sent successfully!";
                         contactMessageDiv.classList.remove('hidden', 'text-red-500');
                         contactMessageDiv.classList.add('text-green-500');
@@ -184,8 +186,8 @@
                             contactMessageDiv.classList.add('hidden');
                         }, 5000); // Hide message after 5 seconds
                     } catch (error) {
-                        console.error("Error saving message to Firebase:", error);
-                        contactMessageDiv.textContent = "Failed to save message. Please try again.";
+                        console.error("Error sending message:", error);
+                        contactMessageDiv.textContent = "Failed to send message. Please try again.";
                         contactMessageDiv.classList.remove('hidden', 'text-green-500');
                         contactMessageDiv.classList.add('text-red-500');
                     }
@@ -463,8 +465,7 @@
             <div class="container mx-auto px-4 md:px-8 lg:px-16 text-center">
                 <h2 class="text-4xl font-bold text-brand-black mb-12" data-aos="fade-down" data-aos-duration="1000">Our Recent Work</h2>
                 <div id="portfolio-items-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <p>Loading portfolio items...</p>
-                </div>
+                    <p class="text-base text-gray-600">Loading portfolio items...</p> </div>
             </div>
         </section>
 
@@ -575,12 +576,7 @@
                     <div class="md:w-1/2 text-left bg-gray-100 p-8 rounded-lg shadow-md" data-aos="fade-left" data-aos-duration="1000">
                         <h3 class="text-2xl font-semibold text-brand-black mb-2">Send us a Message</h3>
                         <p class="text-gray-600 mb-6">Fill out the form below and we'll get back to you within 24 hours.</p>
-                        <form id="contact-form" action="https://formsubmit.co/princealexdigital@gmail.com" method="POST" class="space-y-6">
-                            <input type="hidden" name="_subject" value="New Contact Message from Prince Alex Website">
-                            <input type="hidden" name="_template" value="table">
-                            <input type="hidden" name="_captcha" value="false">
-                            <input type="hidden" name="_next" value="https://princealex.pro/#contact">
-                            <input type="hidden" name="_autoresponse" value="Thank you for contacting us! We'll get back to you shortly.">
+                        <form id="contact-form" action="#" method="POST" class="space-y-6">
                             <div>
                                 <label for="full-name" class="block text-gray-700 text-sm font-bold mb-2">Full Name *</label>
                                 <input type="text" id="full-name" name="full-name" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-brand-blue focus:border-transparent" placeholder="Enter your full name" required>
