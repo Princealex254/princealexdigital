@@ -11,18 +11,194 @@
     <link rel="preconnect" href="https://unpkg.com">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link rel="preconnect" href="https://www.chatbase.co">
-    <link rel="preconnect" href="https://www.gstatic.com">
-
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preconnect" href="https://www.gstatic.com"> <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"></noscript>
 
-    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"></noscript>
+    <script src="https://cdn.tailwindcss.com"></script>
 
-    <link rel="preload" href="https://unpkg.com/aos@2.3.1/dist/aos.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css"></noscript>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" defer>
 
-    <script src="https://cdn.tailwindcss.com" defer></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+        import { getFirestore, collection, doc, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCW0BqYOirnrPRkgvSvtSjK2-OGVTa71uQ",
+            authDomain: "princealexdigital-4848c.firebaseapp.com",
+            projectId: "princealexdigital-4848c",
+            storageBucket: "princealexdigital-4848c.firebasestorage.app",
+            messagingSenderId: "1316427677",
+            appId: "1:1316427677:web:21bdffbf2095d1d5064174"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // Global variables for app ID and user ID
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        let userId = null; // Will be set after authentication
+
+        // Authenticate anonymously
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                userId = user.uid;
+                console.log("Authenticated with Firebase. User ID:", userId);
+                // Call functions to load data after authentication
+                loadPortfolioItems();
+                loadTestimonials();
+                loadStatistics();
+            } else {
+                try {
+                    // Use __initial_auth_token if available for Canvas environment, otherwise sign in anonymously
+                    if (typeof __initial_auth_token !== 'undefined') {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                        console.log("Signed in with custom token.");
+                    } else {
+                        await signInAnonymously(auth);
+                        console.log("Signed in anonymously.");
+                    }
+                } catch (error) {
+                    console.error("Error during authentication:", error);
+                }
+            }
+        });
+
+
+        // Function to load portfolio items
+        function loadPortfolioItems() {
+            const portfolioContainer = document.getElementById('portfolio-items-container');
+            if (!portfolioContainer) return;
+
+            const portfolioCollectionRef = collection(db, `artifacts/${appId}/public/data/portfolio`);
+
+            onSnapshot(portfolioCollectionRef, (snapshot) => {
+                portfolioContainer.innerHTML = ''; // Clear existing items
+                snapshot.forEach((doc) => {
+                    const item = doc.data();
+                    const portfolioItemHTML = `
+                        <div class="portfolio-item bg-gray-100 rounded-lg shadow-md overflow-hidden" data-aos="fade-up" data-aos-duration="1000">
+                            <!-- Removed image tag as per user request -->
+                            <div class="p-6 text-center">
+                                <h3 class="text-xl md:text-2xl font-semibold text-brand-blue mb-4">${item.title}</h3> <!-- Adjusted font size -->
+                                <p class="text-base text-gray-600 mb-4">${item.description}</p> <!-- Adjusted font size -->
+                                <a href="${item.link}" target="_blank" class="text-brand-blue hover:underline font-medium">${item.linkText || 'View Details'}</a>
+                            </div>
+                        </div>
+                    `;
+                    portfolioContainer.insertAdjacentHTML('beforeend', portfolioItemHTML);
+                });
+            }, (error) => {
+                console.error("Error fetching portfolio items:", error);
+            });
+        }
+
+        // Function to load testimonials
+        function loadTestimonials() {
+            const testimonialText = document.getElementById('testimonial-text');
+            const testimonialAuthor = document.getElementById('testimonial-author');
+            const testimonialCompany = document.getElementById('testimonial-company');
+
+            if (!testimonialText || !testimonialAuthor || !testimonialCompany) return;
+
+            const testimonialsCollectionRef = collection(db, `artifacts/${appId}/public/data/testimonials`);
+
+            // For simplicity, we'll just display the latest testimonial
+            // In a real app, you might cycle through them or have a dedicated section for all.
+            onSnapshot(testimonialsCollectionRef, (snapshot) => {
+                if (!snapshot.empty) {
+                    // Get the last testimonial added (assuming order by timestamp if added)
+                    const latestTestimonialDoc = snapshot.docs[snapshot.docs.length - 1];
+                    const testimonial = latestTestimonialDoc.data();
+                    testimonialText.textContent = `"${testimonial.quote}"`;
+                    testimonialAuthor.textContent = `- ${testimonial.author}`;
+                    testimonialCompany.textContent = testimonial.company;
+                } else {
+                    testimonialText.textContent = "No testimonials yet. Be the first!";
+                    testimonialAuthor.textContent = "";
+                    testimonialCompany.textContent = "";
+                }
+            }, (error) => {
+                console.error("Error fetching testimonials:", error);
+            });
+        }
+
+        // Function to load statistics
+        function loadStatistics() {
+            const projectsDelivered = document.getElementById('projects-delivered');
+            const happyClients = document.getElementById('happy-clients');
+            const successRate = document = document.getElementById('success-rate');
+
+            if (!projectsDelivered || !happyClients || !successRate) return;
+
+            const statsDocRef = doc(db, `artifacts/${appId}/public/data/statistics/currentStats`);
+
+            onSnapshot(statsDocRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const stats = docSnap.data();
+                    projectsDelivered.textContent = stats.projects || '--';
+                    happyClients.textContent = stats.clients || '--';
+                    successRate.textContent = stats.successRate || '--';
+                } else {
+                    projectsDelivered.textContent = '--';
+                    happyClients.textContent = '--';
+                    successRate.textContent = '--';
+                    console.log("No statistics data found.");
+                }
+            }, (error) => {
+                console.error("Error fetching statistics:", error);
+            });
+        }
+
+        // Handle contact form submission
+        document.addEventListener('DOMContentLoaded', () => {
+            const contactForm = document.getElementById('contact-form');
+            const contactMessageDiv = document.getElementById('contact-message');
+
+            if (contactForm) {
+                contactForm.addEventListener('submit', async (e) => {
+                    // Prevent default form submission ONLY if using Firebase for submission
+                    // If using FormSubmit, we want the default submission to happen
+                    // e.preventDefault(); // Comment this out for FormSubmit
+
+                    const fullName = document.getElementById('full-name').value;
+                    const emailAddress = document.getElementById('email-address').value;
+                    const projectDetails = document.getElementById('project-details').value;
+
+                    // This part for Firebase storage is now separate from the email sending via FormSubmit
+                    // You can keep it if you want to store messages in Firebase AND send email via FormSubmit
+                    try {
+                        await addDoc(collection(db, `artifacts/${appId}/public/data/messages`), {
+                            fullName: fullName,
+                            emailAddress: emailAddress,
+                            projectDetails: projectDetails,
+                            timestamp: serverTimestamp()
+                        });
+
+                        // contactForm.reset(); // FormSubmit will handle this
+                        contactMessageDiv.textContent = "Your message has been sent successfully!";
+                        contactMessageDiv.classList.remove('hidden', 'text-red-500');
+                        contactMessageDiv.classList.add('text-green-500');
+                        setTimeout(() => {
+                            contactMessageDiv.classList.add('hidden');
+                        }, 5000); // Hide message after 5 seconds
+                    } catch (error) {
+                        console.error("Error saving message to Firebase:", error);
+                        contactMessageDiv.textContent = "Failed to save message. Please try again.";
+                        contactMessageDiv.classList.remove('hidden', 'text-green-500');
+                        contactMessageDiv.classList.add('text-red-500');
+                    }
+                });
+            }
+        });
+    </script>
 
     <style>
         body {
@@ -116,10 +292,7 @@
 
     <main>
         <section id="hero" class="relative bg-brand-black text-white h-screen flex items-center justify-center overflow-hidden">
-            <picture>
-                <source srcset="background.webp" type="image/webp">
-                <img src="background.jpg" alt="Background" class="absolute inset-0 bg-cover bg-center opacity-30" loading="eager">
-            </picture>
+            <div class="absolute inset-0 bg-cover bg-center opacity-30" style="background-image: url('background.jpg');"></div>
             <div class="absolute inset-0 bg-gradient-to-r from-brand-black to-transparent opacity-70"></div>
 
             <div class="relative z-10 text-center px-4" data-aos="fade-up" data-aos-duration="1000">
@@ -139,10 +312,7 @@
                 </p>
                 <div class="flex flex-col items-center" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
                     <div class="relative mb-6">
-                        <picture>
-                            <source srcset="founder.webp" type="image/webp">
-                            <img src="founder.jpg" alt="Alex Senerwa Keverenge" class="rounded-lg shadow-xl object-cover w-64 h-64 md:w-80 md:h-80 border-4 border-brand-blue" loading="lazy" width="320" height="320">
-                        </picture>
+                        <img src="founder.jpg" alt="Alex Senerwa Keverenge" class="rounded-lg shadow-xl object-cover w-64 h-64 md:w-80 md:h-80 border-4 border-brand-blue" loading="lazy" width="320" height="320">
                     </div>
                     <h3 class="text-3xl font-bold text-brand-black mb-2">Alex Senerwa Keverenge</h3>
                     <p class="text-lg text-brand-blue font-medium mb-8">Founder & Digital Solutions Expert</p>
@@ -299,6 +469,7 @@
             <div class="container mx-auto px-4 md:px-8 lg:px-16 text-center">
                 <h2 class="text-4xl font-bold text-brand-black mb-12" data-aos="fade-down" data-aos-duration="1000">Our Recent Work</h2>
                 <div id="portfolio-items-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Adjusted font size for loading text -->
                     <p class="text-base text-gray-600">Loading portfolio items...</p>
                 </div>
             </div>
@@ -473,200 +644,8 @@
         </div>
     </footer>
 
-    <script type="module">
-        // Import the functions you need from the SDKs you need
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-        import { getFirestore, collection, doc, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-
-
-        // Your web app's Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyCW0BqYOirnrPRkgvSvtSjK2-OGVTa71uQ",
-            authDomain: "princealexdigital-4848c.firebaseapp.com",
-            projectId: "princealexdigital-4848c",
-            storageBucket: "princealexdigital-4848c.firebasestorage.app",
-            messagingSenderId: "1316427677",
-            appId: "1:1316427677:web:21bdffbf2095d1d5064174"
-        };
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-
-        // Global variables for app ID and user ID
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        let userId = null; // Will be set after authentication
-
-        // Authenticate anonymously
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                userId = user.uid;
-                console.log("Authenticated with Firebase. User ID:", userId);
-                // Call functions to load data after authentication, potentially splitting into chunks
-                requestIdleCallback(() => {
-                    loadPortfolioItems();
-                    loadTestimonials();
-                    loadStatistics();
-                });
-            } else {
-                try {
-                    // Use __initial_auth_token if available for Canvas environment, otherwise sign in anonymously
-                    if (typeof __initial_auth_token !== 'undefined') {
-                        await signInWithCustomToken(auth, __initial_auth_token);
-                        console.log("Signed in with custom token.");
-                    } else {
-                        await signInAnonymously(auth);
-                        console.log("Signed in anonymously.");
-                    }
-                } catch (error) {
-                    console.error("Error during authentication:", error);
-                }
-            }
-        });
-
-
-        // Function to load portfolio items
-        function loadPortfolioItems() {
-            const portfolioContainer = document.getElementById('portfolio-items-container');
-            if (!portfolioContainer) return;
-
-            const portfolioCollectionRef = collection(db, `artifacts/${appId}/public/data/portfolio`);
-
-            onSnapshot(portfolioCollectionRef, (snapshot) => {
-                portfolioContainer.innerHTML = ''; // Clear existing items
-                snapshot.forEach((doc) => {
-                    const item = doc.data();
-                    const portfolioItemHTML = `
-                        <div class="portfolio-item bg-gray-100 rounded-lg shadow-md overflow-hidden" data-aos="fade-up" data-aos-duration="1000">
-                            <div class="p-6 text-center">
-                                <h3 class="text-xl md:text-2xl font-semibold text-brand-blue mb-4">${item.title}</h3> <p class="text-base text-gray-600 mb-4">${item.description}</p> <a href="${item.link}" target="_blank" class="text-brand-blue hover:underline font-medium">${item.linkText || 'View Details'}</a>
-                            </div>
-                        </div>
-                    `;
-                    portfolioContainer.insertAdjacentHTML('beforeend', portfolioItemHTML);
-                });
-            }, (error) => {
-                console.error("Error fetching portfolio items:", error);
-            });
-        }
-
-        // Function to load testimonials
-        function loadTestimonials() {
-            const testimonialText = document.getElementById('testimonial-text');
-            const testimonialAuthor = document.getElementById('testimonial-author');
-            const testimonialCompany = document.getElementById('testimonial-company');
-
-            if (!testimonialText || !testimonialAuthor || !testimonialCompany) return;
-
-            const testimonialsCollectionRef = collection(db, `artifacts/${appId}/public/data/testimonials`);
-
-            // For simplicity, we'll just display the latest testimonial
-            // In a real app, you might cycle through them or have a dedicated section for all.
-            onSnapshot(testimonialsCollectionRef, (snapshot) => {
-                if (!snapshot.empty) {
-                    // Get the last testimonial added (assuming order by timestamp if added)
-                    const latestTestimonialDoc = snapshot.docs[snapshot.docs.length - 1];
-                    const testimonial = latestTestimonialDoc.data();
-                    testimonialText.textContent = `"${testimonial.quote}"`;
-                    testimonialAuthor.textContent = `- ${testimonial.author}`;
-                    testimonialCompany.textContent = testimonial.company;
-                } else {
-                    testimonialText.textContent = "No testimonials yet. Be the first!";
-                    testimonialAuthor.textContent = "";
-                    testimonialCompany.textContent = "";
-                }
-            }, (error) => {
-                console.error("Error fetching testimonials:", error);
-            });
-        }
-
-        // Function to load statistics
-        function loadStatistics() {
-            const projectsDelivered = document.getElementById('projects-delivered');
-            const happyClients = document.getElementById('happy-clients');
-            const successRate = document = document.getElementById('success-rate');
-
-            if (!projectsDelivered || !happyClients || !successRate) return;
-
-            const statsDocRef = doc(db, `artifacts/${appId}/public/data/statistics/currentStats`);
-
-            onSnapshot(statsDocRef, (docSnap) => {
-                if (docSnap.exists()) {
-                    const stats = docSnap.data();
-                    projectsDelivered.textContent = stats.projects || '--';
-                    happyClients.textContent = stats.clients || '--';
-                    successRate.textContent = stats.successRate || '--';
-                } else {
-                    projectsDelivered.textContent = '--';
-                    happyClients.textContent = '--';
-                    successRate.textContent = '--';
-                    console.log("No statistics data found.");
-                }
-            }, (error) => {
-                console.error("Error fetching statistics:", error);
-            });
-        }
-
-        // Handle contact form submission
-        document.addEventListener('DOMContentLoaded', () => {
-            const contactForm = document.getElementById('contact-form');
-            const contactMessageDiv = document.getElementById('contact-message');
-
-            if (contactForm) {
-                contactForm.addEventListener('submit', async (e) => {
-                    // Prevent default form submission ONLY if using Firebase for submission
-                    // If using FormSubmit, we want the default submission to happen
-                    // e.preventDefault(); // Comment this out for FormSubmit
-
-                    const fullName = document.getElementById('full-name').value;
-                    const emailAddress = document.getElementById('email-address').value;
-                    const projectDetails = document.getElementById('project-details').value;
-
-                    // This part for Firebase storage is now separate from the email sending via FormSubmit
-                    // You can keep it if you want to store messages in Firebase AND send email via FormSubmit
-                    try {
-                        await addDoc(collection(db, `artifacts/${appId}/public/data/messages`), {
-                            fullName: fullName,
-                            emailAddress: emailAddress,
-                            projectDetails: projectDetails,
-                            timestamp: serverTimestamp()
-                        });
-
-                        // contactForm.reset(); // FormSubmit will handle this
-                        contactMessageDiv.textContent = "Your message has been sent successfully!";
-                        contactMessageDiv.classList.remove('hidden', 'text-red-500');
-                        contactMessageDiv.classList.add('text-green-500');
-                        setTimeout(() => {
-                            contactMessageDiv.classList.add('hidden');
-                        }, 5000); // Hide message after 5 seconds
-                    } catch (error) {
-                        console.error("Error saving message to Firebase:", error);
-                        contactMessageDiv.textContent = "Failed to save message. Please try again.";
-                        contactMessageDiv.classList.remove('hidden', 'text-green-500');
-                        contactMessageDiv.classList.add('text-red-500');
-                    }
-                });
-            }
-        });
-    </script>
-
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js" defer></script>
     <script src="https://unpkg.com/lucide@latest" defer></script>
-
-    <script>
-        // Ensure chatbaseConfig is defined before the chatbase script loads
-        window.chatbaseConfig = {
-            chatbotId: "R1TiiZ1iAxEt-Oy6PjEEF",
-        };
-    </script>
-    <script
-        src="https://www.chatbase.co/embed.min.js"
-        id="R1TiiZ1iAxEt-Oy6PjEEF"
-        defer>
-    </script>
-
     <script>
         // Use DOMContentLoaded to ensure all scripts and elements are loaded before execution
         document.addEventListener('DOMContentLoaded', () => {
@@ -677,24 +656,13 @@
                 easing: 'ease-out-cubic', // default easing for AOS animations
             });
 
-            // Initialize Lucide icons after they are loaded
-            // The defer attribute on the lucide script tag handles the loading
-            // and this part ensures createIcons is called when it's available.
-            const initializeLucide = () => {
-                if (typeof lucide !== 'undefined') {
-                    lucide.createIcons();
-                } else {
-                    console.warn("Lucide library not found. Icons may not render correctly.");
-                }
-            };
-
-            // Check if lucide is already loaded, otherwise wait for it
-            if (document.readyState === 'complete' || document.readyState === 'interactive') {
-                initializeLucide();
+            // Initialize Lucide icons
+            // Check if lucide is defined before calling createIcons
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
             } else {
-                document.addEventListener('DOMContentLoaded', initializeLucide);
+                console.warn("Lucide library not found. Icons may not render correctly.");
             }
-
 
             // Mobile menu toggle functionality
             const mobileMenuButton = document.getElementById('mobile-menu-button');
@@ -729,6 +697,17 @@
                 });
             });
         });
+    </script>
+    <script
+        src="https://www.chatbase.co/embed.min.js"
+        id="R1TiiZ1iAxEt-Oy6PjEEF"
+        defer>
+    </script>
+    <script>
+        // Ensure chatbaseConfig is defined before the chatbase script loads
+        window.chatbaseConfig = {
+            chatbotId: "R1TiiZ1iAxEt-Oy6PjEEF",
+        };
     </script>
 </body>
 </html>
