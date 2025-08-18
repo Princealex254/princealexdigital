@@ -1,0 +1,6 @@
+# robots.txt for https://princealex.pro
+
+User-agent: *
+Allow: /
+
+Sitemap: https://princealex.pro/sitemap.xml
