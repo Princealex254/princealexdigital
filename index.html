@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prince Alex Digital | Web Design & Digital Marketing</title>
     <meta name="description" content="Prince Alex Digital helps businesses grow with expert web design, digital marketing, and branding solutions in Kenya. Get modern, results-driven strategies today.">
-
     <!-- ✅ Open Graph Meta Tags (Facebook, LinkedIn, WhatsApp) -->
     <meta property="og:title" content="Prince Alex Digital | Web Design & Marketing Solutions">
     <meta property="og:description" content="Prince Alex Digital provides expert web design, digital marketing, and branding solutions in Kenya. Grow your business with modern strategies.">
@@ -18,10 +17,10 @@
     <meta name="twitter:description" content="Grow your business with web design, digital marketing, and branding solutions from Prince Alex Digital. Based in Kenya.">
     <meta name="twitter:image" content="https://princealex.pro/mylogo.png">
 
-    <!-- Favicons and Web App Manifest -->
+    <!-- Favicons for various devices -->
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png"> <!-- For Apple devices -->
-    <link rel="manifest" href="/site.webmanifest"> <!-- For Web App Manifest -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/site.webmanifest">
 
     <link rel="preconnect" href="https://cdn.tailwindcss.com">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -29,7 +28,7 @@
     <link rel="preconnect" href="https://unpkg.com">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link rel="preconnect" href="https://www.chatbase.co">
-    <link rel="preconnect" href="https://www.gstatic.com"> <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'\">
+    <link rel="preconnect" href="https://www.gstatic.com"> <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"></noscript>
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -37,6 +36,15 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" defer>
 
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2ECQYPSC5E"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-2ECQYPSC5E');
+    </script>
 
     <script type="module">
         // Import the functions you need from the SDKs you need
@@ -151,7 +159,7 @@
         // Function to load statistics
         function loadStatistics() {
             const projectsDelivered = document.getElementById('projects-delivered');
-            const happyClients = document = document.getElementById('happy-clients');
+            const happyClients = document.getElementById('happy-clients');
             const successRate = document = document.getElementById('success-rate');
 
             if (!projectsDelivered || !happyClients || !successRate) return;
@@ -278,10 +286,8 @@
 
     <header class="bg-brand-black text-white p-4 shadow-lg fixed w-full z-50">
         <nav class="container mx-auto flex justify-between items-center">
-            <!-- Logo in Header - Optimized for small size and retina display -->
             <a href="#hero" class="text-2xl font-bold text-white flex items-center">
-                <img src="mylogo.png" alt="Prince Alex Digital Logo" class="mr-2 rounded-full w-10 h-10 object-contain" loading="lazy" width="40" height="40"
-                     srcset="mylogo.png 1x, mylogo-80.png 2x" sizes="40px">
+                <img src="mylogo.png" alt="Prince Alex Digital Logo" class="mr-2 rounded-full w-10 h-10 object-contain" loading="lazy" width="40" height="40">
                 Prince Alex Digital
             </a>
             <div class="block md:hidden">
@@ -298,15 +304,6 @@
                 <li><a href="#portfolio" class="nav-link hover:text-brand-blue transition duration-300">Portfolio</a></li>
                 <li><a href="#contact" class="nav-link hover:text-brand-blue transition duration-300">Contact</a></li>
             </ul>
-        </nav>
-        <div id="mobile-menu" class="md:hidden hidden bg-brand-black absolute top-full left-0 w-full py-4 shadow-lg">
-            <ul class="flex flex-col items-center space-y-4">
-                <li><a href="#hero" class="nav-link block text-white text-lg hover:text-brand-blue transition duration-300 py-2" onclick="toggleMobileMenu()">Home</a></li>
-                <li><a href="#about" class="nav-link block text-white text-lg hover:text-brand-blue transition duration-300 py-2" onclick="toggleMobileMenu()">About</a></li>
-                <li><a href="#services" class="nav-link block text-white text-lg hover:text-brand-blue transition duration-300 py-2" onclick="toggleMobileMenu()">Services</a></li>
-                <li><a href="#portfolio" class="nav-link block text-white text-lg hover:text-brand-blue transition duration-300 py-2" onclick="toggleMobileMenu()">Portfolio</a></li>
-                <li><a href="#contact" class="nav-link block text-white text-lg hover:text-brand-blue transition duration-300 py-2" onclick="toggleMobileMenu()">Contact</a></li>
-            </ul>
         </div>
     </header>
 
@@ -316,9 +313,7 @@
             <div class="absolute inset-0 bg-gradient-to-r from-brand-black to-transparent opacity-70"></div>
 
             <div class="relative z-10 text-center px-4" data-aos="fade-up" data-aos-duration="1000">
-                <!-- Logo in Hero Section - Optimized for larger size and retina display -->
-                <img src="mylogo.png" alt="Prince Alex Digital Logo" class="mx-auto mb-6 rounded-full shadow-lg w-24 h-24 object-contain" loading="lazy" width="96" height="96"
-                     srcset="mylogo.png 1x, mylogo-192.png 2x" sizes="96px">
+                <img src="mylogo.png" alt="Prince Alex Digital Logo" class="mx-auto mb-6 rounded-full shadow-lg w-24 h-24 object-contain" loading="lazy" width="96" height="96">
                 <h1 class="text-4xl md:text-6xl font-extrabold leading-tight mb-4">Prince Alex Digital | Web Design, Digital Marketing & Branding Solutions</h1>
                 <p class="text-lg md:text-xl max-w-2xl mx-auto mb-8">Led by Alex Senerwa, we bring powerful design and tech together to grow your business online.</p>
                 <a href="#contact" class="nav-link bg-brand-blue text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-blue-700 transition duration-300 ease-in-out shadow-lg transform hover:scale-105">Get Started</a>
@@ -327,25 +322,26 @@
 
         <section id="about" class="py-16 bg-white">
             <div class="container mx-auto px-4 md:px-8 lg:px-16 text-center">
-                <h2 class="text-4xl font-bold text-brand-black mb-4" data-aos="fade-down" data-aos-duration="1000">Meet Alex Senerwa Keverenge</h2>
+                <h2 class="text-4xl font-bold text-brand-black mb-4" data-aos="fade-down" data-aos-duration="1000">About Us</h2>
                 <p class="text-lg leading-relaxed text-gray-700 mb-8 max-w-3xl mx-auto" data-aos="fade-down" data-aos-duration="1000" data-aos-delay="100">
                     A visionary digital solutions expert passionate about transforming businesses through
                     innovative technology and design.
                 </p>
                 <div class="flex flex-col items-center" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
-                    <!-- Founder Image - Reverted to original img tag with descriptive alt -->
-                    <img src="founder.jpg" alt="Alex Senerwa Keverenge, Founder of Prince Alex Digital" class="rounded-lg shadow-xl object-cover w-64 h-64 md:w-80 md:h-80 border-4 border-brand-blue" loading="lazy" width="320" height="320">
+                    <div class="relative mb-6">
+                        <img src="founder.jpg" alt="Alex Senerwa Keverenge" class="rounded-lg shadow-xl object-cover w-64 h-64 md:w-80 md:h-80 border-4 border-brand-blue" loading="lazy" width="320" height="320">
+                    </div>
+                    <h3 class="text-3xl font-bold text-brand-black mb-2">Meet Alex Senerwa Keverenge</h3>
+                    <p class="text-lg text-brand-blue font-medium mb-8">Founder & Digital Solutions Expert</p>
                 </div>
-                <h3 class="text-3xl font-bold text-brand-black mb-2">Alex Senerwa Keverenge</h3>
-                <p class="text-lg text-brand-blue font-medium mb-8">Founder & Digital Solutions Expert</p>
-            </div>
-            <div class="text-lg leading-relaxed text-gray-700 max-w-4xl mx-auto" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="300">
-                <p class="mb-4">
-                    Alex Senerwa Keverenge is the visionary founder of Prince Alex Digital, a brand dedicated to empowering businesses and individuals in the digital landscape. With a profound passion for technology and design, Alex has spent years honing his expertise in creating compelling online presences and effective digital strategies.
-                </p>
-                <p>
-                    His approach is rooted in understanding client needs and translating them into innovative, practical, and visually stunning digital solutions. Alex believes in leveraging the power of design and cutting-edge technology to drive growth, enhance brand visibility, and achieve measurable results for every client.
-                </p>
+                <div class="text-lg leading-relaxed text-gray-700 max-w-4xl mx-auto" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="300">
+                    <p class="mb-4">
+                        Alex Senerwa Keverenge is the visionary founder of Prince Alex Digital, a brand dedicated to empowering businesses and individuals in the digital landscape. With a profound passion for technology and design, Alex has spent years honing his expertise in creating compelling online presences and effective digital strategies.
+                    </p>
+                    <p>
+                        His approach is rooted in understanding client needs and translating them into innovative, practical, and visually stunning digital solutions. Alex believes in leveraging the power of design and cutting-edge technology to drive growth, enhance brand visibility, and achieve measurable results for every client.
+                    </p>
+                </div>
             </div>
         </section>
 
@@ -636,10 +632,8 @@
     <footer class="bg-brand-black text-white py-10">
         <div class="container mx-auto px-4 md:px-8 lg:px-16 text-center">
             <div class="flex flex-col md:flex-row justify-between items-center mb-8">
-                <!-- Logo in Footer - Optimized for small size and retina display -->
                 <a href="#hero" class="text-2xl font-bold text-white flex items-center mb-4 md:mb-0">
-                    <img src="mylogo.png" alt="Prince Alex Digital Logo" class="mr-2 rounded-full w-10 h-10 object-contain" loading="lazy" width="40" height="40"
-                         srcset="mylogo.png 1x, mylogo-80.png 2x" sizes="40px">
+                    <img src="mylogo.png" alt="Prince Alex Digital Logo" class="mr-2 rounded-full w-10 h-10 object-contain" loading="lazy" width="40" height="40">
                     Prince Alex Digital
                 </a>
 
