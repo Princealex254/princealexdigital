@@ -5,19 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prince Alex Digital | Web Design & Digital Marketing</title>
     <meta name="description" content="Prince Alex Digital helps businesses grow with expert web design, digital marketing, and branding solutions in Kenya. Get modern, results-driven strategies today.">
-    <!-- ✅ Open Graph Meta Tags (Facebook, LinkedIn, WhatsApp) -->
     <meta property="og:title" content="Prince Alex Digital | Web Design & Marketing Solutions">
     <meta property="og:description" content="Prince Alex Digital provides expert web design, digital marketing, and branding solutions in Kenya. Grow your business with modern strategies.">
     <meta property="og:image" content="https://princealex.pro/mylogo.png">
     <meta property="og:url" content="https://princealex.pro">
     <meta property="og:type" content="website">
-    <!-- ✅ Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Prince Alex Digital | Web Design & Marketing Solutions">
     <meta name="twitter:description" content="Grow your business with web design, digital marketing, and branding solutions from Prince Alex Digital. Based in Kenya.">
     <meta name="twitter:image" content="https://princealex.pro/mylogo.png">
 
-    <!-- Favicons for various devices -->
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="manifest" href="/site.webmanifest">
@@ -28,7 +25,8 @@
     <link rel="preconnect" href="https://unpkg.com">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link rel="preconnect" href="https://www.chatbase.co">
-    <link rel="preconnect" href="https://www.gstatic.com"> <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preconnect" href="https://www.gstatic.com">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"></noscript>
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -37,7 +35,6 @@
 
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
-    <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-2ECQYPSC5E"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -71,6 +68,42 @@
         // Global variables for app ID and user ID
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         let userId = null; // Will be set after authentication
+
+        // Function to update the statistics counter targets
+        let statsTargets = { projects: 0, clients: 0, successRate: 0 };
+        function updateStatsTargets(stats) {
+            statsTargets.projects = stats.projects || 0;
+            statsTargets.clients = stats.clients || 0;
+            statsTargets.successRate = parseInt(stats.successRate) || 0;
+        }
+
+        // Function to load statistics
+        function loadStatistics() {
+            const projectsDelivered = document.getElementById('projects-delivered');
+            const happyClients = document.getElementById('happy-clients');
+            const successRate = document.getElementById('success-rate');
+
+            if (!projectsDelivered || !happyClients || !successRate) return;
+
+            const statsDocRef = doc(db, `artifacts/${appId}/public/data/statistics/currentStats`);
+
+            onSnapshot(statsDocRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const stats = docSnap.data();
+                    projectsDelivered.textContent = stats.projects || '--';
+                    happyClients.textContent = stats.clients || '--';
+                    successRate.textContent = stats.successRate || '--';
+                    updateStatsTargets(stats); // Update targets for the counter
+                } else {
+                    projectsDelivered.textContent = '--';
+                    happyClients.textContent = '--';
+                    successRate.textContent = '--';
+                    console.log("No statistics data found.");
+                }
+            }, (error) => {
+                console.error("Error fetching statistics:", error);
+            });
+        }
 
         // Authenticate anonymously
         onAuthStateChanged(auth, async (user) => {
@@ -111,11 +144,11 @@
                     const item = doc.data();
                     const portfolioItemHTML = `
                         <div class="portfolio-item bg-gray-100 rounded-lg shadow-md overflow-hidden" data-aos="fade-up" data-aos-duration="1000">
-                            <!-- Removed image tag as per user request -->
                             <div class="p-6 text-center">
-                                <h3 class="text-xl md:text-2xl font-semibold text-brand-blue mb-4">${item.title}</h3> <!-- Adjusted font size -->
-                                <p class="text-base text-gray-600 mb-4">${item.description}</p> <!-- Adjusted font size -->
-                                <a href="${item.link}" target="_blank" class="text-brand-blue hover:underline font-medium">${item.linkText || 'View Details'}</a>
+                                <h3 class="text-xl md:text-2xl font-semibold text-brand-blue mb-4">${item.title}</h3> <p class="text-base text-gray-600 mb-4">${item.description}</p> <a href="${item.link}" target="_blank" class="text-brand-blue hover:underline font-medium">${item.linkText || 'View Details'}</a>
+                            </div>
+                            <div class="overlay">
+                                <span class="text-white font-bold text-lg">View Project</span>
                             </div>
                         </div>
                     `;
@@ -153,33 +186,6 @@
                 }
             }, (error) => {
                 console.error("Error fetching testimonials:", error);
-            });
-        }
-
-        // Function to load statistics
-        function loadStatistics() {
-            const projectsDelivered = document.getElementById('projects-delivered');
-            const happyClients = document.getElementById('happy-clients');
-            const successRate = document = document.getElementById('success-rate');
-
-            if (!projectsDelivered || !happyClients || !successRate) return;
-
-            const statsDocRef = doc(db, `artifacts/${appId}/public/data/statistics/currentStats`);
-
-            onSnapshot(statsDocRef, (docSnap) => {
-                if (docSnap.exists()) {
-                    const stats = docSnap.data();
-                    projectsDelivered.textContent = stats.projects || '--';
-                    happyClients.textContent = stats.clients || '--';
-                    successRate.textContent = stats.successRate || '--';
-                } else {
-                    projectsDelivered.textContent = '--';
-                    happyClients.textContent = '--';
-                    successRate.textContent = '--';
-                    console.log("No statistics data found.");
-                }
-            }, (error) => {
-                console.error("Error fetching statistics:", error);
             });
         }
 
@@ -261,18 +267,46 @@
             color: #1a202c;
         }
         .service-card {
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out, border-color 0.3s ease-in-out;
+            border: 2px solid transparent; /* Added for the initial border state */
         }
         .service-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 0 15px rgba(28, 78, 216, 0.5), 0 10px 20px rgba(0, 0, 0, 0.1);
+            border-color: rgba(28, 78, 216, 0.8); /* Soft blue glow */
         }
         .portfolio-item {
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
             transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
         }
         .portfolio-item:hover {
             transform: scale(1.03);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+        .portfolio-item .portfolio-image {
+            transition: transform 0.5s ease-in-out;
+        }
+        .portfolio-item:hover .portfolio-image {
+            transform: scale(1.1);
+        }
+        .portfolio-item .overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(28, 78, 216, 0.8);
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            transform: translateY(100%);
+            transition: transform 0.4s ease-in-out;
+            opacity: 0;
+        }
+        .portfolio-item:hover .overlay {
+            transform: translateY(0);
+            opacity: 1;
         }
         .icon-bg-blue { background-color: #e0f2fe; } /* light blue for web design */
         .icon-bg-green { background-color: #d1fae5; } /* light green for web hosting */
@@ -280,11 +314,71 @@
         .icon-bg-pink { background-color: #fce7f3; } /* light pink for social media */
         .icon-bg-orange { background-color: #fff7ed; } /* light orange for CV revamping */
         .icon-bg-light-blue-purple { background-color: #e0f2fe; } /* light blue/purple for custom solutions */
+
+        /* Glassmorphism Navbar & Underline Hover */
+        .glassmorphism-header {
+            background-color: rgba(26, 32, 44, 0.7); /* Semi-transparent black */
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px); /* For Safari */
+        }
+        .nav-link {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: #1c4ed8; /* Underline color */
+            transform: translateX(-100%); /* Initially off-screen to the left */
+            transition: transform 0.3s ease-in-out;
+        }
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            transform: translateX(0%); /* Slides in on hover */
+        }
+
+        /* Mobile Menu Animation */
+        .mobile-menu-animated {
+            display: block; /* Override 'hidden' */
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out, opacity 0.5s ease-out;
+            opacity: 0;
+        }
+        .mobile-menu-animated.open {
+            max-height: 500px; /* A value large enough to contain the menu */
+            opacity: 1;
+        }
+
+        /* Scroll Progress Bar */
+        .scroll-progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background-color: #e2e8f0; /* Light gray track */
+            z-index: 9999;
+        }
+        .scroll-progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: #1c4ed8; /* Blue progress color */
+            transition: width 0.1s linear;
+        }
     </style>
 </head>
 <body class="bg-white text-gray-800">
+    <div class="scroll-progress-container">
+        <div class="scroll-progress-bar" id="progressBar"></div>
+    </div>
 
-    <header class="bg-brand-black text-white p-4 shadow-lg fixed w-full z-50">
+    <header class="glassmorphism-header text-white p-4 shadow-lg fixed w-full z-50">
         <nav class="container mx-auto flex justify-between items-center">
             <a href="#hero" class="text-2xl font-bold text-white flex items-center">
                 <img src="mylogo.png" alt="Prince Alex Digital Logo" class="mr-2 rounded-full w-10 h-10 object-contain" loading="lazy" width="40" height="40">
@@ -304,15 +398,14 @@
                 <li><a href="#portfolio" class="nav-link hover:text-brand-blue transition duration-300">Portfolio</a></li>
                 <li><a href="#contact" class="nav-link hover:text-brand-blue transition duration-300">Contact</a></li>
             </ul>
+        </nav>
 
-            <!-- Mobile Menu (hidden by default) -->
-            <div id="mobile-menu" class="hidden md:hidden bg-brand-black text-white px-6 py-4 space-y-4">
-                <a href="#hero" class="block hover:text-brand-blue">Home</a>
-                <a href="#about" class="block hover:text-brand-blue">About</a>
-                <a href="#services" class="block hover:text-brand-blue">Services</a>
-                <a href="#portfolio" class="block hover:text-brand-blue">Portfolio</a>
-                <a href="#contact" class="block hover:text-brand-blue">Contact</a>
-            </div>
+        <div id="mobile-menu" class="md:hidden bg-brand-black text-white px-6 py-4 space-y-4 mobile-menu-animated">
+            <a href="#hero" class="block hover:text-brand-blue">Home</a>
+            <a href="#about" class="block hover:text-brand-blue">About</a>
+            <a href="#services" class="block hover:text-brand-blue">Services</a>
+            <a href="#portfolio" class="block hover:text-brand-blue">Portfolio</a>
+            <a href="#contact" class="block hover:text-brand-blue">Contact</a>
         </div>
     </header>
 
@@ -495,13 +588,12 @@
             <div class="container mx-auto px-4 md:px-8 lg:px-16 text-center">
                 <h2 class="text-4xl font-bold text-brand-black mb-12" data-aos="fade-down" data-aos-duration="1000">Our Recent Work</h2>
                 <div id="portfolio-items-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <!-- Adjusted font size for loading text -->
                     <p class="text-base text-gray-600">Loading portfolio items...</p>
                 </div>
             </div>
         </section>
 
-        <section id="more-projects-stats" class="py-16 bg-brand-blue text-white">
+        <section id="more-projects-stats" class="py-16 bg-brand-blue text-white statistics-section">
             <div class="container mx-auto px-4 md:px-8 lg:px-16 text-center">
                 <div class="bg-blue-800 p-8 rounded-lg shadow-lg mb-12" data-aos="fade-up" data-aos-duration="1000">
                     <h2 class="text-3xl md:text-4xl font-bold mb-4">More Projects Coming Soon</h2>
@@ -695,15 +787,22 @@
             const mobileMenu = document.getElementById('mobile-menu');
 
             function toggleMobileMenu() {
-                mobileMenu.classList.toggle('hidden');
+                mobileMenu.classList.toggle('open');
             }
 
             mobileMenuButton.addEventListener('click', toggleMobileMenu);
 
+            // Close mobile menu when clicking a link inside
+            document.querySelectorAll('#mobile-menu a').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.remove('open');
+                });
+            });
+
             // Close mobile menu when clicking outside (optional, but good UX)
             document.addEventListener('click', function(event) {
-                if (!mobileMenu.contains(event.target) && !mobileMenuButton.contains(event.target) && !mobileMenu.classList.contains('hidden')) {
-                    mobileMenu.classList.add('hidden');
+                if (!mobileMenu.contains(event.target) && !mobileMenuButton.contains(event.target) && mobileMenu.classList.contains('open')) {
+                    mobileMenu.classList.remove('open');
                 }
             });
 
@@ -722,6 +821,57 @@
                     }
                 });
             });
+            
+            // Scroll Progress Bar
+            const progressBar = document.getElementById('progressBar');
+            if (progressBar) {
+                window.addEventListener('scroll', () => {
+                    const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+                    const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                    const scrolled = (scrollTop / scrollHeight) * 100;
+                    progressBar.style.width = scrolled + '%';
+                });
+            }
+
+            // Animated Statistics Counters
+            const statisticsSection = document.querySelector('.statistics-section');
+            if (statisticsSection) {
+                const numbers = {
+                    projects: document.getElementById('projects-delivered'),
+                    clients: document.getElementById('happy-clients'),
+                    successRate: document.getElementById('success-rate')
+                };
+
+                const animateCounter = (element, target) => {
+                    let current = 0;
+                    const step = Math.ceil(target / 100);
+                    const timer = setInterval(() => {
+                        current += step;
+                        if (current >= target) {
+                            clearInterval(timer);
+                            current = target;
+                        }
+                        if (element) {
+                            element.textContent = current + (element.id === 'success-rate' ? '%' : '');
+                        }
+                    }, 10);
+                };
+
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            animateCounter(numbers.projects, window.statsTargets.projects);
+                            animateCounter(numbers.clients, window.statsTargets.clients);
+                            animateCounter(numbers.successRate, window.statsTargets.successRate);
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.5 });
+                
+                // Expose a global variable to the Intersection Observer
+                window.statsTargets = { projects: 0, clients: 0, successRate: 0 };
+                observer.observe(statisticsSection);
+            }
         });
     </script>
     <script
@@ -737,4 +887,3 @@
     </script>
 </body>
 </html>
-
