@@ -756,6 +756,7 @@
             transform: translateY(-20px) scale(0.95);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             pointer-events: none;
+            display: none;
         }
 
         .mobile-menu-animated.show {
@@ -763,6 +764,7 @@
             visibility: visible;
             transform: translateY(0) scale(1);
             pointer-events: auto;
+            display: block;
         }
 
         /* Mobile Menu Link Animations */
@@ -890,7 +892,7 @@
             </ul>
         </nav>
 
-        <div id="mobile-menu" class="md:hidden fixed top-20 left-4 right-4 bg-white/95 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl py-6 px-6 space-y-2 mobile-menu-animated z-40" style="display: none;">
+        <div id="mobile-menu" class="md:hidden fixed top-20 left-4 right-4 bg-white/95 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl py-6 px-6 space-y-2 mobile-menu-animated z-40">
             <a href="#hero" class="block py-3 px-4 rounded-xl text-gray-800 font-medium hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600 hover:text-white transition-all duration-300 transform hover:scale-105 mobile-menu-link">Home</a>
             <a href="#about" class="block py-3 px-4 rounded-xl text-gray-800 font-medium hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600 hover:text-white transition-all duration-300 transform hover:scale-105 mobile-menu-link">About</a>
             <a href="#services" class="block py-3 px-4 rounded-xl text-gray-800 font-medium hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600 hover:text-white transition-all duration-300 transform hover:scale-105 mobile-menu-link">Services</a>
@@ -1518,33 +1520,30 @@
             const mobileMenuButton = document.getElementById('mobile-menu-button');
             const mobileMenu = document.getElementById('mobile-menu');
             const mobileMenuBackdrop = document.getElementById('mobile-menu-backdrop');
-            const hamburgerIcon = mobileMenuButton.querySelector('.hamburger-icon');
+            const hamburgerIcon = mobileMenuButton ? mobileMenuButton.querySelector('.hamburger-icon') : null;
 
-            console.log('Mobile menu elements:', {
-                button: mobileMenuButton,
-                menu: mobileMenu,
-                backdrop: mobileMenuBackdrop,
-                icon: hamburgerIcon
+            console.log('Mobile menu elements found:', {
+                button: !!mobileMenuButton,
+                menu: !!mobileMenu,
+                backdrop: !!mobileMenuBackdrop,
+                icon: !!hamburgerIcon
             });
 
             function toggleMobileMenu() {
-                const isOpen = mobileMenu.classList.contains('show');
-                console.log('Toggle mobile menu, isOpen:', isOpen);
+                console.log('Toggle mobile menu clicked');
                 
-                if (isOpen) {
+                if (mobileMenu.classList.contains('show')) {
                     // Close menu
                     mobileMenu.classList.remove('show');
-                    mobileMenuBackdrop.classList.remove('show');
-                    hamburgerIcon.classList.remove('active');
+                    if (mobileMenuBackdrop) mobileMenuBackdrop.classList.remove('show');
+                    if (hamburgerIcon) hamburgerIcon.classList.remove('active');
                     document.body.style.overflow = '';
-                    mobileMenu.style.display = 'none';
                     console.log('Menu closed');
                 } else {
                     // Open menu
-                    mobileMenu.style.display = 'block';
                     mobileMenu.classList.add('show');
-                    mobileMenuBackdrop.classList.add('show');
-                    hamburgerIcon.classList.add('active');
+                    if (mobileMenuBackdrop) mobileMenuBackdrop.classList.add('show');
+                    if (hamburgerIcon) hamburgerIcon.classList.add('active');
                     document.body.style.overflow = 'hidden';
                     console.log('Menu opened');
                 }
@@ -1552,20 +1551,28 @@
 
             function closeMobileMenu() {
                 mobileMenu.classList.remove('show');
-                mobileMenuBackdrop.classList.remove('show');
-                hamburgerIcon.classList.remove('active');
+                if (mobileMenuBackdrop) mobileMenuBackdrop.classList.remove('show');
+                if (hamburgerIcon) hamburgerIcon.classList.remove('active');
                 document.body.style.overflow = '';
-                mobileMenu.style.display = 'none';
             }
 
+            // Add click event to hamburger button
             if (mobileMenuButton) {
-                mobileMenuButton.addEventListener('click', toggleMobileMenu);
+                mobileMenuButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Hamburger button clicked');
+                    alert('Hamburger clicked!'); // Test alert
+                    toggleMobileMenu();
+                });
             } else {
                 console.error('Mobile menu button not found!');
             }
 
             // Close mobile menu when clicking backdrop
-            mobileMenuBackdrop.addEventListener('click', closeMobileMenu);
+            if (mobileMenuBackdrop) {
+                mobileMenuBackdrop.addEventListener('click', closeMobileMenu);
+            }
 
             // Close mobile menu when clicking a link inside
             document.querySelectorAll('#mobile-menu a').forEach(link => {
@@ -1575,16 +1582,19 @@
                 });
             });
 
-            // Close mobile menu when clicking outside (optional, but good UX)
+            // Close mobile menu when clicking outside
             document.addEventListener('click', function(event) {
-                if (!mobileMenu.contains(event.target) && !mobileMenuButton.contains(event.target) && mobileMenu.classList.contains('show')) {
+                if (mobileMenu && mobileMenuButton && 
+                    !mobileMenu.contains(event.target) && 
+                    !mobileMenuButton.contains(event.target) && 
+                    mobileMenu.classList.contains('show')) {
                     closeMobileMenu();
                 }
             });
 
             // Close mobile menu on escape key
             document.addEventListener('keydown', function(event) {
-                if (event.key === 'Escape' && mobileMenu.classList.contains('show')) {
+                if (event.key === 'Escape' && mobileMenu && mobileMenu.classList.contains('show')) {
                     closeMobileMenu();
                 }
             });
