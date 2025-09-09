@@ -200,6 +200,51 @@
         let currentTestimonialIndex = 0;
         let testimonialInterval = null;
 
+        // Toast notification functions
+        function showToast(message, type = 'success', duration = 5000) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast-notification ${type}`;
+            
+            const icon = type === 'success' ? 
+                '<svg class="toast-icon" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>' :
+                '<svg class="toast-icon" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>';
+            
+            toast.innerHTML = `
+                <div class="toast-content">
+                    ${icon}
+                    <div class="toast-message">${message}</div>
+                    <button class="toast-close" onclick="closeToast(this)">
+                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                        </svg>
+                    </button>
+                </div>
+            `;
+            
+            container.appendChild(toast);
+            
+            // Trigger animation
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 100);
+            
+            // Auto remove after duration
+            setTimeout(() => {
+                closeToast(toast.querySelector('.toast-close'));
+            }, duration);
+        }
+
+        function closeToast(button) {
+            const toast = button.closest('.toast-notification');
+            toast.classList.remove('show');
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 400);
+        }
+
         // Function to load testimonials
         function loadTestimonials() {
             const testimonialText = document.getElementById('testimonial-text');
@@ -299,6 +344,12 @@
                     const emailAddress = document.getElementById('email-address').value;
                     const projectDetails = document.getElementById('project-details').value;
 
+                    // Show loading state
+                    const submitButton = contactForm.querySelector('button[type="submit"]');
+                    const originalButtonText = submitButton.innerHTML;
+                    submitButton.innerHTML = '<i data-lucide="loader-2" class="w-5 h-5 mr-2 animate-spin"></i>Sending Message...';
+                    submitButton.disabled = true;
+
                     // This part for Firebase storage is now separate from the email sending via FormSubmit
                     // You can keep it if you want to store messages in Firebase AND send email via FormSubmit
                     try {
@@ -309,18 +360,39 @@
                             timestamp: serverTimestamp()
                         });
 
-                        // contactForm.reset(); // FormSubmit will handle this
-                        contactMessageDiv.textContent = "Your message has been sent successfully!";
-                        contactMessageDiv.classList.remove('hidden', 'text-red-500');
-                        contactMessageDiv.classList.add('text-green-500');
-                        setTimeout(() => {
+                        // Show success toast
+                        showToast(
+                            `Thank you ${fullName}! Your message has been sent successfully. We'll get back to you within 24 hours.`,
+                            'success',
+                            8000
+                        );
+
+                        // Reset form
+                        contactForm.reset();
+                        
+                        // Hide the old message div if it exists
+                        if (contactMessageDiv) {
                             contactMessageDiv.classList.add('hidden');
-                        }, 5000); // Hide message after 5 seconds
+                        }
+
                     } catch (error) {
                         console.error("Error saving message to Firebase:", error);
-                        contactMessageDiv.textContent = "Failed to save message. Please try again.";
-                        contactMessageDiv.classList.remove('hidden', 'text-green-500');
-                        contactMessageDiv.classList.add('text-red-500');
+                        
+                        // Show error toast
+                        showToast(
+                            "Sorry, there was an error sending your message. Please try again or contact us directly.",
+                            'error',
+                            6000
+                        );
+                    } finally {
+                        // Restore button state
+                        submitButton.innerHTML = originalButtonText;
+                        submitButton.disabled = false;
+                        
+                        // Re-initialize Lucide icons
+                        if (typeof lucide !== 'undefined') {
+                            lucide.createIcons();
+                        }
                     }
                 });
             }
@@ -490,6 +562,60 @@
         #testimonial-company {
             transition: opacity 0.3s ease-in-out;
         }
+
+        /* Toast notification styles */
+        .toast-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 20px 24px;
+            border-radius: 16px;
+            color: white;
+            font-weight: 600;
+            box-shadow: var(--shadow-xl);
+            transform: translateX(400px);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            max-width: 400px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .toast-notification.show {
+            transform: translateX(0);
+        }
+        .toast-notification.success {
+            background: linear-gradient(135deg, #10b981, #059669);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        .toast-notification.error {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        .toast-notification .toast-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .toast-notification .toast-icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+        .toast-notification .toast-message {
+            flex: 1;
+        }
+        .toast-notification .toast-close {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        .toast-notification .toast-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
         .icon-bg-blue { 
             background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
             border-radius: 16px;
@@ -600,6 +726,9 @@
     <div class="scroll-progress-container">
         <div class="scroll-progress-bar" id="progressBar"></div>
     </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container"></div>
 
     <header class="glassmorphism-header text-white p-4 shadow-lg fixed w-full z-50">
         <nav class="container mx-auto flex justify-between items-center">
