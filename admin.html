@@ -1,404 +1,990 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Dashboard - Prince Alex Digital</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script type="module">
-    // Import Firebase services
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-    import {
-      getAuth,
-      signInWithEmailAndPassword,
-      onAuthStateChanged,
-      signOut,
-    } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-    import {
-      getFirestore,
-      doc,
-      setDoc,
-      getDoc,
-      onSnapshot,
-      collection,
-      addDoc,
-      deleteDoc,
-      updateDoc,
-      serverTimestamp, // Import serverTimestamp for consistent timestamps
-    } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
-    // Removed Firebase Storage imports as image upload is no longer direct
-
-    // Firebase configuration (from your provided code)
-    const firebaseConfig = {
-      apiKey: "AIzaSyCW0BqYOirnrPRkgvSvtSjK2-OGVTa71uQ",
-      authDomain: "princealexdigital-4848c.firebaseapp.com",
-      projectId: "princealexdigital-4848c",
-      storageBucket: "princealexdigital-4848c.appspot.com",
-      messagingSenderId: "1316427677",
-      appId: "1:1316427677:web:21bdffbf2095d1d5064174"
-    };
-
-    // Initialize Firebase services
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
-    // Removed Firebase Storage initialization
-
-    // Get the dynamic app ID from the environment if available, otherwise use a default
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-
-    // DOM elements
-    const loginForm = document.getElementById("login-form");
-    const dashboard = document.getElementById("dashboard");
-    const loginPage = document.getElementById("login-page");
-    const logoutBtn = document.getElementById("logout-btn");
-    const loadingIndicator = document.getElementById("loading-indicator"); // Loading indicator element
-
-    // Function to show loading indicator
-    function showLoading() {
-      loadingIndicator.classList.remove("hidden");
-    }
-
-    // Function to hide loading indicator
-    function hideLoading() {
-      loadingIndicator.classList.add("hidden");
-    }
-
-    // --- Authentication Logic ---
-    loginForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      showLoading(); // Show loading indicator
-      const email = loginForm.email.value;
-      const password = loginForm.password.value;
-
-      try {
-        await signInWithEmailAndPassword(auth, email, password);
-        // UI update handled by onAuthStateChanged
-      } catch (error) {
-        // Use a custom modal or message box instead of alert()
-        displayMessage("Login failed: " + error.message, "error");
-      } finally {
-        hideLoading(); // Hide loading indicator
-      }
-    });
-
-    logoutBtn.addEventListener("click", async () => {
-      showLoading(); // Show loading indicator
-      try {
-        await signOut(auth);
-        // UI update handled by onAuthStateChanged
-      } catch (error) {
-        console.error("Error logging out:", error);
-        displayMessage("Logout failed: " + error.message, "error");
-      } finally {
-        hideLoading(); // Hide loading indicator
-      }
-    });
-
-    // Listen for authentication state changes
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        loginPage.classList.add("hidden");
-        dashboard.classList.remove("hidden");
-        // Load data only after successful login
-        loadStats();
-        loadPortfolio();
-        loadTestimonials();
-        loadMessages();
-      } else {
-        dashboard.classList.add("hidden");
-        loginPage.classList.remove("hidden");
-      }
-    });
-
-    // --- Custom Message Box (instead of alert) ---
-    const messageBox = document.createElement('div');
-    messageBox.className = 'fixed top-4 right-4 bg-blue-500 text-white p-3 rounded shadow-lg hidden z-50';
-    document.body.appendChild(messageBox);
-
-    function displayMessage(message, type = 'info') {
-      messageBox.textContent = message;
-      messageBox.className = `fixed top-4 right-4 p-3 rounded shadow-lg z-50 ${
-        type === 'error' ? 'bg-red-500' : 'bg-blue-500'
-      }`;
-      messageBox.classList.remove('hidden');
-      setTimeout(() => {
-        messageBox.classList.add('hidden');
-      }, 3000); // Hide after 3 seconds
-    }
-
-
-    // --- Statistics Update Logic ---
-    const statForm = document.getElementById("stats-form");
-    statForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      showLoading(); // Show loading indicator
-      const statsRef = doc(db, `artifacts/${appId}/public/data/statistics/currentStats`);
-      try {
-        await setDoc(statsRef, {
-          projects: statForm.projects.value,
-          clients: statForm.clients.value,
-          successRate: statForm.success.value,
-        });
-        displayMessage("Statistics updated successfully!");
-      } catch (error) {
-        console.error("Error updating statistics:", error);
-        displayMessage("Failed to update statistics: " + error.message, "error");
-      } finally {
-        hideLoading(); // Hide loading indicator
-      }
-    });
-
-    // Load statistics on dashboard display
-    function loadStats() {
-      const statsRef = doc(db, `artifacts/${appId}/public/data/statistics/currentStats`);
-      onSnapshot(statsRef, (docSnap) => {
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          statForm.projects.value = data.projects || "";
-          statForm.clients.value = data.clients || "";
-          statForm.success.value = data.successRate || "";
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Prince Alex Digital</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Custom Styles -->
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #a5b4fc;
+            --secondary-color: #f59e0b;
+            --accent-color: #10b981;
+            --dark-bg: #0f172a;
+            --dark-secondary: #1e293b;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --text-light: #94a3b8;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-accent: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
         }
-      }, (error) => {
-        console.error("Error loading statistics:", error);
-      });
-    }
 
-    // --- Portfolio Management Logic ---
-    const portfolioList = document.getElementById("portfolio-list");
-    const portfolioForm = document.getElementById("portfolio-form");
-    // Removed imageUploadInput as direct file upload is no longer used
-
-    portfolioForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      showLoading(); // Show loading indicator
-
-      const title = portfolioForm.title.value;
-      const description = portfolioForm.description.value;
-      const link = portfolioForm.link.value;
-      const imageUrl = portfolioForm.imageUrl.value; // Get the image URL from the text input
-      const linkText = portfolioForm.linkText.value || "View Project";
-
-      // Add project data to Firestore, including the image URL
-      try {
-        await addDoc(collection(db, `artifacts/${appId}/public/data/portfolio`), {
-          title: title,
-          description: description,
-          link: link,
-          imageUrl: imageUrl, // Save the provided image URL
-          linkText: linkText,
-          createdAt: serverTimestamp() // Add a timestamp for ordering if needed
-        });
-        displayMessage("Project added successfully!");
-        portfolioForm.reset(); // Clear the form fields
-      } catch (error) {
-        console.error("Error adding project to Firestore:", error);
-        displayMessage("Failed to add project: " + error.message, "error");
-      } finally {
-        hideLoading(); // Hide loading indicator
-      }
-    });
-
-    // Load portfolio projects
-    function loadPortfolio() {
-      const portfolioRef = collection(db, `artifacts/${appId}/public/data/portfolio`);
-      onSnapshot(portfolioRef, (snapshot) => {
-        portfolioList.innerHTML = ""; // Clear current list
-        snapshot.forEach((docSnap) => {
-          const data = docSnap.data();
-          portfolioList.innerHTML += `
-            <div class="border p-4 rounded-lg shadow mb-4 bg-white flex flex-col md:flex-row items-center">
-              ${data.imageUrl ? `<img src="${data.imageUrl}" alt="${data.title}" class="w-full md:w-32 h-32 object-cover rounded-md mr-4 mb-4 md:mb-0">` : ''}
-              <div class="flex-grow">
-                <p class="text-lg font-semibold">${data.title}</p>
-                <p class="text-gray-600 mb-2">${data.description}</p>
-                <a href="${data.link}" target="_blank" class="text-blue-600 hover:underline">${data.linkText}</a>
-              </div>
-              <button onclick="deletePortfolio('${docSnap.id}')" class="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 mt-4 md:mt-0 md:ml-4">Delete</button>
-            </div>
-          `;
-        });
-      }, (error) => {
-        console.error("Error loading portfolio:", error);
-      });
-    }
-
-    // Global function to delete portfolio item (accessible from HTML)
-    window.deletePortfolio = async (id) => {
-      showLoading(); // Show loading indicator
-      try {
-        await deleteDoc(doc(db, `artifacts/${appId}/public/data/portfolio`, id));
-        displayMessage("Project deleted successfully!");
-      } catch (error) {
-        console.error("Error deleting portfolio item:", error);
-        displayMessage("Failed to delete project: " + error.message, "error");
-      } finally {
-        hideLoading(); // Hide loading indicator
-      }
-    };
-
-    // --- Testimonials Management Logic ---
-    const testimonialForm = document.getElementById("testimonial-form");
-    const testimonialList = document.getElementById("testimonial-list");
-
-    testimonialForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      showLoading(); // Show loading indicator
-      try {
-        await addDoc(collection(db, `artifacts/${appId}/public/data/testimonials`), {
-          quote: testimonialForm.quote.value,
-          author: testimonialForm.author.value,
-          company: testimonialForm.company.value,
-          createdAt: serverTimestamp() // Add timestamp
-        });
-        displayMessage("Testimonial added successfully!");
-        testimonialForm.reset();
-      } catch (error) {
-        console.error("Error adding testimonial:", error);
-        displayMessage("Failed to add testimonial: " + error.message, "error");
-      } finally {
-        hideLoading(); // Hide loading indicator
-      }
-    });
-
-    // Load testimonials
-    function loadTestimonials() {
-      const ref = collection(db, `artifacts/${appId}/public/data/testimonials`);
-      onSnapshot(ref, (snapshot) => {
-        testimonialList.innerHTML = "";
-        snapshot.forEach((docSnap) => {
-          const data = docSnap.data();
-          testimonialList.innerHTML += `
-            <div class="border p-4 rounded-lg shadow mb-4 bg-white">
-              <p class="italic">"${data.quote}"</p>
-              <p class="text-gray-700 mt-2">- ${data.author}, <span class="font-semibold">${data.company}</span></p>
-              <button onclick="deleteTestimonial('${docSnap.id}')" class="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 mt-2">Delete</button>
-            </div>
-          `;
-        });
-      }, (error) => {
-        console.error("Error loading testimonials:", error);
-      });
-    }
-
-    // Global function to delete testimonial (accessible from HTML)
-    window.deleteTestimonial = async (id) => {
-      showLoading(); // Show loading indicator
-      try {
-        await deleteDoc(doc(db, `artifacts/${appId}/public/data/testimonials`, id));
-        displayMessage("Testimonial deleted successfully!");
-      } catch (error) {
-        console.error("Error deleting testimonial:", error);
-        displayMessage("Failed to delete testimonial: " + error.message, "error");
-      } finally {
-        hideLoading(); // Hide loading indicator
-      }
-    };
-
-    // --- Messages Display Logic ---
-    function loadMessages() {
-      const ref = collection(db, `artifacts/${appId}/public/data/messages`);
-      const container = document.getElementById("messages-list");
-      onSnapshot(ref, (snapshot) => {
-        container.innerHTML = "";
-        if (snapshot.empty) {
-          container.innerHTML = '<p class="text-gray-500">No messages received yet.</p>';
-          return;
+        .bg-brand-blue {
+            background: var(--gradient-primary);
         }
-        snapshot.forEach((docSnap) => {
-          const m = docSnap.data();
-          // Format timestamp if available
-          const messageDate = m.createdAt ? new Date(m.createdAt.toDate()).toLocaleString() : 'N/A';
-          container.innerHTML += `
-            <div class="border p-4 rounded-lg shadow mb-4 bg-white">
-              <p class="text-lg font-semibold">${m.fullName} (<a href="mailto:${m.emailAddress}" class="text-blue-600 hover:underline">${m.emailAddress}</a>)</p>
-              <p class="text-gray-700 mt-1">${m.projectDetails}</p>
-              <p class="text-sm text-gray-500 mt-2">Received: ${messageDate}</p>
-            </div>
-          `;
+        .text-brand-blue {
+            color: var(--primary-color);
+        }
+        .border-brand-blue {
+            border-color: var(--primary-color);
+        }
+        .bg-brand-black {
+            background: var(--dark-bg);
+        }
+        .text-brand-black {
+            color: var(--text-primary);
+        }
+
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .sidebar-item {
+            transition: all 0.3s ease;
+        }
+        .sidebar-item:hover {
+            background: rgba(99, 102, 241, 0.1);
+            transform: translateX(4px);
+        }
+        .sidebar-item.active {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .loading-spinner {
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #6366f1;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 16px 24px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 500;
+            box-shadow: var(--shadow-lg);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+        .message-toast.show {
+            transform: translateX(0);
+        }
+        .message-toast.success {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+        .message-toast.error {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+        .message-toast.info {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+        }
+    </style>
+    <script type="module">
+        // Import Firebase services
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+        import {
+            getAuth,
+            signInWithEmailAndPassword,
+            onAuthStateChanged,
+            signOut,
+            sendPasswordResetEmail,
+        } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+        import {
+            getFirestore,
+            doc,
+            setDoc,
+            getDoc,
+            onSnapshot,
+            collection,
+            addDoc,
+            deleteDoc,
+            updateDoc,
+            serverTimestamp,
+            query,
+            orderBy,
+        } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+        // Firebase configuration (same as your main site)
+        const firebaseConfig = {
+            apiKey: "AIzaSyCW0BqYOirnrPRkgvSvtSjK2-OGVTa71uQ",
+            authDomain: "princealexdigital-4848c.firebaseapp.com",
+            projectId: "princealexdigital-4848c",
+            storageBucket: "princealexdigital-4848c.firebasestorage.app",
+            messagingSenderId: "1316427677",
+            appId: "1:1316427677:web:21bdffbf2095d1d5064174"
+        };
+
+        // Initialize Firebase services
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // Get the dynamic app ID from the environment if available, otherwise use a default
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        // Global state
+        let currentUser = null;
+        let currentSection = 'dashboard';
+
+        // DOM elements
+        const loginPage = document.getElementById("login-page");
+        const dashboard = document.getElementById("dashboard");
+        const loadingIndicator = document.getElementById("loading-indicator");
+        const messageToast = document.getElementById("message-toast");
+
+        // Utility functions
+        function showLoading() {
+            loadingIndicator.classList.remove("hidden");
+        }
+
+        function hideLoading() {
+            loadingIndicator.classList.add("hidden");
+        }
+
+        function showMessage(message, type = 'info') {
+            messageToast.textContent = message;
+            messageToast.className = `message-toast ${type} show`;
+            setTimeout(() => {
+                messageToast.classList.remove('show');
+            }, 4000);
+        }
+
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.remove('hidden');
+            
+            // Update active sidebar item
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`[data-section="${sectionId}"]`).classList.add('active');
+            
+            currentSection = sectionId;
+        }
+
+        // Authentication functions
+        async function handleLogin(email, password) {
+            try {
+                showLoading();
+                await signInWithEmailAndPassword(auth, email, password);
+                showMessage("Login successful!", "success");
+            } catch (error) {
+                console.error("Login error:", error);
+                let errorMessage = "Login failed. Please try again.";
+                
+                switch (error.code) {
+                    case 'auth/user-not-found':
+                        errorMessage = "No account found with this email address.";
+                        break;
+                    case 'auth/wrong-password':
+                        errorMessage = "Incorrect password.";
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = "Invalid email address.";
+                        break;
+                    case 'auth/too-many-requests':
+                        errorMessage = "Too many failed attempts. Please try again later.";
+                        break;
+                }
+                
+                showMessage(errorMessage, "error");
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function handleLogout() {
+            try {
+                showLoading();
+                await signOut(auth);
+                showMessage("Logged out successfully!", "info");
+            } catch (error) {
+                console.error("Logout error:", error);
+                showMessage("Logout failed. Please try again.", "error");
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function handlePasswordReset(email) {
+            try {
+                showLoading();
+                await sendPasswordResetEmail(auth, email);
+                showMessage("Password reset email sent! Check your inbox.", "success");
+            } catch (error) {
+                console.error("Password reset error:", error);
+                let errorMessage = "Failed to send password reset email.";
+                
+                switch (error.code) {
+                    case 'auth/user-not-found':
+                        errorMessage = "No account found with this email address.";
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = "Invalid email address.";
+                        break;
+                }
+                
+                showMessage(errorMessage, "error");
+            } finally {
+                hideLoading();
+            }
+        }
+
+
+        // Statistics management
+        async function updateStatistics(projects, clients, successRate) {
+            try {
+                showLoading();
+                const statsRef = doc(db, `artifacts/${appId}/public/data/statistics/currentStats`);
+                await setDoc(statsRef, {
+                    projects: parseInt(projects),
+                    clients: parseInt(clients),
+                    successRate: parseInt(successRate)
+                });
+                showMessage("Statistics updated successfully!", "success");
+            } catch (error) {
+                console.error("Error updating statistics:", error);
+                showMessage("Failed to update statistics: " + error.message, "error");
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function loadStatistics() {
+            const statsRef = doc(db, `artifacts/${appId}/public/data/statistics/currentStats`);
+            onSnapshot(statsRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    document.getElementById('stats-projects').value = data.projects || "";
+                    document.getElementById('stats-clients').value = data.clients || "";
+                    document.getElementById('stats-success').value = data.successRate || "";
+                    
+                    // Update dashboard display
+                    document.getElementById('success-rate-display').textContent = data.successRate || "0";
+                }
+            }, (error) => {
+                console.error("Error loading statistics:", error);
+            });
+        }
+
+        // Portfolio management
+        async function addPortfolioItem(title, description, imageUrl, link, linkText) {
+            try {
+                showLoading();
+                await addDoc(collection(db, `artifacts/${appId}/public/data/portfolio`), {
+                    title: title,
+                    description: description,
+                    imageUrl: imageUrl,
+                    link: link,
+                    linkText: linkText || "View Project",
+                    createdAt: serverTimestamp()
+                });
+                showMessage("Portfolio item added successfully!", "success");
+                document.getElementById('portfolio-form').reset();
+            } catch (error) {
+                console.error("Error adding portfolio item:", error);
+                showMessage("Failed to add portfolio item: " + error.message, "error");
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function deletePortfolioItem(id) {
+            try {
+                showLoading();
+                await deleteDoc(doc(db, `artifacts/${appId}/public/data/portfolio`, id));
+                showMessage("Portfolio item deleted successfully!", "success");
+            } catch (error) {
+                console.error("Error deleting portfolio item:", error);
+                showMessage("Failed to delete portfolio item: " + error.message, "error");
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function loadPortfolio() {
+            const portfolioRef = collection(db, `artifacts/${appId}/public/data/portfolio`);
+            const q = query(portfolioRef, orderBy('createdAt', 'desc'));
+            
+            onSnapshot(q, (snapshot) => {
+                const container = document.getElementById('portfolio-list');
+                container.innerHTML = "";
+                
+                if (snapshot.empty) {
+                    container.innerHTML = `
+                        <div class="text-center py-12">
+                            <i class="fas fa-folder-open text-4xl text-gray-400 mb-4"></i>
+                            <p class="text-gray-500 text-lg">No portfolio items yet</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                snapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    const item = document.createElement('div');
+                    item.className = 'bg-white rounded-xl shadow-lg p-6 card-hover fade-in';
+                    item.innerHTML = `
+                        <div class="flex flex-col md:flex-row gap-6">
+                            ${data.imageUrl ? `
+                                <div class="md:w-48 flex-shrink-0">
+                                    <img src="${data.imageUrl}" alt="${data.title}" 
+                                         class="w-full h-32 md:h-48 object-cover rounded-lg shadow-md">
+                                </div>
+                            ` : ''}
+                            <div class="flex-1">
+                                <h3 class="text-xl font-bold text-gray-800 mb-2">${data.title}</h3>
+                                <p class="text-gray-600 mb-4">${data.description}</p>
+                                <div class="flex flex-col sm:flex-row gap-3">
+                                    <a href="${data.link}" target="_blank" 
+                                       class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                        <i class="fas fa-external-link-alt mr-2"></i>
+                                        ${data.linkText}
+                                    </a>
+                                    <button onclick="deletePortfolioItem('${docSnap.id}')" 
+                                            class="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                                        <i class="fas fa-trash mr-2"></i>
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(item);
+                });
+            }, (error) => {
+                console.error("Error loading portfolio:", error);
+            });
+        }
+
+        // Testimonials management
+        async function addTestimonial(quote, author, company) {
+            try {
+                showLoading();
+                await addDoc(collection(db, `artifacts/${appId}/public/data/testimonials`), {
+                    quote: quote,
+                    author: author,
+                    company: company,
+                    createdAt: serverTimestamp()
+                });
+                showMessage("Testimonial added successfully!", "success");
+                document.getElementById('testimonial-form').reset();
+            } catch (error) {
+                console.error("Error adding testimonial:", error);
+                showMessage("Failed to add testimonial: " + error.message, "error");
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function deleteTestimonial(id) {
+            try {
+                showLoading();
+                await deleteDoc(doc(db, `artifacts/${appId}/public/data/testimonials`, id));
+                showMessage("Testimonial deleted successfully!", "success");
+            } catch (error) {
+                console.error("Error deleting testimonial:", error);
+                showMessage("Failed to delete testimonial: " + error.message, "error");
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function loadTestimonials() {
+            const testimonialsRef = collection(db, `artifacts/${appId}/public/data/testimonials`);
+            const q = query(testimonialsRef, orderBy('createdAt', 'desc'));
+            
+            onSnapshot(q, (snapshot) => {
+                const container = document.getElementById('testimonial-list');
+                container.innerHTML = "";
+                
+                if (snapshot.empty) {
+                    container.innerHTML = `
+                        <div class="text-center py-12">
+                            <i class="fas fa-quote-left text-4xl text-gray-400 mb-4"></i>
+                            <p class="text-gray-500 text-lg">No testimonials yet</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                snapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    const item = document.createElement('div');
+                    item.className = 'bg-white rounded-xl shadow-lg p-6 card-hover fade-in';
+                    item.innerHTML = `
+                        <div class="flex items-start gap-4">
+                            <div class="flex-shrink-0">
+                                <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-quote-left text-white text-lg"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <blockquote class="text-gray-700 italic text-lg mb-4">
+                                    "${data.quote}"
+                                </blockquote>
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <p class="font-semibold text-gray-800">${data.author}</p>
+                                        <p class="text-gray-500">${data.company}</p>
+                                    </div>
+                                    <button onclick="deleteTestimonial('${docSnap.id}')" 
+                                            class="inline-flex items-center px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                                        <i class="fas fa-trash mr-2"></i>
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(item);
+                });
+            }, (error) => {
+                console.error("Error loading testimonials:", error);
+            });
+        }
+
+        // Messages management
+        function loadMessages() {
+            const messagesRef = collection(db, `artifacts/${appId}/public/data/messages`);
+            const q = query(messagesRef, orderBy('timestamp', 'desc'));
+            
+            onSnapshot(q, (snapshot) => {
+                const container = document.getElementById('messages-list');
+                container.innerHTML = "";
+                
+                if (snapshot.empty) {
+                    container.innerHTML = `
+                        <div class="text-center py-12">
+                            <i class="fas fa-envelope text-4xl text-gray-400 mb-4"></i>
+                            <p class="text-gray-500 text-lg">No messages received yet</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                snapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    const messageDate = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleString() : 'N/A';
+                    
+                    const item = document.createElement('div');
+                    item.className = 'bg-white rounded-xl shadow-lg p-6 card-hover fade-in';
+                    item.innerHTML = `
+                        <div class="flex items-start gap-4">
+                            <div class="flex-shrink-0">
+                                <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user text-white text-lg"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex justify-between items-start mb-3">
+                                    <div>
+                                        <h3 class="text-lg font-semibold text-gray-800">${data.fullName}</h3>
+                                        <a href="mailto:${data.emailAddress}" 
+                                           class="text-blue-600 hover:text-blue-800 transition-colors">
+                                            ${data.emailAddress}
+                                        </a>
+                                    </div>
+                                    <span class="text-sm text-gray-500">${messageDate}</span>
+                                </div>
+                                <div class="bg-gray-50 rounded-lg p-4">
+                                    <p class="text-gray-700 leading-relaxed">${data.projectDetails}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(item);
+                });
+            }, (error) => {
+                console.error("Error loading messages:", error);
+            });
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            // Login form
+            document.getElementById('login-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const email = e.target.email.value;
+                const password = e.target.password.value;
+                handleLogin(email, password);
+            });
+
+            // Password reset
+            document.getElementById('reset-password-btn').addEventListener('click', () => {
+                const email = document.getElementById('login-email').value;
+                if (!email) {
+                    showMessage("Please enter your email address first.", "error");
+                    return;
+                }
+                handlePasswordReset(email);
+            });
+
+            // Logout
+            document.getElementById('logout-btn').addEventListener('click', handleLogout);
+
+            // Statistics form
+            document.getElementById('stats-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const projects = e.target.projects.value;
+                const clients = e.target.clients.value;
+                const success = e.target.success.value;
+                updateStatistics(projects, clients, success);
+            });
+
+            // Portfolio form
+            document.getElementById('portfolio-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const title = e.target.title.value;
+                const description = e.target.description.value;
+                const imageUrl = e.target.imageUrl.value;
+                const link = e.target.link.value;
+                const linkText = e.target.linkText.value;
+                addPortfolioItem(title, description, imageUrl, link, linkText);
+            });
+
+            // Testimonial form
+            document.getElementById('testimonial-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const quote = e.target.quote.value;
+                const author = e.target.author.value;
+                const company = e.target.company.value;
+                addTestimonial(quote, author, company);
+            });
+
+            // Sidebar navigation
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const section = item.getAttribute('data-section');
+                    showSection(section);
+                });
+            });
+
+            // Mobile menu toggle
+            document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+                document.getElementById('sidebar').classList.toggle('-translate-x-full');
+            });
+
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', (e) => {
+                const sidebar = document.getElementById('sidebar');
+                const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+                
+                if (!sidebar.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+                    sidebar.classList.add('-translate-x-full');
+                }
+            });
         });
-      }, (error) => {
-        console.error("Error loading messages:", error);
-      });
-    }
-  </script>
+
+        // Authentication state listener
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            if (user) {
+                loginPage.classList.add("hidden");
+                dashboard.classList.remove("hidden");
+                loadStatistics();
+                loadPortfolio();
+                loadTestimonials();
+                loadMessages();
+            } else {
+                dashboard.classList.add("hidden");
+                loginPage.classList.remove("hidden");
+            }
+        });
+
+        // Make functions globally available
+        window.deletePortfolioItem = deletePortfolioItem;
+        window.deleteTestimonial = deleteTestimonial;
+    </script>
 </head>
 <body class="bg-gray-100 font-sans">
-
-  <!-- Loading Indicator -->
-  <div id="loading-indicator" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 hidden">
-    <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4"></div>
-    <style>
-      .loader {
-        border-top-color: #3498db; /* Blue */
-        -webkit-animation: spinner 1.5s linear infinite;
-        animation: spinner 1.5s linear infinite;
-      }
-      @-webkit-keyframes spinner {
-        0% { -webkit-transform: rotate(0deg); }
-        100% { -webkit-transform: rotate(360deg); }
-      }
-      @keyframes spinner {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-      }
-    </style>
-  </div>
-
-  <div id="login-page" class="flex justify-center items-center h-screen">
-    <form id="login-form" class="bg-white p-8 rounded-lg shadow-md w-full max-w-sm">
-      <h2 class="text-2xl font-bold text-center mb-6">Admin Login</h2>
-      <input name="email" type="email" placeholder="Email" required class="w-full mb-4 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
-      <input name="password" type="password" placeholder="Password" required class="w-full mb-6 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
-      <button type="submit" class="w-full bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 transition duration-300">Login</button>
-    </form>
-  </div>
-
-  <div id="dashboard" class="hidden p-6 space-y-10 max-w-4xl mx-auto">
-    <div class="flex justify-between items-center bg-white p-4 rounded-lg shadow">
-      <h1 class="text-3xl font-bold text-gray-800">Admin Dashboard</h1>
-      <button id="logout-btn" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-300">Logout</button>
+    <!-- Loading Indicator -->
+    <div id="loading-indicator" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg p-8 flex flex-col items-center">
+            <div class="loading-spinner mb-4"></div>
+            <p class="text-gray-600">Processing...</p>
+        </div>
     </div>
 
-    <section class="bg-white p-6 rounded-lg shadow">
-      <h2 class="text-xl font-semibold mb-4 text-gray-800">Update Website Statistics</h2>
-      <form id="stats-form" class="grid gap-4 max-w-md">
-        <input name="projects" placeholder="Projects Delivered" required class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
-        <input name="clients" placeholder="Happy Clients" required class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
-        <input name="success" placeholder="Success Rate" required class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
-        <button class="bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 transition duration-300">Update Stats</button>
-      </form>
-    </section>
+    <!-- Message Toast -->
+    <div id="message-toast" class="message-toast"></div>
 
-    <section class="bg-white p-6 rounded-lg shadow">
-      <h2 class="text-xl font-semibold mb-4 text-gray-800">Manage Portfolio Projects</h2>
-      <form id="portfolio-form" class="grid gap-4 max-w-md mb-6">
-        <input name="title" placeholder="Project Title" required class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" />
-        <input name="description" placeholder="Project Description" required class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" />
-        <!-- Reverted to text input for image URL -->
-        <input name="imageUrl" placeholder="Image URL" required class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" />
-        <input name="link" placeholder="Project Link (URL)" required class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" />
-        <input name="linkText" placeholder="Link Text (e.g., 'View Project')" class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" />
-        <button class="bg-green-600 text-white p-2 rounded-md hover:bg-green-700 transition duration-300">Add Project</button>
-      </form>
-      <div id="portfolio-list" class="space-y-4"></div>
-    </section>
+    <!-- Login Page -->
+    <div id="login-page" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+        <div class="glassmorphism rounded-3xl p-8 w-full max-w-md mx-4">
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 shadow-2xl mb-6">
+                    <img src="mylogo.png" alt="Prince Alex Digital Logo" class="w-12 h-12 object-contain">
+                </div>
+                <h1 class="text-3xl font-bold text-white mb-2">Admin Dashboard</h1>
+                <p class="text-gray-300">Sign in to manage your website</p>
+            </div>
 
-    <section class="bg-white p-6 rounded-lg shadow">
-      <h2 class="text-xl font-semibold mb-4 text-gray-800">Manage Client Testimonials</h2>
-      <form id="testimonial-form" class="grid gap-4 max-w-md mb-6">
-        <textarea name="quote" placeholder="Client Quote" required class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 h-24 resize-y"></textarea>
-        <input name="author" placeholder="Author" required class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" />
-        <input name="company" placeholder="Company" required class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" />
-        <button class="bg-green-600 text-white p-2 rounded-md hover:bg-green-700 transition duration-300">Add Testimonial</button>
-      </form>
-      <div id="testimonial-list" class="space-y-4"></div>
-    </section>
+            <form id="login-form" class="space-y-6">
+                <div>
+                    <label class="block text-white text-sm font-medium mb-2">Email Address</label>
+                    <input id="login-email" name="email" type="email" required 
+                           class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent backdrop-blur-sm"
+                           placeholder="Enter your email">
+                </div>
+                
+                <div>
+                    <label class="block text-white text-sm font-medium mb-2">Password</label>
+                    <input name="password" type="password" required 
+                           class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent backdrop-blur-sm"
+                           placeholder="Enter your password">
+                </div>
 
-    <section class="bg-white p-6 rounded-lg shadow">
-      <h2 class="text-xl font-semibold mb-4 text-gray-800">Received Contact Messages</h2>
-      <div id="messages-list" class="space-y-4"></div>
-    </section>
-  </div>
+                <button type="submit" 
+                        class="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105">
+                    Sign In
+                </button>
+
+                <button type="button" id="reset-password-btn" 
+                        class="w-full py-2 px-4 text-white/80 hover:text-white transition-colors text-sm">
+                    Forgot Password?
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="hidden min-h-screen bg-gray-100">
+        <!-- Mobile Header -->
+        <div class="lg:hidden bg-white shadow-sm p-4 flex items-center justify-between">
+            <h1 class="text-xl font-bold text-gray-800">Admin Dashboard</h1>
+            <button id="mobile-menu-btn" class="p-2 text-gray-600 hover:text-gray-800">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+        </div>
+
+        <div class="flex">
+            <!-- Sidebar -->
+            <div id="sidebar" class="fixed lg:static inset-y-0 left-0 z-30 w-64 bg-white shadow-lg transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out">
+                <div class="p-6">
+                    <div class="flex items-center mb-8">
+                        <img src="mylogo.png" alt="Prince Alex Digital Logo" class="w-10 h-10 object-contain mr-3">
+                        <h2 class="text-xl font-bold text-gray-800">Admin Panel</h2>
+                    </div>
+
+                    <nav class="space-y-2">
+                        <a href="#" data-section="dashboard" class="sidebar-item active flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50">
+                            <i class="fas fa-tachometer-alt mr-3"></i>
+                            Dashboard
+                        </a>
+                        <a href="#" data-section="statistics" class="sidebar-item flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50">
+                            <i class="fas fa-chart-bar mr-3"></i>
+                            Statistics
+                        </a>
+                        <a href="#" data-section="portfolio" class="sidebar-item flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50">
+                            <i class="fas fa-briefcase mr-3"></i>
+                            Portfolio
+                        </a>
+                        <a href="#" data-section="testimonials" class="sidebar-item flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50">
+                            <i class="fas fa-quote-left mr-3"></i>
+                            Testimonials
+                        </a>
+                        <a href="#" data-section="messages" class="sidebar-item flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50">
+                            <i class="fas fa-envelope mr-3"></i>
+                            Messages
+                        </a>
+                    </nav>
+
+                    <div class="mt-8 pt-6 border-t border-gray-200">
+                        <button id="logout-btn" class="w-full flex items-center px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                            <i class="fas fa-sign-out-alt mr-3"></i>
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="flex-1 lg:ml-0">
+                <!-- Header -->
+                <div class="bg-white shadow-sm p-6 hidden lg:block">
+                    <div class="flex justify-between items-center">
+                        <h1 class="text-3xl font-bold text-gray-800">Admin Dashboard</h1>
+                        <div class="flex items-center space-x-4">
+                            <span class="text-gray-600">Welcome back!</span>
+                            <button id="logout-btn" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">
+                                <i class="fas fa-sign-out-alt mr-2"></i>
+                                Logout
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Overview -->
+                <div id="dashboard" class="content-section p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <div class="bg-white rounded-xl shadow-lg p-6 card-hover">
+                            <div class="flex items-center">
+                                <div class="p-3 bg-blue-100 rounded-lg">
+                                    <i class="fas fa-briefcase text-blue-600 text-xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <p class="text-sm font-medium text-gray-600">Portfolio Items</p>
+                                    <p class="text-2xl font-bold text-gray-900" id="portfolio-count">-</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-xl shadow-lg p-6 card-hover">
+                            <div class="flex items-center">
+                                <div class="p-3 bg-green-100 rounded-lg">
+                                    <i class="fas fa-quote-left text-green-600 text-xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <p class="text-sm font-medium text-gray-600">Testimonials</p>
+                                    <p class="text-2xl font-bold text-gray-900" id="testimonial-count">-</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-xl shadow-lg p-6 card-hover">
+                            <div class="flex items-center">
+                                <div class="p-3 bg-purple-100 rounded-lg">
+                                    <i class="fas fa-envelope text-purple-600 text-xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <p class="text-sm font-medium text-gray-600">Messages</p>
+                                    <p class="text-2xl font-bold text-gray-900" id="message-count">-</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-xl shadow-lg p-6 card-hover">
+                            <div class="flex items-center">
+                                <div class="p-3 bg-orange-100 rounded-lg">
+                                    <i class="fas fa-chart-line text-orange-600 text-xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <p class="text-sm font-medium text-gray-600">Success Rate</p>
+                                    <p class="text-2xl font-bold text-gray-900" id="success-rate-display">-</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6">Quick Actions</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <button onclick="showSection('statistics')" class="p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors text-left">
+                                <i class="fas fa-chart-bar text-blue-600 text-2xl mb-2"></i>
+                                <h3 class="font-semibold text-gray-800">Update Statistics</h3>
+                                <p class="text-sm text-gray-600">Manage your website stats</p>
+                            </button>
+                            
+                            <button onclick="showSection('portfolio')" class="p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors text-left">
+                                <i class="fas fa-briefcase text-green-600 text-2xl mb-2"></i>
+                                <h3 class="font-semibold text-gray-800">Manage Portfolio</h3>
+                                <p class="text-sm text-gray-600">Add or edit projects</p>
+                            </button>
+                            
+                            <button onclick="showSection('testimonials')" class="p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors text-left">
+                                <i class="fas fa-quote-left text-purple-600 text-2xl mb-2"></i>
+                                <h3 class="font-semibold text-gray-800">Manage Testimonials</h3>
+                                <p class="text-sm text-gray-600">Add client reviews</p>
+                            </button>
+                            
+                            <button onclick="showSection('messages')" class="p-4 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors text-left">
+                                <i class="fas fa-envelope text-orange-600 text-2xl mb-2"></i>
+                                <h3 class="font-semibold text-gray-800">View Messages</h3>
+                                <p class="text-sm text-gray-600">Check contact form submissions</p>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statistics Management -->
+                <div id="statistics" class="content-section hidden p-6">
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6">Update Website Statistics</h2>
+                        <form id="stats-form" class="max-w-2xl">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Projects Delivered</label>
+                                    <input id="stats-projects" name="projects" type="number" required 
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Happy Clients</label>
+                                    <input id="stats-clients" name="clients" type="number" required 
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Success Rate (%)</label>
+                                    <input id="stats-success" name="success" type="number" min="0" max="100" required 
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                            </div>
+                            <button type="submit" class="mt-6 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                                <i class="fas fa-save mr-2"></i>
+                                Update Statistics
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Portfolio Management -->
+                <div id="portfolio" class="content-section hidden p-6">
+                    <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6">Add New Portfolio Item</h2>
+                        <form id="portfolio-form" class="max-w-4xl">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Project Title</label>
+                                    <input name="title" type="text" required 
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                           placeholder="Enter project title">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Image URL</label>
+                                    <input name="imageUrl" type="url" required 
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                           placeholder="https://example.com/image.jpg">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                                    <textarea name="description" rows="3" required 
+                                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                              placeholder="Enter project description"></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Project Link</label>
+                                    <input name="link" type="url" required 
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                           placeholder="https://example.com">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Link Text</label>
+                                    <input name="linkText" type="text" 
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                           placeholder="View Project" value="View Project">
+                                </div>
+                            </div>
+                            <button type="submit" class="mt-6 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors">
+                                <i class="fas fa-plus mr-2"></i>
+                                Add Portfolio Item
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6">Portfolio Items</h2>
+                        <div id="portfolio-list" class="space-y-6">
+                            <!-- Portfolio items will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonials Management -->
+                <div id="testimonials" class="content-section hidden p-6">
+                    <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6">Add New Testimonial</h2>
+                        <form id="testimonial-form" class="max-w-4xl">
+                            <div class="space-y-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Client Quote</label>
+                                    <textarea name="quote" rows="4" required 
+                                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                              placeholder="Enter the client's testimonial quote"></textarea>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Client Name</label>
+                                        <input name="author" type="text" required 
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                               placeholder="Enter client name">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Company</label>
+                                        <input name="company" type="text" required 
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                               placeholder="Enter company name">
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="mt-6 bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors">
+                                <i class="fas fa-plus mr-2"></i>
+                                Add Testimonial
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6">Client Testimonials</h2>
+                        <div id="testimonial-list" class="space-y-6">
+                            <!-- Testimonials will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Messages Management -->
+                <div id="messages" class="content-section hidden p-6">
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6">Contact Messages</h2>
+                        <div id="messages-list" class="space-y-6">
+                            <!-- Messages will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
