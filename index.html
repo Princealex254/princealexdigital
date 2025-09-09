@@ -229,10 +229,12 @@
                 toast.classList.add('show');
             }, 100);
             
-            // Auto remove after duration
-            setTimeout(() => {
-                closeToast(toast.querySelector('.toast-close'));
-            }, duration);
+            // Auto remove after duration (only if duration > 0)
+            if (duration > 0) {
+                setTimeout(() => {
+                    closeToast(toast.querySelector('.toast-close'));
+                }, duration);
+            }
         }
 
         function closeToast(button) {
@@ -336,9 +338,8 @@
 
             if (contactForm) {
                 contactForm.addEventListener('submit', async (e) => {
-                    // Prevent default form submission ONLY if using Firebase for submission
-                    // If using FormSubmit, we want the default submission to happen
-                    // e.preventDefault(); // Comment this out for FormSubmit
+                    // Prevent default form submission to avoid page refresh
+                    e.preventDefault();
 
                     const fullName = document.getElementById('full-name').value;
                     const emailAddress = document.getElementById('email-address').value;
@@ -350,9 +351,8 @@
                     submitButton.innerHTML = '<i data-lucide="loader-2" class="w-5 h-5 mr-2 animate-spin"></i>Sending Message...';
                     submitButton.disabled = true;
 
-                    // This part for Firebase storage is now separate from the email sending via FormSubmit
-                    // You can keep it if you want to store messages in Firebase AND send email via FormSubmit
                     try {
+                        // Save to Firebase
                         await addDoc(collection(db, `artifacts/${appId}/public/data/messages`), {
                             fullName: fullName,
                             emailAddress: emailAddress,
@@ -360,11 +360,27 @@
                             timestamp: serverTimestamp()
                         });
 
-                        // Show success toast
+                        // Send email via FormSubmit (without page refresh)
+                        const formData = new FormData();
+                        formData.append('name', fullName);
+                        formData.append('email', emailAddress);
+                        formData.append('message', projectDetails);
+                        formData.append('_subject', 'New Contact Message from Prince Alex Website');
+                        formData.append('_template', 'table');
+                        formData.append('_captcha', 'false');
+                        formData.append('_autoresponse', 'Thank you for contacting us! We\'ll get back to you shortly.');
+
+                        // Send email
+                        await fetch('https://formsubmit.co/princealexdigital@gmail.com', {
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        // Show success toast (no auto-dismiss)
                         showToast(
                             `Thank you ${fullName}! Your message has been sent successfully. We'll get back to you within 24 hours.`,
                             'success',
-                            8000
+                            0 // 0 means no auto-dismiss
                         );
 
                         // Reset form
@@ -376,13 +392,13 @@
                         }
 
                     } catch (error) {
-                        console.error("Error saving message to Firebase:", error);
+                        console.error("Error sending message:", error);
                         
-                        // Show error toast
+                        // Show error toast (no auto-dismiss)
                         showToast(
                             "Sorry, there was an error sending your message. Please try again or contact us directly.",
                             'error',
-                            6000
+                            0 // 0 means no auto-dismiss
                         );
                     } finally {
                         // Restore button state
