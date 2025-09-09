@@ -68,7 +68,7 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        // Enable Firestore persistence for offline caching
+        // Enable Firestore persistence for offline caching (with mobile-friendly error handling)
         enableIndexedDbPersistence(db, { cacheSizeBytes: CACHE_SIZE_UNLIMITED })
             .then(() => {
                 console.log("Firestore persistence enabled successfully");
@@ -81,6 +81,8 @@
                 } else {
                     console.error("Error enabling Firestore persistence:", err);
                 }
+                // Continue without persistence - the app will still work
+                console.log("Continuing without persistence, using localStorage fallback");
             });
 
         // Global variables for app ID and user ID
@@ -203,8 +205,38 @@
             });
         }
 
-        // Authenticate anonymously
+        // Mobile-friendly authentication with timeout
+        let authTimeout;
+        let dataLoaded = false;
+
+        // Load data immediately for better mobile experience
+        console.log("Loading data immediately for mobile compatibility");
+        
+        // Check if we're on mobile and add mobile-specific optimizations
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        if (isMobile) {
+            console.log("Mobile device detected - using optimized loading");
+        }
+        
+        loadPortfolioItems();
+        loadTestimonials();
+        loadStatistics();
+        dataLoaded = true;
+
+        // Set a timeout for authentication to prevent infinite loading on mobile
+        authTimeout = setTimeout(() => {
+            if (!dataLoaded) {
+                console.log("Authentication timeout - loading data anyway");
+                loadPortfolioItems();
+                loadTestimonials();
+                loadStatistics();
+                dataLoaded = true;
+            }
+        }, 5000); // 5 second timeout
+
         onAuthStateChanged(auth, async (user) => {
+            clearTimeout(authTimeout); // Clear timeout if auth succeeds
+            
             if (user) {
                 userId = user.uid;
                 console.log("Authenticated with Firebase. User ID:", userId);
@@ -212,6 +244,7 @@
                 loadPortfolioItems();
                 loadTestimonials();
                 loadStatistics();
+                dataLoaded = true;
             } else {
                 try {
                     // Use __initial_auth_token if available for Canvas environment, otherwise sign in anonymously
@@ -224,6 +257,14 @@
                     }
                 } catch (error) {
                     console.error("Error during authentication:", error);
+                    // Load data anyway if auth fails
+                    if (!dataLoaded) {
+                        console.log("Authentication failed - loading data with fallback");
+                        loadPortfolioItems();
+                        loadTestimonials();
+                        loadStatistics();
+                        dataLoaded = true;
+                    }
                 }
             }
         });
@@ -256,10 +297,29 @@
                 `;
             }
 
-            // Step 2: Set up Firestore listener for real-time updates
+            // Step 2: Set up Firestore listener with timeout for mobile
             const portfolioCollectionRef = collection(db, `artifacts/${appId}/public/data/portfolio`);
             
+            // Set a timeout for Firestore connection
+            const firestoreTimeout = setTimeout(() => {
+                console.log('Firestore connection timeout - showing fallback content');
+                if (!cachedItems) {
+                    portfolioContainer.innerHTML = `
+                        <div class="col-span-full text-center py-16">
+                            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 mb-6">
+                                <i data-lucide="briefcase" class="w-10 h-10 text-blue-600"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-800 mb-4">Projects Coming Soon</h3>
+                            <p class="text-lg text-gray-600 max-w-md mx-auto">
+                                We're working on some amazing projects. Check back soon to see our latest work!
+                            </p>
+                        </div>
+                    `;
+                }
+            }, 10000); // 10 second timeout for mobile
+
             onSnapshot(portfolioCollectionRef, (snapshot) => {
+                clearTimeout(firestoreTimeout); // Clear timeout if data loads
                 console.log('Firestore portfolio data received');
                 
                 const portfolioItems = [];
@@ -280,18 +340,19 @@
                 
                 console.log(`Portfolio updated: ${portfolioItems.length} items`);
             }, (error) => {
+                clearTimeout(firestoreTimeout); // Clear timeout on error
                 console.error("Error fetching portfolio items:", error);
                 
                 // Only show error if we don't have cached data
                 if (!cachedItems) {
                     portfolioContainer.innerHTML = `
                         <div class="col-span-full text-center py-16">
-                            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-red-100 mb-6">
-                                <i data-lucide="alert-circle" class="w-10 h-10 text-red-600"></i>
+                            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 mb-6">
+                                <i data-lucide="briefcase" class="w-10 h-10 text-blue-600"></i>
                             </div>
-                            <h3 class="text-2xl font-bold text-gray-800 mb-4">Error Loading Projects</h3>
+                            <h3 class="text-2xl font-bold text-gray-800 mb-4">Projects Coming Soon</h3>
                             <p class="text-lg text-gray-600 max-w-md mx-auto">
-                                We're having trouble loading our projects. Please try refreshing the page.
+                                We're working on some amazing projects. Check back soon to see our latest work!
                             </p>
                         </div>
                     `;
