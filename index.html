@@ -143,14 +143,37 @@
 
             onSnapshot(portfolioCollectionRef, (snapshot) => {
                 portfolioContainer.innerHTML = ''; // Clear existing items
+                
+                if (snapshot.empty) {
+                    portfolioContainer.innerHTML = `
+                        <div class="col-span-full text-center py-16">
+                            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 mb-6">
+                                <i data-lucide="briefcase" class="w-10 h-10 text-blue-600"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-800 mb-4">No Projects Yet</h3>
+                            <p class="text-lg text-gray-600 max-w-md mx-auto">
+                                We're working on some amazing projects. Check back soon to see our latest work!
+                            </p>
+                        </div>
+                    `;
+                    return;
+                }
+
                 snapshot.forEach((doc) => {
                     const item = doc.data();
                     const portfolioItemHTML = `
-                        <div class="portfolio-item bg-gray-100 rounded-lg shadow-md overflow-hidden" data-aos="fade-up" data-aos-duration="1000">
-                            <div class="p-6 text-center">
-                                <h3 class="text-xl md:text-2xl font-semibold text-brand-blue mb-4">${item.title}</h3> <p class="text-base text-gray-600 mb-4">${item.description}</p> <a href="${item.link}" target="_blank" class="text-brand-blue hover:underline font-medium">${item.linkText || 'View Details'}</a>
-                            </div>
-                            <div class="overlay">
+                        <div class="portfolio-item group" data-aos="fade-up" data-aos-duration="1000">
+                            <div class="portfolio-content">
+                                <h3 class="text-xl md:text-2xl font-bold text-gray-800 mb-3 group-hover:text-brand-blue transition-colors">
+                                    ${item.title}
+                                </h3>
+                                <p class="text-gray-600 mb-6 leading-relaxed">
+                                    ${item.description}
+                                </p>
+                                <a href="${item.link}" target="_blank" class="portfolio-link">
+                                    <span>${item.linkText || 'View Project'}</span>
+                                    <i data-lucide="external-link" class="w-4 h-4"></i>
+                                </a>
                             </div>
                         </div>
                     `;
@@ -158,6 +181,17 @@
                 });
             }, (error) => {
                 console.error("Error fetching portfolio items:", error);
+                portfolioContainer.innerHTML = `
+                    <div class="col-span-full text-center py-16">
+                        <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-red-100 mb-6">
+                            <i data-lucide="alert-circle" class="w-10 h-10 text-red-600"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4">Error Loading Projects</h3>
+                        <p class="text-lg text-gray-600">
+                            There was an error loading the portfolio items. Please try again later.
+                        </p>
+                    </div>
+                `;
             });
         }
 
@@ -330,38 +364,65 @@
         .portfolio-item {
             position: relative;
             overflow: hidden;
-            cursor: pointer;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             background: var(--bg-white);
-            border-radius: 16px;
+            border-radius: 20px;
             box-shadow: var(--shadow-md);
+            border: 1px solid rgba(0, 0, 0, 0.05);
         }
         .portfolio-item:hover {
-            transform: translateY(-8px) scale(1.02);
+            transform: translateY(-12px);
             box-shadow: var(--shadow-xl);
+            border-color: rgba(99, 102, 241, 0.2);
         }
-        .portfolio-item .portfolio-image {
-            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        .portfolio-content {
+            padding: 2rem;
+            position: relative;
         }
-        .portfolio-item:hover .portfolio-image {
-            transform: scale(1.05);
-        }
-        .portfolio-item .overlay {
+        .portfolio-content::before {
+            content: '';
             position: absolute;
-            bottom: 0;
+            top: 0;
             left: 0;
-            width: 100%;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        .portfolio-item:hover .portfolio-content::before {
+            transform: scaleX(1);
+        }
+        .portfolio-link {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
             background: var(--gradient-primary);
             color: white;
-            text-align: center;
-            padding: 1.5rem;
-            transform: translateY(100%);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            opacity: 0;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            overflow: hidden;
         }
-        .portfolio-item:hover .overlay {
-            transform: translateY(0);
-            opacity: 1;
+        .portfolio-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        .portfolio-link:hover::before {
+            left: 100%;
+        }
+        .portfolio-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
         }
         .icon-bg-blue { 
             background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
@@ -786,25 +847,35 @@
             </div>
         </section>
 
-        <section id="portfolio" class="py-20 bg-gradient-to-b from-gray-50 to-white">
-            <div class="container mx-auto px-4 md:px-8 lg:px-16">
+        <section id="portfolio" class="py-20 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+            <!-- Background decoration -->
+            <div class="absolute inset-0">
+                <div class="absolute top-1/4 right-1/4 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse"></div>
+                <div class="absolute bottom-1/4 left-1/4 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse" style="animation-delay: 2s;"></div>
+            </div>
+
+            <div class="container mx-auto px-4 md:px-8 lg:px-16 relative z-10">
                 <!-- Section Header -->
-                <div class="text-center mb-16" data-aos="fade-down" data-aos-duration="1000">
+                <div class="text-center mb-20" data-aos="fade-down" data-aos-duration="1000">
+                    <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 mb-8">
+                        <i data-lucide="briefcase" class="w-10 h-10 text-blue-600"></i>
+                    </div>
                     <h2 class="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-blue-600 to-purple-600 mb-6">
                         Our Recent Work
                     </h2>
-                    <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-                        Showcasing our latest projects and creative solutions
+                    <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                        Showcasing our latest projects and creative solutions that drive real results for our clients
                     </p>
                 </div>
 
                 <!-- Portfolio Grid -->
                 <div id="portfolio-items-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <div class="col-span-full text-center py-12">
-                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 mb-4">
-                            <i data-lucide="loader-2" class="w-8 h-8 text-blue-600 animate-spin"></i>
+                    <div class="col-span-full text-center py-16">
+                        <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 mb-6">
+                            <i data-lucide="loader-2" class="w-10 h-10 text-blue-600 animate-spin"></i>
                         </div>
-                        <p class="text-lg text-gray-600">Loading portfolio items...</p>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4">Loading Projects</h3>
+                        <p class="text-lg text-gray-600">Please wait while we load our latest work...</p>
                     </div>
                 </div>
             </div>
