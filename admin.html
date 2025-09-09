@@ -394,6 +394,11 @@
                                         <i class="fas fa-external-link-alt mr-2"></i>
                                         ${data.linkText}
                                     </a>
+                                    <button onclick="editPortfolioItem('${docSnap.id}', '${data.title}', '${data.description}', '${data.imageUrl}', '${data.link}', '${data.linkText}')" 
+                                            class="inline-flex items-center px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors">
+                                        <i class="fas fa-edit mr-2"></i>
+                                        Edit
+                                    </button>
                                     <button onclick="deletePortfolioItem('${docSnap.id}')" 
                                             class="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
                                         <i class="fas fa-trash mr-2"></i>
@@ -481,11 +486,18 @@
                                         <p class="font-semibold text-gray-800">${data.author}</p>
                                         <p class="text-gray-500">${data.company}</p>
                                     </div>
-                                    <button onclick="deleteTestimonial('${docSnap.id}')" 
-                                            class="inline-flex items-center px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
-                                        <i class="fas fa-trash mr-2"></i>
-                                        Delete
-                                    </button>
+                                    <div class="flex gap-2">
+                                        <button onclick="editTestimonial('${docSnap.id}', '${data.quote}', '${data.author}', '${data.company}')" 
+                                                class="inline-flex items-center px-3 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors">
+                                            <i class="fas fa-edit mr-2"></i>
+                                            Edit
+                                        </button>
+                                        <button onclick="deleteTestimonial('${docSnap.id}')" 
+                                                class="inline-flex items-center px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                                            <i class="fas fa-trash mr-2"></i>
+                                            Delete
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -645,9 +657,112 @@
             }
         });
 
+        // Edit functions
+        async function editPortfolioItem(id, title, description, imageUrl, link, linkText) {
+            // Populate the form with existing data
+            document.getElementById('portfolio-form').title.value = title;
+            document.getElementById('portfolio-form').description.value = description;
+            document.getElementById('portfolio-form').imageUrl.value = imageUrl || '';
+            document.getElementById('portfolio-form').link.value = link;
+            document.getElementById('portfolio-form').linkText.value = linkText || 'View Project';
+            
+            // Change form button text and add update functionality
+            const submitBtn = document.querySelector('#portfolio-form button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-save mr-2"></i>Update Portfolio Item';
+            
+            // Store the original event listener and remove it
+            const form = document.getElementById('portfolio-form');
+            const newForm = form.cloneNode(true);
+            form.parentNode.replaceChild(newForm, form);
+            
+            // Add new event listener for update
+            newForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const updatedTitle = newForm.title.value;
+                const updatedDescription = newForm.description.value;
+                const updatedImageUrl = newForm.imageUrl.value;
+                const updatedLink = newForm.link.value;
+                const updatedLinkText = newForm.linkText.value;
+                
+                try {
+                    showLoading();
+                    await updateDoc(doc(db, `artifacts/${appId}/public/data/portfolio`, id), {
+                        title: updatedTitle,
+                        description: updatedDescription,
+                        imageUrl: updatedImageUrl,
+                        link: updatedLink,
+                        linkText: updatedLinkText,
+                        updatedAt: serverTimestamp()
+                    });
+                    showMessage("Portfolio item updated successfully!", "success");
+                    newForm.reset();
+                    // Restore original form functionality
+                    location.reload();
+                } catch (error) {
+                    console.error("Error updating portfolio item:", error);
+                    showMessage("Failed to update portfolio item: " + error.message, "error");
+                } finally {
+                    hideLoading();
+                }
+            });
+            
+            // Scroll to form
+            document.getElementById('portfolio').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        async function editTestimonial(id, quote, author, company) {
+            // Populate the form with existing data
+            document.getElementById('testimonial-form').quote.value = quote;
+            document.getElementById('testimonial-form').author.value = author;
+            document.getElementById('testimonial-form').company.value = company;
+            
+            // Change form button text and add update functionality
+            const submitBtn = document.querySelector('#testimonial-form button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-save mr-2"></i>Update Testimonial';
+            
+            // Store the original event listener and remove it
+            const form = document.getElementById('testimonial-form');
+            const newForm = form.cloneNode(true);
+            form.parentNode.replaceChild(newForm, form);
+            
+            // Add new event listener for update
+            newForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const updatedQuote = newForm.quote.value;
+                const updatedAuthor = newForm.author.value;
+                const updatedCompany = newForm.company.value;
+                
+                try {
+                    showLoading();
+                    await updateDoc(doc(db, `artifacts/${appId}/public/data/testimonials`, id), {
+                        quote: updatedQuote,
+                        author: updatedAuthor,
+                        company: updatedCompany,
+                        updatedAt: serverTimestamp()
+                    });
+                    showMessage("Testimonial updated successfully!", "success");
+                    newForm.reset();
+                    // Restore original form functionality
+                    location.reload();
+                } catch (error) {
+                    console.error("Error updating testimonial:", error);
+                    showMessage("Failed to update testimonial: " + error.message, "error");
+                } finally {
+                    hideLoading();
+                }
+            });
+            
+            // Scroll to form
+            document.getElementById('testimonials').scrollIntoView({ behavior: 'smooth' });
+        }
+
         // Make functions globally available
         window.deletePortfolioItem = deletePortfolioItem;
         window.deleteTestimonial = deleteTestimonial;
+        window.editPortfolioItem = editPortfolioItem;
+        window.editTestimonial = editTestimonial;
     </script>
 </head>
 <body class="bg-gray-100 font-sans">
