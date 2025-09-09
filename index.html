@@ -235,93 +235,165 @@
     </script>
 
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            scroll-behavior: smooth;
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #a5b4fc;
+            --secondary-color: #f59e0b;
+            --accent-color: #10b981;
+            --dark-bg: #0f172a;
+            --dark-secondary: #1e293b;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --text-light: #94a3b8;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-accent: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
         }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            scroll-behavior: smooth;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background-color: var(--bg-white);
+        }
+
         /* Custom scrollbar for a cleaner look */
         ::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
         }
         ::-webkit-scrollbar-track {
-            background: #f1f1f1;
+            background: var(--bg-light);
         }
         ::-webkit-scrollbar-thumb {
-            background: #1e3a8a; /* Darker blue */
-            border-radius: 4px;
+            background: var(--primary-color);
+            border-radius: 3px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #1c4ed8; /* Lighter blue on hover */
+            background: var(--primary-dark);
         }
+
         .bg-brand-blue {
-            background-color: #1c4ed8; /* A shade of blue */
+            background: var(--gradient-primary);
         }
         .text-brand-blue {
-            color: #1c4ed8;
+            color: var(--primary-color);
         }
         .border-brand-blue {
-            border-color: #1c4ed8;
+            border-color: var(--primary-color);
         }
         .bg-brand-black {
-            background-color: #1a202c; /* A dark black */
+            background: var(--dark-bg);
         }
         .text-brand-black {
-            color: #1a202c;
+            color: var(--text-primary);
         }
         .service-card {
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out, border-color 0.3s ease-in-out;
-            border: 2px solid transparent; /* Added for the initial border state */
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid #e2e8f0;
+            background: var(--bg-white);
+            position: relative;
+            overflow: hidden;
+        }
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
         }
         .service-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 0 15px rgba(28, 78, 216, 0.5), 0 10px 20px rgba(0, 0, 0, 0.1);
-            border-color: rgba(28, 78, 216, 0.8); /* Soft blue glow */
+            transform: translateY(-12px);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--primary-light);
+        }
+        .service-card:hover::before {
+            transform: scaleX(1);
         }
         .portfolio-item {
             position: relative;
             overflow: hidden;
             cursor: pointer;
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--bg-white);
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
         }
         .portfolio-item:hover {
-            transform: scale(1.03);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: var(--shadow-xl);
         }
         .portfolio-item .portfolio-image {
-            transition: transform 0.5s ease-in-out;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .portfolio-item:hover .portfolio-image {
-            transform: scale(1.1);
+            transform: scale(1.05);
         }
         .portfolio-item .overlay {
             position: absolute;
             bottom: 0;
             left: 0;
             width: 100%;
-            background-color: rgba(28, 78, 216, 0.8);
+            background: var(--gradient-primary);
             color: white;
             text-align: center;
-            padding: 1rem;
+            padding: 1.5rem;
             transform: translateY(100%);
-            transition: transform 0.4s ease-in-out;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             opacity: 0;
         }
         .portfolio-item:hover .overlay {
             transform: translateY(0);
             opacity: 1;
         }
-        .icon-bg-blue { background-color: #e0f2fe; } /* light blue for web design */
-        .icon-bg-green { background-color: #d1fae5; } /* light green for web hosting */
-        .icon-bg-purple { background-color: #ede9fe; } /* light purple for graphic design */
-        .icon-bg-pink { background-color: #fce7f3; } /* light pink for social media */
-        .icon-bg-orange { background-color: #fff7ed; } /* light orange for CV revamping */
-        .icon-bg-light-blue-purple { background-color: #e0f2fe; } /* light blue/purple for custom solutions */
+        .icon-bg-blue { 
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border-radius: 16px;
+        }
+        .icon-bg-green { 
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border-radius: 16px;
+        }
+        .icon-bg-purple { 
+            background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
+            border-radius: 16px;
+        }
+        .icon-bg-pink { 
+            background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
+            border-radius: 16px;
+        }
+        .icon-bg-orange { 
+            background: linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%);
+            border-radius: 16px;
+        }
+        .icon-bg-light-blue-purple { 
+            background: linear-gradient(135deg, #e0f2fe 0%, #ddd6fe 100%);
+            border-radius: 16px;
+        }
 
-        /* Glassmorphism Navbar & Underline Hover */
+        /* Modern Glassmorphism Navbar */
         .glassmorphism-header {
-            background-color: rgba(26, 32, 44, 0.7); /* Semi-transparent black */
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px); /* For Safari */
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         .nav-link {
             position: relative;
@@ -335,13 +407,13 @@
             height: 2px;
             bottom: 0;
             left: 0;
-            background-color: #1c4ed8; /* Underline color */
-            transform: translateX(-100%); /* Initially off-screen to the left */
-            transition: transform 0.3s ease-in-out;
+            background: var(--gradient-primary);
+            transform: translateX(-100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .nav-link:hover::after,
         .nav-link.active::after {
-            transform: translateX(0%); /* Slides in on hover */
+            transform: translateX(0%);
         }
 
         /* Mobile Menu Animation */
@@ -405,7 +477,7 @@
     <header class="glassmorphism-header text-white p-4 shadow-lg fixed w-full z-50">
         <nav class="container mx-auto flex justify-between items-center">
             <a href="#hero" class="text-2xl font-bold text-white flex items-center">
-                <img src="mylogo.png" alt="Prince Alex Digital Logo" class="mr-2 rounded-full w-10 h-10 object-contain" loading="lazy" width="40" height="40">
+                <img src="mylogo.png" alt="Prince Alex Digital Logo" class="mr-3 rounded-full w-14 h-14 object-contain" loading="lazy" width="56" height="56">
                 Prince Alex Digital
             </a>
             <div class="block md:hidden">
@@ -434,355 +506,587 @@
     </header>
 
     <main>
-        <section id="hero" class="relative bg-brand-black text-white h-screen flex items-center justify-center overflow-hidden">
-            <div class="absolute inset-0 bg-cover bg-center opacity-30" style="background-image: url('background.webp');"></div>
-            <div class="absolute inset-0 bg-gradient-to-r from-brand-black to-transparent opacity-70"></div>
-
-            <div class="relative z-10 text-center px-4" data-aos="fade-up" data-aos-duration="1000">
-                <img src="mylogo.png" alt="Prince Alex Digital Logo" class="mx-auto mb-6 rounded-full shadow-lg w-24 h-24 object-contain" loading="lazy" width="96" height="96">
-                <h1 class="text-4xl md:text-6xl font-extrabold leading-tight mb-4">Prince Alex Digital | Web Design & Digital Marketing</h1>
-                <p class="text-lg md:text-xl max-w-2xl mx-auto mb-8">Led by Alex Senerwa, we bring powerful design and tech together to grow your business online.</p>
-                <a href="#contact" class="nav-link bg-brand-blue text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-blue-700 transition duration-300 ease-in-out shadow-lg transform hover:scale-105">Get Started</a>
+        <section id="hero" class="relative min-h-screen flex items-center justify-center overflow-hidden">
+            <!-- Modern gradient background -->
+            <div class="absolute inset-0 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900"></div>
+            <div class="absolute inset-0 bg-cover bg-center opacity-20" style="background-image: url('background.webp');"></div>
+            
+            <!-- Animated background elements -->
+            <div class="absolute inset-0">
+                <div class="absolute top-1/4 left-1/4 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse"></div>
+                <div class="absolute top-3/4 right-1/4 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse" style="animation-delay: 2s;"></div>
+                <div class="absolute bottom-1/4 left-1/3 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse" style="animation-delay: 4s;"></div>
             </div>
-        </section>
 
-        <section id="about" class="py-16 bg-white">
-            <div class="container mx-auto px-4 md:px-8 lg:px-16 text-center">
-                <h2 class="text-4xl font-bold text-brand-black mb-4" data-aos="fade-down" data-aos-duration="1000">About Us</h2>
-                <p class="text-lg leading-relaxed text-gray-700 mb-8 max-w-3xl mx-auto" data-aos="fade-down" data-aos-duration="1000" data-aos-delay="100">
-                    A visionary digital solutions expert passionate about transforming businesses through
-                    innovative technology and design.
+            <div class="relative z-10 text-center px-4 max-w-6xl mx-auto" data-aos="fade-up" data-aos-duration="1000">
+                <!-- Logo with modern styling -->
+                <div class="mb-8">
+                    <div class="inline-flex items-center justify-center w-40 h-40 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 shadow-2xl mb-6">
+                        <img src="mylogo.png" alt="Prince Alex Digital Logo" class="w-28 h-28 object-contain" loading="lazy" width="112" height="112">
+                    </div>
+                </div>
+                
+                <!-- Modern typography -->
+                <h1 class="text-5xl md:text-7xl font-black leading-tight mb-6 bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent">
+                    Prince Alex Digital
+                </h1>
+                <h2 class="text-2xl md:text-3xl font-semibold text-blue-200 mb-8">
+                    Web Design & Digital Marketing
+                </h2>
+                <p class="text-xl md:text-2xl max-w-3xl mx-auto mb-12 text-gray-300 leading-relaxed">
+                    Led by Alex Senerwa, we bring powerful design and tech together to grow your business online.
                 </p>
-                <div class="flex flex-col items-center" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
-                    <div class="relative mb-6">
-                        <img src="founder.jpg" alt="Alex Senerwa Keverenge" class="rounded-lg shadow-xl object-cover w-64 h-64 md:w-80 md:h-80 border-4 border-brand-blue" loading="lazy" width="320" height="320">
-                    </div>
-                    <h3 class="text-3xl font-bold text-brand-black mb-2">Meet Alex Senerwa Keverenge</h3>
-                    <p class="text-lg text-brand-blue font-medium mb-8">Founder & Digital Solutions Expert</p>
-                </div>
-                <div class="text-lg leading-relaxed text-gray-700 max-w-4xl mx-auto" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="300">
-                    <p class="mb-4">
-                        Alex Senerwa Keverenge is the visionary founder of Prince Alex Digital, a brand dedicated to empowering businesses and individuals in the digital landscape. With a profound passion for technology and design, Alex has spent years honing his expertise in creating compelling online presences and effective digital strategies.
-                    </p>
-                    <p>
-                        His approach is rooted in understanding client needs and translating them into innovative, practical, and visually stunning digital solutions. Alex believes in leveraging the power of design and cutting-edge technology to drive growth, enhance brand visibility, and achieve measurable results for every client.
-                    </p>
+                
+                <!-- Modern CTA button -->
+                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <a href="#contact" class="group relative px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-lg font-semibold rounded-full shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1">
+                        <span class="relative z-10">Get Started</span>
+                        <div class="absolute inset-0 bg-gradient-to-r from-blue-700 to-purple-700 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    </a>
+                    <a href="#about" class="px-8 py-4 border-2 border-white/30 text-white text-lg font-semibold rounded-full hover:bg-white/10 hover:border-white/50 transition-all duration-300 backdrop-blur-sm">
+                        Learn More
+                    </a>
                 </div>
             </div>
         </section>
 
-        <section id="mission-values" class="py-16 bg-gray-100">
-            <div class="container mx-auto px-4 md:px-8 lg:px-16 text-center">
-                <div class="bg-brand-blue text-white p-8 rounded-lg shadow-lg mb-12" data-aos="fade-up" data-aos-duration="1000">
-                    <h2 class="text-3xl md:text-4xl font-bold mb-4">Our Mission</h2>
-                    <p class="text-lg max-w-3xl mx-auto leading-relaxed">
-                        "To empower businesses with cutting-edge digital solutions that drive growth, enhance brand presence, and create meaningful connections with their audience."
+        <section id="about" class="py-20 bg-gradient-to-b from-white to-gray-50">
+            <div class="container mx-auto px-4 md:px-8 lg:px-16">
+                <!-- Section Header -->
+                <div class="text-center mb-16" data-aos="fade-down" data-aos-duration="1000">
+                    <h2 class="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-blue-600 to-purple-600 mb-6">
+                        About Us
+                    </h2>
+                    <p class="text-xl leading-relaxed text-gray-600 max-w-3xl mx-auto">
+                        A visionary digital solutions expert passionate about transforming businesses through
+                        innovative technology and design.
                     </p>
                 </div>
 
+                <!-- Founder Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
+                    <!-- Image -->
+                    <div class="relative">
+                        <div class="relative z-10">
+                            <img src="founder.jpg" alt="Alex Senerwa Keverenge" class="rounded-3xl shadow-2xl object-cover w-full h-96 lg:h-[500px]" loading="lazy">
+                        </div>
+                        <!-- Decorative elements -->
+                        <div class="absolute -top-4 -right-4 w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full opacity-20"></div>
+                        <div class="absolute -bottom-4 -left-4 w-32 h-32 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full opacity-20"></div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="space-y-8">
+                        <div>
+                            <h3 class="text-4xl md:text-5xl font-black text-slate-900 mb-4">Meet Alex Senerwa Keverenge</h3>
+                            <p class="text-2xl text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 font-semibold mb-8">
+                                Founder & Digital Solutions Expert
+                            </p>
+                        </div>
+                        
+                        <div class="space-y-6 text-lg leading-relaxed text-gray-700">
+                            <p>
+                                Alex Senerwa Keverenge is the visionary founder of Prince Alex Digital, a brand dedicated to empowering businesses and individuals in the digital landscape. With a profound passion for technology and design, Alex has spent years honing his expertise in creating compelling online presences and effective digital strategies.
+                            </p>
+                            <p>
+                                His approach is rooted in understanding client needs and translating them into innovative, practical, and visually stunning digital solutions. Alex believes in leveraging the power of design and cutting-edge technology to drive growth, enhance brand visibility, and achieve measurable results for every client.
+                            </p>
+                        </div>
+
+                        <!-- Stats or highlights -->
+                        <div class="grid grid-cols-2 gap-6 pt-8">
+                            <div class="text-center p-6 bg-white rounded-2xl shadow-lg">
+                                <div class="text-3xl font-bold text-blue-600 mb-2">5+</div>
+                                <div class="text-gray-600">Years Experience</div>
+                            </div>
+                            <div class="text-center p-6 bg-white rounded-2xl shadow-lg">
+                                <div class="text-3xl font-bold text-purple-600 mb-2">100+</div>
+                                <div class="text-gray-600">Projects Delivered</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="mission-values" class="py-20 bg-gradient-to-br from-slate-50 to-blue-50">
+            <div class="container mx-auto px-4 md:px-8 lg:px-16">
+                <!-- Mission Statement -->
+                <div class="text-center mb-20" data-aos="fade-up" data-aos-duration="1000">
+                    <div class="relative max-w-4xl mx-auto">
+                        <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-12 rounded-3xl shadow-2xl relative overflow-hidden">
+                            <!-- Background decoration -->
+                            <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
+                            <div class="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-12 -translate-x-12"></div>
+                            
+                            <div class="relative z-10">
+                                <h2 class="text-4xl md:text-5xl font-black mb-6">Our Mission</h2>
+                                <p class="text-xl md:text-2xl leading-relaxed max-w-3xl mx-auto">
+                                    "To empower businesses with cutting-edge digital solutions that drive growth, enhance brand presence, and create meaningful connections with their audience."
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Values Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div class="bg-white p-8 rounded-lg shadow-md flex flex-col items-center text-center" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="100">
-                        <div class="p-4 rounded-full mb-4 icon-bg-blue">
-                            <i data-lucide="award" class="w-8 h-8 text-blue-600"></i>
+                    <div class="group bg-white p-8 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="100">
+                        <div class="flex flex-col items-center text-center">
+                            <div class="p-6 rounded-2xl mb-6 icon-bg-blue group-hover:scale-110 transition-transform duration-300">
+                                <i data-lucide="award" class="w-12 h-12 text-blue-600"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-slate-900 mb-4">Digital Excellence</h3>
+                            <p class="text-gray-600 leading-relaxed text-lg">
+                                Delivering high-quality digital solutions that exceed expectations
+                            </p>
                         </div>
-                        <h3 class="text-xl font-semibold text-brand-black mb-2">Digital Excellence</h3>
-                        <p class="text-gray-600 leading-relaxed">
-                            Delivering high-quality digital solutions that exceed expectations
-                        </p>
                     </div>
 
-                    <div class="bg-white p-8 rounded-lg shadow-md flex flex-col items-center text-center" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="200">
-                        <div class="p-4 rounded-full mb-4 icon-bg-blue">
-                            <i data-lucide="target" class="w-8 h-8 text-blue-600"></i>
+                    <div class="group bg-white p-8 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="200">
+                        <div class="flex flex-col items-center text-center">
+                            <div class="p-6 rounded-2xl mb-6 icon-bg-green group-hover:scale-110 transition-transform duration-300">
+                                <i data-lucide="target" class="w-12 h-12 text-green-600"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-slate-900 mb-4">Client-Focused</h3>
+                            <p class="text-gray-600 leading-relaxed text-lg">
+                                Understanding your business goals and translating them into digital success
+                            </p>
                         </div>
-                        <h3 class="text-xl font-semibold text-brand-black mb-2">Client-Focused</h3>
-                        <p class="text-gray-600 leading-relaxed">
-                            Understanding your business goals and translating them into digital success
-                        </p>
                     </div>
 
-                    <div class="bg-white p-8 rounded-lg shadow-md flex flex-col items-center text-center" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="300">
-                        <div class="p-4 rounded-full mb-4 icon-bg-blue">
-                            <i data-lucide="lightbulb" class="w-8 h-8 text-blue-600"></i>
+                    <div class="group bg-white p-8 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="300">
+                        <div class="flex flex-col items-center text-center">
+                            <div class="p-6 rounded-2xl mb-6 icon-bg-purple group-hover:scale-110 transition-transform duration-300">
+                                <i data-lucide="lightbulb" class="w-12 h-12 text-purple-600"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-slate-900 mb-4">Innovation</h3>
+                            <p class="text-gray-600 leading-relaxed text-lg">
+                                Staying ahead of digital trends to provide cutting-edge solutions
+                            </p>
                         </div>
-                        <h3 class="text-xl font-semibold text-brand-black mb-2">Innovation</h3>
-                        <p class="text-gray-600 leading-relaxed">
-                            Staying ahead of digital trends to provide cutting-edge solutions
-                        </p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="services" class="py-16 bg-gray-100">
-            <div class="container mx-auto px-4 md:px-8 lg:px-16 text-center">
-                <h2 class="text-4xl font-bold text-brand-black mb-12" data-aos="fade-down" data-aos-duration="1000">Our Digital Services</h2>
+        <section id="services" class="py-20 bg-white">
+            <div class="container mx-auto px-4 md:px-8 lg:px-16">
+                <!-- Section Header -->
+                <div class="text-center mb-16" data-aos="fade-down" data-aos-duration="1000">
+                    <h2 class="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-blue-600 to-purple-600 mb-6">
+                        Our Digital Services
+                    </h2>
+                    <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                        Comprehensive digital solutions designed to elevate your business and drive growth
+                    </p>
+                </div>
+
+                <!-- Services Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
-                    <div class="service-card bg-white p-8 rounded-lg shadow-md border-b-4 border-brand-blue flex flex-col items-start text-left" data-aos="zoom-in" data-aos-duration="800">
-                        <div class="p-4 rounded-full mb-4 icon-bg-blue">
-                            <i data-lucide="layout" class="w-8 h-8 text-blue-600"></i>
+                    <div class="service-card group" data-aos="zoom-in" data-aos-duration="800">
+                        <div class="p-8 h-full flex flex-col">
+                            <div class="p-6 rounded-2xl mb-6 icon-bg-blue group-hover:scale-110 transition-transform duration-300 w-fit">
+                                <i data-lucide="layout" class="w-10 h-10 text-blue-600"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-slate-900 mb-4">Web Design & Development</h3>
+                            <p class="text-gray-600 leading-relaxed mb-6 text-lg">Custom, responsive websites that look great and perform excellently across all devices.</p>
+                            <ul class="text-gray-700 space-y-3 flex-grow">
+                                <li class="flex items-center text-base"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500 flex-shrink-0"></i> Responsive Design</li>
+                                <li class="flex items-center text-base"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500 flex-shrink-0"></i> SEO Optimized</li>
+                                <li class="flex items-center text-base"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500 flex-shrink-0"></i> Fast Loading</li>
+                                <li class="flex items-center text-base"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500 flex-shrink-0"></i> Modern UI/UX</li>
+                            </ul>
                         </div>
-                        <h3 class="text-2xl font-semibold text-brand-black mb-3">Web Design & Development</h3>
-                        <p class="text-gray-600 leading-relaxed mb-4">Custom, responsive websites that look great and perform excellently across all devices.</p>
-                        <ul class="text-gray-700 space-y-2">
-                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> Responsive Design</li>
-                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> SEO Optimized</li>
-                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> Fast Loading</li>
-                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> Modern UI/UX</li>
-                        </ul>
                     </div>
 
-                    <div class="service-card bg-white p-8 rounded-lg shadow-md border-b-4 border-brand-blue flex flex-col items-start text-left" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="100">
-                        <div class="p-4 rounded-full mb-4 icon-bg-green">
-                            <i data-lucide="server" class="w-8 h-8 text-green-600"></i>
+                    <div class="service-card group" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="100">
+                        <div class="p-8 h-full flex flex-col">
+                            <div class="p-6 rounded-2xl mb-6 icon-bg-green group-hover:scale-110 transition-transform duration-300 w-fit">
+                                <i data-lucide="server" class="w-10 h-10 text-green-600"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-slate-900 mb-4">Web Hosting & Domains</h3>
+                            <p class="text-gray-600 leading-relaxed mb-6 text-lg">Reliable hosting solutions with domain registration to get your business online.</p>
+                            <ul class="text-gray-700 space-y-3 flex-grow">
+                                <li class="flex items-center text-base"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500 flex-shrink-0"></i> 99.9% Uptime</li>
+                                <li class="flex items-center text-base"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500 flex-shrink-0"></i> SSL Certificates</li>
+                                <li class="flex items-center text-base"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500 flex-shrink-0"></i> Daily Backups</li>
+                                <li class="flex items-center text-base"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500 flex-shrink-0"></i> 24/7 Support</li>
+                                <li class="flex items-center text-base"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500 flex-shrink-0"></i> Monthly Web Maintenance</li>
+                            </ul>
                         </div>
-                        <h3 class="text-2xl font-semibold text-brand-black mb-3">Web Hosting & Domains</h3>
-                        <p class="text-gray-600 leading-relaxed mb-4">Reliable hosting solutions with domain registration to get your business online.</p>
-                        <ul class="text-gray-700 space-y-2">
-                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> 99.9% Uptime</li>
-                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> SSL Certificates</li>
-                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> Daily Backups</li>
-                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> 24/7 Support</li>
-                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> Monthly Web Maintenance</li>
-                        </ul>
                     </div>
 
-                    <div class="service-card bg-white p-8 rounded-lg shadow-md border-b-4 border-brand-blue flex flex-col items-start text-left" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="200">
-                        <div class="p-4 rounded-full mb-4 icon-bg-purple">
-                            <i data-lucide="palette" class="w-8 h-8 text-purple-600"></i>
+                    <div class="service-card group" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="200">
+                        <div class="p-8 h-full flex flex-col">
+                            <div class="p-6 rounded-2xl mb-6 icon-bg-purple group-hover:scale-110 transition-transform duration-300 w-fit">
+                                <i data-lucide="palette" class="w-10 h-10 text-purple-600"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-slate-900 mb-4">Graphic Design</h3>
+                            <p class="text-gray-600 leading-relaxed mb-6 text-lg">Professional visual identity and marketing materials that make your brand stand out.</p>
+                            <ul class="text-gray-700 space-y-3 flex-grow">
+                                <li class="flex items-center text-base"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500 flex-shrink-0"></i> Logo Design</li>
+                                <li class="flex items-center text-base"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500 flex-shrink-0"></i> Brand Identity</li>
+                                <li class="flex items-center text-base"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500 flex-shrink-0"></i> Print Design</li>
+                                <li class="flex items-center text-base"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500 flex-shrink-0"></i> Digital Graphics</li>
+                            </ul>
                         </div>
-                        <h3 class="text-2xl font-semibold text-brand-black mb-3">Graphic Design</h3>
-                        <p class="text-gray-600 leading-relaxed mb-4">Professional visual identity and marketing materials that make your brand stand out.</p>
-                        <ul class="text-gray-700 space-y-2">
-                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> Logo Design</li>
-                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> Brand Identity</li>
-                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> Print Design</li>
-                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> Digital Graphics</li>
-                        </ul>
                     </div>
 
-                    <div class="service-card bg-white p-8 rounded-lg shadow-md border-b-4 border-brand-blue flex flex-col items-start text-left" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="300">
-                        <div class="p-4 rounded-full mb-4 icon-bg-pink">
-                            <i data-lucide="share-2" class="w-8 h-8 text-pink-600"></i>
+                    <div class="service-card group" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="300">
+                        <div class="p-8 h-full flex flex-col">
+                            <div class="p-6 rounded-2xl mb-6 icon-bg-pink group-hover:scale-110 transition-transform duration-300 w-fit">
+                                <i data-lucide="share-2" class="w-10 h-10 text-pink-600"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-slate-900 mb-4">Social Media Management</h3>
+                            <p class="text-gray-600 leading-relaxed mb-6 text-lg">Strategic social media presence to engage your audience and grow your brand.</p>
+                            <ul class="text-gray-700 space-y-3 flex-grow">
+                                <li class="flex items-center text-base"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500 flex-shrink-0"></i> Content Creation</li>
+                                <li class="flex items-center text-base"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500 flex-shrink-0"></i> Strategy Planning</li>
+                                <li class="flex items-center text-base"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500 flex-shrink-0"></i> Analytics</li>
+                                <li class="flex items-center text-base"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500 flex-shrink-0"></i> Community Management</li>
+                            </ul>
                         </div>
-                        <h3 class="text-2xl font-semibold text-brand-black mb-3">Social Media Management</h3>
-                        <p class="text-gray-600 leading-relaxed mb-4">Strategic social media presence to engage your audience and grow your brand.</p>
-                        <ul class="text-gray-700 space-y-2">
-                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> Content Creation</li>
-                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> Strategy Planning</li>
-                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> Analytics</li>
-                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> Community Management</li>
-                        </ul>
                     </div>
 
-                    <div class="service-card bg-white p-8 rounded-lg shadow-md border-b-4 border-brand-blue flex flex-col items-start text-left" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="400">
-                        <div class="p-4 rounded-full mb-4 icon-bg-orange">
-                            <i data-lucide="file-text" class="w-8 h-8 text-orange-600"></i>
+                    <div class="service-card group" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="400">
+                        <div class="p-8 h-full flex flex-col">
+                            <div class="p-6 rounded-2xl mb-6 icon-bg-orange group-hover:scale-110 transition-transform duration-300 w-fit">
+                                <i data-lucide="file-text" class="w-10 h-10 text-orange-600"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-slate-900 mb-4">CV Revamping & Editorial</h3>
+                            <p class="text-gray-600 leading-relaxed mb-6 text-lg">Professional CV redesign and editorial services to help you land your dream job.</p>
+                            <ul class="text-gray-700 space-y-3 flex-grow">
+                                <li class="flex items-center text-base"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500 flex-shrink-0"></i> Modern Templates</li>
+                                <li class="flex items-center text-base"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500 flex-shrink-0"></i> ATS Optimization</li>
+                                <li class="flex items-center text-base"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500 flex-shrink-0"></i> Content Writing</li>
+                                <li class="flex items-center text-base"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500 flex-shrink-0"></i> Cover Letters</li>
+                            </ul>
                         </div>
-                        <h3 class="text-2xl font-semibold text-brand-black mb-3">CV Revamping & Editorial</h3>
-                        <p class="text-gray-600 leading-relaxed mb-4">Professional CV redesign and editorial services to help you land your dream job.</p>
-                        <ul class="text-gray-700 space-y-2">
-                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> Modern Templates</li>
-                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> ATS Optimization</li>
-                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> Content Writing</li>
-                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> Cover Letters</li>
-                        </ul>
                     </div>
 
-                    <div class="service-card bg-white p-8 rounded-lg shadow-md border-b-4 border-brand-blue flex flex-col items-start text-left" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="500">
-                        <div class="p-4 rounded-full mb-4 icon-bg-light-blue-purple">
-                            <i data-lucide="zap" class="w-8 h-8 text-indigo-600"></i>
+                    <div class="service-card group" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="500">
+                        <div class="p-8 h-full flex flex-col">
+                            <div class="p-6 rounded-2xl mb-6 icon-bg-light-blue-purple group-hover:scale-110 transition-transform duration-300 w-fit">
+                                <i data-lucide="zap" class="w-10 h-10 text-indigo-600"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-slate-900 mb-4">Custom Digital Solutions</h3>
+                            <p class="text-gray-600 leading-relaxed mb-6 text-lg">Tailored digital solutions designed specifically for your unique business needs.</p>
+                            <ul class="text-gray-700 space-y-3 flex-grow">
+                                <li class="flex items-center text-base"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500 flex-shrink-0"></i> Custom Development</li>
+                                <li class="flex items-center text-base"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500 flex-shrink-0"></i> API Integration</li>
+                                <li class="flex items-center text-base"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500 flex-shrink-0"></i> Automation</li>
+                                <li class="flex items-center text-base"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500 flex-shrink-0"></i> Consulting</li>
+                            </ul>
                         </div>
-                        <h3 class="text-2xl font-semibold text-brand-black mb-3">Custom Digital Solutions</h3>
-                        <p class="text-gray-600 leading-relaxed mb-4">Tailored digital solutions designed specifically for your unique business needs.</p>
-                        <ul class="text-gray-700 space-y-2">
-                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> Custom Development</li>
-                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> API Integration</li>
-                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> Automation</li>
-                            <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-2 text-green-500"></i> Consulting</li>
-                        </ul>
                     </div>
 
                 </div>
             </div>
         </section>
 
-        <section id="portfolio" class="py-16 bg-white">
-            <div class="container mx-auto px-4 md:px-8 lg:px-16 text-center">
-                <h2 class="text-4xl font-bold text-brand-black mb-12" data-aos="fade-down" data-aos-duration="1000">Our Recent Work</h2>
+        <section id="portfolio" class="py-20 bg-gradient-to-b from-gray-50 to-white">
+            <div class="container mx-auto px-4 md:px-8 lg:px-16">
+                <!-- Section Header -->
+                <div class="text-center mb-16" data-aos="fade-down" data-aos-duration="1000">
+                    <h2 class="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-blue-600 to-purple-600 mb-6">
+                        Our Recent Work
+                    </h2>
+                    <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                        Showcasing our latest projects and creative solutions
+                    </p>
+                </div>
+
+                <!-- Portfolio Grid -->
                 <div id="portfolio-items-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <p class="text-base text-gray-600">Loading portfolio items...</p>
+                    <div class="col-span-full text-center py-12">
+                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 mb-4">
+                            <i data-lucide="loader-2" class="w-8 h-8 text-blue-600 animate-spin"></i>
+                        </div>
+                        <p class="text-lg text-gray-600">Loading portfolio items...</p>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <section id="more-projects-stats" class="py-16 bg-brand-blue text-white statistics-section">
-            <div class="container mx-auto px-4 md:px-8 lg:px-16 text-center">
-                <div class="bg-blue-800 p-8 rounded-lg shadow-lg mb-12" data-aos="fade-up" data-aos-duration="1000">
-                    <h2 class="text-3xl md:text-4xl font-bold mb-4">More Projects Coming Soon</h2>
-                    <p class="text-lg mb-8 max-w-2xl mx-auto">
-                        We're constantly working on exciting new projects. Check back regularly to see our latest work,
-                        or get in touch to discuss your project requirements.
+        <section id="more-projects-stats" class="py-20 bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 text-white statistics-section relative overflow-hidden">
+            <!-- Background decoration -->
+            <div class="absolute inset-0">
+                <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
+                <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" style="animation-delay: 2s;"></div>
+            </div>
+
+            <div class="container mx-auto px-4 md:px-8 lg:px-16 relative z-10">
+                <!-- Call to Action -->
+                <div class="text-center mb-20" data-aos="fade-up" data-aos-duration="1000">
+                    <div class="max-w-4xl mx-auto">
+                        <h2 class="text-4xl md:text-6xl font-black mb-6 bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent">
+                            More Projects Coming Soon
+                        </h2>
+                        <p class="text-xl md:text-2xl mb-12 text-gray-300 leading-relaxed max-w-3xl mx-auto">
+                            We're constantly working on exciting new projects. Check back regularly to see our latest work,
+                            or get in touch to discuss your project requirements.
+                        </p>
+                        <a href="#contact" class="group relative inline-flex items-center px-8 py-4 bg-gradient-to-r from-white to-gray-100 text-slate-900 text-lg font-bold rounded-full shadow-2xl hover:shadow-white/25 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1">
+                            <span class="relative z-10">Discuss Your Project</span>
+                            <div class="absolute inset-0 bg-gradient-to-r from-gray-100 to-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Statistics Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="group text-center p-8 bg-white/10 backdrop-blur-sm rounded-3xl border border-white/20 hover:bg-white/20 transition-all duration-500 transform hover:-translate-y-2" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="100">
+                        <div id="projects-delivered" class="text-6xl font-black text-white mb-4 group-hover:scale-110 transition-transform duration-300">--</div>
+                        <p class="text-xl text-blue-200 font-semibold">Projects Delivered</p>
+                    </div>
+                    <div class="group text-center p-8 bg-white/10 backdrop-blur-sm rounded-3xl border border-white/20 hover:bg-white/20 transition-all duration-500 transform hover:-translate-y-2" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
+                        <div id="happy-clients" class="text-6xl font-black text-white mb-4 group-hover:scale-110 transition-transform duration-300">--</div>
+                        <p class="text-xl text-blue-200 font-semibold">Happy Clients</p>
+                    </div>
+                    <div class="group text-center p-8 bg-white/10 backdrop-blur-sm rounded-3xl border border-white/20 hover:bg-white/20 transition-all duration-500 transform hover:-translate-y-2" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="300">
+                        <div id="success-rate" class="text-6xl font-black text-white mb-4 group-hover:scale-110 transition-transform duration-300">--</div>
+                        <p class="text-xl text-blue-200 font-semibold">Success Rate</p>
+                    </div>
+                    <div class="group text-center p-8 bg-white/10 backdrop-blur-sm rounded-3xl border border-white/20 hover:bg-white/20 transition-all duration-500 transform hover:-translate-y-2" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="400">
+                        <div class="text-6xl font-black text-white mb-4 group-hover:scale-110 transition-transform duration-300">24/7</div>
+                        <p class="text-xl text-blue-200 font-semibold">Support</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="testimonials" class="py-20 bg-gradient-to-br from-slate-50 to-blue-50">
+            <div class="container mx-auto px-4 md:px-8 lg:px-16">
+                <!-- Section Header -->
+                <div class="text-center mb-16" data-aos="fade-down" data-aos-duration="1000">
+                    <h2 class="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-blue-600 to-purple-600 mb-6">
+                        What Our Clients Say
+                    </h2>
+                    <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                        Hear from our satisfied clients about their experience working with us
                     </p>
-                    <a href="#contact" class="nav-link bg-brand-black text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-gray-800 transition duration-300 ease-in-out shadow-lg transform hover:scale-105">Discuss Your Project</a>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
-                    <div class="p-4" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="100">
-                        <div id="projects-delivered" class="text-5xl font-extrabold text-white mb-2">--</div>
-                        <p class="text-lg text-blue-200">Projects Delivered</p>
-                    </div>
-                    <div class="p-4" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
-                        <div id="happy-clients" class="text-5xl font-extrabold text-white mb-2">--</div>
-                        <p class="text-lg text-blue-200">Happy Clients</p>
-                    </div>
-                    <div class="p-4" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="300">
-                        <div id="success-rate" class="text-5xl font-extrabold text-white mb-2">--</div>
-                        <p class="text-lg text-blue-200">Success Rate</p>
-                    </div>
-                    <div class="p-4" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="400">
-                        <div class="text-5xl font-extrabold text-white mb-2">24/7</div>
-                        <p class="text-lg text-blue-200">Support</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="testimonials" class="py-16 bg-gray-100">
-            <div class="container mx-auto px-4 md:px-8 lg:px-16 text-center">
-                <h2 class="text-4xl font-bold text-brand-black mb-12" data-aos="fade-down" data-aos-duration="1000">What Our Clients Say</h2>
-                <div class="max-w-3xl mx-auto" data-aos="fade-up" data-aos-duration="1000">
-                    <p id="testimonial-text" class="text-lg text-gray-700 italic mb-6">
-                        Loading testimonials...
-                    </p>
-                    <p id="testimonial-author" class="font-semibold text-brand-black"></p>
-                    <p id="testimonial-company" class="text-gray-500"></p>
-                    <p class="mt-8 text-gray-600">More testimonials coming soon!</p>
-                </div>
-            </div>
-        </section>
-
-        <section id="contact" class="py-16 bg-white">
-            <div class="container mx-auto px-4 md:px-8 lg:px-16 text-center">
-                <h2 class="text-4xl font-bold text-brand-black mb-12" data-aos="fade-down" data-aos-duration="1000">Get In Touch</h2>
-                <div class="flex flex-col md:flex-row gap-12 justify-center items-start">
-                    <div class="md:w-1/2 text-left bg-gray-100 p-8 rounded-lg shadow-md" data-aos="fade-right" data-aos-duration="1000">
-                        <h3 class="text-2xl font-semibold text-brand-black mb-6">Contact Information</h3>
-                        <div class="space-y-6">
-                            <div class="flex items-center">
-                                <div class="p-3 bg-blue-100 rounded-full mr-4">
-                                    <i data-lucide="mail" class="w-6 h-6 text-brand-blue"></i>
-                                </div>
-                                <div>
-                                    <p class="font-semibold text-gray-800">Email</p>
-                                    <a href="mailto:princealexdigital@gmail.com" class="text-gray-700 hover:underline">princealexdigital@gmail.com</a>
-                                </div>
+                <!-- Testimonial Card -->
+                <div class="max-w-4xl mx-auto" data-aos="fade-up" data-aos-duration="1000">
+                    <div class="bg-white rounded-3xl shadow-2xl p-12 relative overflow-hidden">
+                        <!-- Background decoration -->
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full -translate-y-16 translate-x-16"></div>
+                        <div class="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full translate-y-12 -translate-x-12"></div>
+                        
+                        <div class="relative z-10 text-center">
+                            <!-- Quote icon -->
+                            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white mb-8">
+                                <i data-lucide="quote" class="w-8 h-8"></i>
                             </div>
-                            <div class="flex items-center">
-                                <div class="p-3 bg-blue-100 rounded-full mr-4">
-                                    <i data-lucide="phone" class="w-6 h-6 text-brand-blue"></i>
-                                </div>
-                                <div>
-                                    <p class="font-semibold text-gray-800">Phone</p>
-                                    <a href="tel:+254717384875" class="text-gray-700 hover:underline">0717384875</a>
-                                </div>
+                            
+                            <!-- Testimonial content -->
+                            <p id="testimonial-text" class="text-2xl md:text-3xl text-gray-700 italic mb-8 leading-relaxed">
+                                Loading testimonials...
+                            </p>
+                            
+                            <!-- Author info -->
+                            <div class="space-y-2">
+                                <p id="testimonial-author" class="text-xl font-bold text-slate-900"></p>
+                                <p id="testimonial-company" class="text-lg text-gray-500"></p>
                             </div>
-                            <div class="flex items-center">
-                                <div class="p-3 bg-blue-100 rounded-full mr-4">
-                                    <i data-lucide="map-pin" class="w-6 h-6 text-brand-blue"></i>
-                                </div>
-                                <div>
-                                    <p class="font-semibold text-gray-800">Location</p>
-                                    <p class="text-gray-700">Kenya</p>
-                                </div>
-                            </div>
-                            <div class="flex items-center">
-                                <div class="p-3 bg-blue-100 rounded-full mr-4">
-                                    <i data-lucide="clock" class="w-6 h-6 text-brand-blue"></i>
-                                </div>
-                                <div>
-                                    <p class="font-semibold text-gray-800">Business Hours</p>
-                                    <p class="text-gray-700">Mon - Sun: 8AM - 10PM</p>
-                                </div>
+                            
+                            <!-- Coming soon message -->
+                            <div class="mt-12 pt-8 border-t border-gray-200">
+                                <p class="text-lg text-gray-600">More testimonials coming soon!</p>
                             </div>
                         </div>
-                        <h3 class="text-2xl font-semibold text-brand-black mb-4 mt-8">Find Us</h3>
-                        <div class="w-full h-64 bg-gray-200 rounded-lg overflow-hidden shadow-inner">
-                            <iframe
-                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15959.043590012224!2d36.81228225!3d-1.286389!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f1172d84d0d5d%3A0xf57297e7f6d3d9a!2sNairobi%2C%20Kenya!5e0!3m2!1sen!2sus!4m2!3m1!1s0x182f1172d84d0d5d%3A0xf57297e7f6d3d9a"
-                                width="100%"
-                                height="100%"
-                                style="border:0;"
-                                allowfullscreen=""
-                                loading="lazy"
-                                referrerpolicy="no-referrer-when-downgrade">
-                            </iframe>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="py-20 bg-gradient-to-b from-white to-gray-50">
+            <div class="container mx-auto px-4 md:px-8 lg:px-16">
+                <!-- Section Header -->
+                <div class="text-center mb-16" data-aos="fade-down" data-aos-duration="1000">
+                    <h2 class="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-blue-600 to-purple-600 mb-6">
+                        Get In Touch
+                    </h2>
+                    <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                        Ready to start your next project? Let's discuss how we can help you achieve your goals.
+                    </p>
+                </div>
+
+                <!-- Contact Content -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                    <!-- Contact Information -->
+                    <div class="bg-white rounded-3xl shadow-2xl p-10 relative overflow-hidden" data-aos="fade-right" data-aos-duration="1000">
+                        <!-- Background decoration -->
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full -translate-y-16 translate-x-16"></div>
+                        <div class="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full translate-y-12 -translate-x-12"></div>
+                        
+                        <div class="relative z-10">
+                            <h3 class="text-3xl font-bold text-slate-900 mb-8">Contact Information</h3>
+                            <div class="space-y-8">
+                                <div class="flex items-center group">
+                                    <div class="p-4 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-500 text-white mr-6 group-hover:scale-110 transition-transform duration-300">
+                                        <i data-lucide="mail" class="w-6 h-6"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-gray-800 text-lg">Email</p>
+                                        <a href="mailto:princealexdigital@gmail.com" class="text-gray-600 hover:text-blue-600 transition-colors duration-300 text-lg">princealexdigital@gmail.com</a>
+                                    </div>
+                                </div>
+                                <div class="flex items-center group">
+                                    <div class="p-4 rounded-2xl bg-gradient-to-r from-green-500 to-blue-500 text-white mr-6 group-hover:scale-110 transition-transform duration-300">
+                                        <i data-lucide="phone" class="w-6 h-6"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-gray-800 text-lg">Phone</p>
+                                        <a href="tel:+254717384875" class="text-gray-600 hover:text-green-600 transition-colors duration-300 text-lg">0717384875</a>
+                                    </div>
+                                </div>
+                                <div class="flex items-center group">
+                                    <div class="p-4 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 text-white mr-6 group-hover:scale-110 transition-transform duration-300">
+                                        <i data-lucide="map-pin" class="w-6 h-6"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-gray-800 text-lg">Location</p>
+                                        <p class="text-gray-600 text-lg">Kenya</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center group">
+                                    <div class="p-4 rounded-2xl bg-gradient-to-r from-orange-500 to-red-500 text-white mr-6 group-hover:scale-110 transition-transform duration-300">
+                                        <i data-lucide="clock" class="w-6 h-6"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-gray-800 text-lg">Business Hours</p>
+                                        <p class="text-gray-600 text-lg">Mon - Sun: 8AM - 10PM</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <h3 class="text-3xl font-bold text-slate-900 mb-6 mt-12">Find Us</h3>
+                            <div class="w-full h-80 bg-gray-100 rounded-2xl overflow-hidden shadow-inner">
+                                <iframe
+                                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15959.043590012224!2d36.81228225!3d-1.286389!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f1172d84d0d5d%3A0xf57297e7f6d3d9a!2sNairobi%2C%20Kenya!5e0!3m2!1sen!2sus!4m2!3m1!1s0x182f1172d84d0d5d%3A0xf57297e7f6d3d9a"
+                                    width="100%"
+                                    height="100%"
+                                    style="border:0;"
+                                    allowfullscreen=""
+                                    loading="lazy"
+                                    referrerpolicy="no-referrer-when-downgrade">
+                                </iframe>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="md:w-1/2 text-left bg-gray-100 p-8 rounded-lg shadow-md" data-aos="fade-left" data-aos-duration="1000">
-                        <h3 class="text-2xl font-semibold text-brand-black mb-2">Send us a Message</h3>
-                        <p class="text-gray-600 mb-6">Fill out the form below and we'll get back to you within 24 hours.</p>
-                        <form id="contact-form" action="https://formsubmit.co/princealexdigital@gmail.com" method="POST" class="space-y-6">
-                            <input type="hidden" name="_subject" value="New Contact Message from Prince Alex Website">
-                            <input type="hidden" name="_template" value="table">
-                            <input type="hidden" name="_captcha" value="false">
-                            <input type="hidden" name="_next" value="https://princealex.pro/#contact">
-                            <input type="hidden" name="_autoresponse" value="Thank you for contacting us! We'll get back to you shortly.">
-                            <div>
-                                <label for="full-name" class="block text-gray-700 text-sm font-bold mb-2">Full Name *</label>
-                                <input type="text" id="full-name" name="full-name" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-brand-blue focus:border-transparent" placeholder="Enter your full name" required>
-                            </div>
-                            <div>
-                                <label for="email-address" class="block text-gray-700 text-sm font-bold mb-2">Email Address *</label>
-                                <input type="email" id="email-address" name="email-address" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-brand-blue focus:border-transparent" placeholder="Enter your email" required>
-                            </div>
-                            <div>
-                                <label for="project-details" class="block text-gray-700 text-sm font-bold mb-2">Project Details *</label>
-                                <textarea id="project-details" name="project-details" rows="6" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-brand-blue focus:border-transparent" placeholder="Tell us about your project requirements, goals, and any specific details..." required></textarea>
-                            </div>
-                            <button type="submit" class="bg-brand-blue text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition duration-300 ease-in-out shadow-lg transform hover:scale-105 flex items-center justify-center">
-                                Send Message
-                                <i data-lucide="send" class="w-5 h-5 ml-2"></i>
-                            </button>
-                            <div id="contact-message" class="mt-4 text-center hidden"></div>
-                        </form>
+                    <!-- Contact Form -->
+                    <div class="bg-white rounded-3xl shadow-2xl p-10 relative overflow-hidden" data-aos="fade-left" data-aos-duration="1000">
+                        <!-- Background decoration -->
+                        <div class="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full -translate-y-16 -translate-x-16"></div>
+                        <div class="absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full translate-y-12 translate-x-12"></div>
+                        
+                        <div class="relative z-10">
+                            <h3 class="text-3xl font-bold text-slate-900 mb-4">Send us a Message</h3>
+                            <p class="text-gray-600 mb-8 text-lg">Fill out the form below and we'll get back to you within 24 hours.</p>
+                            
+                            <form id="contact-form" action="https://formsubmit.co/princealexdigital@gmail.com" method="POST" class="space-y-8">
+                                <input type="hidden" name="_subject" value="New Contact Message from Prince Alex Website">
+                                <input type="hidden" name="_template" value="table">
+                                <input type="hidden" name="_captcha" value="false">
+                                <input type="hidden" name="_next" value="https://princealex.pro/#contact">
+                                <input type="hidden" name="_autoresponse" value="Thank you for contacting us! We'll get back to you shortly.">
+                                
+                                <div>
+                                    <label for="full-name" class="block text-gray-800 text-lg font-semibold mb-3">Full Name *</label>
+                                    <input type="text" id="full-name" name="full-name" class="w-full py-4 px-6 text-gray-700 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 text-lg" placeholder="Enter your full name" required>
+                                </div>
+                                
+                                <div>
+                                    <label for="email-address" class="block text-gray-800 text-lg font-semibold mb-3">Email Address *</label>
+                                    <input type="email" id="email-address" name="email-address" class="w-full py-4 px-6 text-gray-700 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 text-lg" placeholder="Enter your email" required>
+                                </div>
+                                
+                                <div>
+                                    <label for="project-details" class="block text-gray-800 text-lg font-semibold mb-3">Project Details *</label>
+                                    <textarea id="project-details" name="project-details" rows="6" class="w-full py-4 px-6 text-gray-700 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 text-lg resize-none" placeholder="Tell us about your project requirements, goals, and any specific details..." required></textarea>
+                                </div>
+                                
+                                <button type="submit" class="group relative w-full py-4 px-8 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-lg font-bold rounded-2xl shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1">
+                                    <span class="relative z-10 flex items-center justify-center">
+                                        Send Message
+                                        <i data-lucide="send" class="w-5 h-5 ml-3 group-hover:translate-x-1 transition-transform duration-300"></i>
+                                    </span>
+                                    <div class="absolute inset-0 bg-gradient-to-r from-blue-700 to-purple-700 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                </button>
+                                
+                                <div id="contact-message" class="mt-6 text-center hidden"></div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
     </main>
 
-    <footer class="bg-brand-black text-white py-10">
-        <div class="container mx-auto px-4 md:px-8 lg:px-16 text-center">
-            <div class="flex flex-col md:flex-row justify-between items-center mb-8">
-                <a href="#hero" class="text-2xl font-bold text-white flex items-center mb-4 md:mb-0">
-                    <img src="mylogo.png" alt="Prince Alex Digital Logo" class="mr-2 rounded-full w-10 h-10 object-contain" loading="lazy" width="40" height="40">
-                    Prince Alex Digital
-                </a>
+    <footer class="bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 text-white py-16 relative overflow-hidden">
+        <!-- Background decoration -->
+        <div class="absolute inset-0">
+            <div class="absolute top-0 left-1/4 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10"></div>
+            <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10"></div>
+        </div>
 
-                <ul class="flex flex-wrap justify-center md:justify-start space-x-6 text-lg mb-4 md:mb-0">
-                    <li><a href="#hero" class="nav-link hover:text-brand-blue transition duration-300">Home</a></li>
-                    <li><a href="#about" class="nav-link hover:text-brand-blue transition duration-300">About</a></li>
-                    <li><a href="#services" class="nav-link hover:text-brand-blue transition duration-300">Services</a></li>
-                    <li><a href="#portfolio" class="nav-link hover:text-brand-blue transition duration-300">Portfolio</a></li>
-                    <li><a href="#contact" class="nav-link hover:text-brand-blue transition duration-300">Contact</a></li>
-                </ul>
+        <div class="container mx-auto px-4 md:px-8 lg:px-16 relative z-10">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+                <!-- Brand Section -->
+                <div class="text-center md:text-left">
+                    <a href="#hero" class="inline-flex items-center text-3xl font-black text-white mb-6 group">
+                        <div class="w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-300">
+                            <img src="mylogo.png" alt="Prince Alex Digital Logo" class="w-12 h-12 object-contain" loading="lazy" width="48" height="48">
+                        </div>
+                        Prince Alex Digital
+                    </a>
+                    <p class="text-gray-300 text-lg leading-relaxed max-w-md mx-auto md:mx-0">
+                        Empowering businesses with cutting-edge digital solutions that drive growth and enhance brand presence.
+                    </p>
+                </div>
 
-                <div class="flex space-x-6 text-2xl">
-                    <a href="https://www.facebook.com/princealexdigital" target="_blank" rel="noopener noreferrer" aria-label="Facebook" class="hover:text-brand-blue transition duration-300">
-                        <i class="fab fa-facebook"></i>
-                    </a>
-                    <a href="#" target="_blank" rel="noopener noreferrer" aria-label="TikTok" class="hover:text-brand-blue transition duration-300">
-                        <i class="fab fa-tiktok"></i>
-                    </a>
+                <!-- Navigation -->
+                <div class="text-center md:text-left">
+                    <h3 class="text-2xl font-bold text-white mb-6">Quick Links</h3>
+                    <ul class="space-y-4">
+                        <li><a href="#hero" class="text-gray-300 hover:text-white transition-colors duration-300 text-lg">Home</a></li>
+                        <li><a href="#about" class="text-gray-300 hover:text-white transition-colors duration-300 text-lg">About</a></li>
+                        <li><a href="#services" class="text-gray-300 hover:text-white transition-colors duration-300 text-lg">Services</a></li>
+                        <li><a href="#portfolio" class="text-gray-300 hover:text-white transition-colors duration-300 text-lg">Portfolio</a></li>
+                        <li><a href="#contact" class="text-gray-300 hover:text-white transition-colors duration-300 text-lg">Contact</a></li>
+                    </ul>
+                </div>
+
+                <!-- Social Media -->
+                <div class="text-center md:text-left">
+                    <h3 class="text-2xl font-bold text-white mb-6">Follow Us</h3>
+                    <div class="flex justify-center md:justify-start space-x-6">
+                        <a href="https://www.facebook.com/princealexdigital" target="_blank" rel="noopener noreferrer" aria-label="Facebook" class="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center text-white hover:scale-110 transition-transform duration-300 shadow-lg">
+                            <i class="fab fa-facebook text-xl"></i>
+                        </a>
+                        <a href="#" target="_blank" rel="noopener noreferrer" aria-label="TikTok" class="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 flex items-center justify-center text-white hover:scale-110 transition-transform duration-300 shadow-lg">
+                            <i class="fab fa-tiktok text-xl"></i>
+                        </a>
                     </div>
+                    <div class="mt-8">
+                        <p class="text-gray-300 text-lg mb-2">Get in touch</p>
+                        <a href="mailto:princealexdigital@gmail.com" class="text-blue-400 hover:text-blue-300 transition-colors duration-300 text-lg">princealexdigital@gmail.com</a>
+                    </div>
+                </div>
             </div>
 
-            <hr class="border-gray-700 mb-8">
-
-            <p class="text-gray-400 text-sm">© 2025 Prince Alex Digital. All rights reserved.</p>
+            <!-- Bottom Bar -->
+            <div class="border-t border-gray-700 pt-8">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <p class="text-gray-400 text-lg mb-4 md:mb-0">© 2025 Prince Alex Digital. All rights reserved.</p>
+                    <p class="text-gray-500 text-sm">Made with ❤️ in Kenya</p>
+                </div>
+            </div>
         </div>
     </footer>
 
