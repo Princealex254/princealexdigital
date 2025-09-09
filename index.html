@@ -175,38 +175,31 @@
         }
 
         // Function to update the statistics counter targets
-        let statsTargets = { projects: 0, clients: 0, successRate: 0 };
+        let statsTargets = { successRate: 0 };
         function updateStatsTargets(stats) {
-            statsTargets.projects = stats.projects || 0;
-            statsTargets.clients = stats.clients || 0;
-            statsTargets.successRate = parseInt(stats.successRate) || 0;
+            statsTargets.successRate = parseInt(stats.successRate) || 100;
         }
 
         // Function to load statistics
         function loadStatistics() {
-            const projectsDelivered = document.getElementById('projects-delivered');
-            const happyClients = document.getElementById('happy-clients');
             const successRate = document.getElementById('success-rate');
 
-            if (!projectsDelivered || !happyClients || !successRate) return;
+            if (!successRate) return;
 
             const statsDocRef = doc(db, `artifacts/${appId}/public/data/statistics/currentStats`);
 
             onSnapshot(statsDocRef, (docSnap) => {
                 if (docSnap.exists()) {
                     const stats = docSnap.data();
-                    projectsDelivered.textContent = stats.projects || '--';
-                    happyClients.textContent = stats.clients || '--';
-                    successRate.textContent = stats.successRate || '--';
+                    successRate.textContent = stats.successRate || '100%';
                     updateStatsTargets(stats); // Update targets for the counter
                 } else {
-                    projectsDelivered.textContent = '--';
-                    happyClients.textContent = '--';
-                    successRate.textContent = '--';
-                    console.log("No statistics data found.");
+                    successRate.textContent = '100%';
+                    console.log("No statistics data found, using default success rate.");
                 }
             }, (error) => {
                 console.error("Error fetching statistics:", error);
+                successRate.textContent = '100%';
             });
         }
 
@@ -1346,20 +1339,12 @@
                 </div>
 
                 <!-- Statistics Grid -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-2xl mx-auto">
                     <div class="group text-center p-8 bg-white/10 backdrop-blur-sm rounded-3xl border border-white/20 hover:bg-white/20 transition-all duration-500 transform hover:-translate-y-2" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="100">
-                        <div id="projects-delivered" class="text-6xl font-black text-white mb-4 group-hover:scale-110 transition-transform duration-300">--</div>
-                        <p class="text-xl text-blue-200 font-semibold">Projects Delivered</p>
-                    </div>
-                    <div class="group text-center p-8 bg-white/10 backdrop-blur-sm rounded-3xl border border-white/20 hover:bg-white/20 transition-all duration-500 transform hover:-translate-y-2" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
-                        <div id="happy-clients" class="text-6xl font-black text-white mb-4 group-hover:scale-110 transition-transform duration-300">--</div>
-                        <p class="text-xl text-blue-200 font-semibold">Happy Clients</p>
-                    </div>
-                    <div class="group text-center p-8 bg-white/10 backdrop-blur-sm rounded-3xl border border-white/20 hover:bg-white/20 transition-all duration-500 transform hover:-translate-y-2" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="300">
-                        <div id="success-rate" class="text-6xl font-black text-white mb-4 group-hover:scale-110 transition-transform duration-300">--</div>
+                        <div id="success-rate" class="text-6xl font-black text-white mb-4 group-hover:scale-110 transition-transform duration-300">100%</div>
                         <p class="text-xl text-blue-200 font-semibold">Success Rate</p>
                     </div>
-                    <div class="group text-center p-8 bg-white/10 backdrop-blur-sm rounded-3xl border border-white/20 hover:bg-white/20 transition-all duration-500 transform hover:-translate-y-2" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="400">
+                    <div class="group text-center p-8 bg-white/10 backdrop-blur-sm rounded-3xl border border-white/20 hover:bg-white/20 transition-all duration-500 transform hover:-translate-y-2" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
                         <div class="text-6xl font-black text-white mb-4 group-hover:scale-110 transition-transform duration-300">24/7</div>
                         <p class="text-xl text-blue-200 font-semibold">Support</p>
                     </div>
