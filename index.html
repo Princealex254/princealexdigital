@@ -685,18 +685,6 @@
             transform: translateX(0%);
         }
 
-        /* Mobile Menu Animation */
-        .mobile-menu-animated {
-            display: block; /* Override 'hidden' */
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.5s ease-out, opacity 0.5s ease-out;
-            opacity: 0;
-        }
-        .mobile-menu-animated.open {
-            max-height: 500px; /* A value large enough to contain the menu */
-            opacity: 1;
-        }
 
         /* Scroll Progress Bar */
         .scroll-progress-container {
@@ -1529,41 +1517,25 @@
                 icon: !!hamburgerIcon
             });
 
-            function toggleMobileMenu() {
-                console.log('Toggle mobile menu clicked');
-                
-                if (mobileMenu.classList.contains('show')) {
-                    // Close menu
-                    mobileMenu.classList.remove('show');
-                    if (mobileMenuBackdrop) mobileMenuBackdrop.classList.remove('show');
-                    if (hamburgerIcon) hamburgerIcon.classList.remove('active');
-                    document.body.style.overflow = '';
-                    console.log('Menu closed');
-                } else {
-                    // Open menu
-                    mobileMenu.classList.add('show');
-                    if (mobileMenuBackdrop) mobileMenuBackdrop.classList.add('show');
-                    if (hamburgerIcon) hamburgerIcon.classList.add('active');
-                    document.body.style.overflow = 'hidden';
-                    console.log('Menu opened');
-                }
-            }
-
-            function closeMobileMenu() {
-                mobileMenu.classList.remove('show');
-                if (mobileMenuBackdrop) mobileMenuBackdrop.classList.remove('show');
-                if (hamburgerIcon) hamburgerIcon.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-
-            // Add click event to hamburger button
+            // Toggle mobile menu
             if (mobileMenuButton) {
                 mobileMenuButton.addEventListener('click', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
                     console.log('Hamburger button clicked');
-                    alert('Hamburger clicked!'); // Test alert
-                    toggleMobileMenu();
+                    
+                    mobileMenu.classList.toggle('show');
+                    if (mobileMenuBackdrop) mobileMenuBackdrop.classList.toggle('show');
+                    if (hamburgerIcon) hamburgerIcon.classList.toggle('active');
+                    
+                    // Toggle body scroll
+                    if (mobileMenu.classList.contains('show')) {
+                        document.body.style.overflow = 'hidden';
+                        console.log('Menu opened');
+                    } else {
+                        document.body.style.overflow = '';
+                        console.log('Menu closed');
+                    }
                 });
             } else {
                 console.error('Mobile menu button not found!');
@@ -1571,14 +1543,22 @@
 
             // Close mobile menu when clicking backdrop
             if (mobileMenuBackdrop) {
-                mobileMenuBackdrop.addEventListener('click', closeMobileMenu);
+                mobileMenuBackdrop.addEventListener('click', function() {
+                    mobileMenu.classList.remove('show');
+                    mobileMenuBackdrop.classList.remove('show');
+                    if (hamburgerIcon) hamburgerIcon.classList.remove('active');
+                    document.body.style.overflow = '';
+                });
             }
 
             // Close mobile menu when clicking a link inside
             document.querySelectorAll('#mobile-menu a').forEach(link => {
                 link.addEventListener('click', function(e) {
                     console.log('Mobile menu link clicked:', this.href);
-                    closeMobileMenu();
+                    mobileMenu.classList.remove('show');
+                    if (mobileMenuBackdrop) mobileMenuBackdrop.classList.remove('show');
+                    if (hamburgerIcon) hamburgerIcon.classList.remove('active');
+                    document.body.style.overflow = '';
                 });
             });
 
@@ -1588,14 +1568,20 @@
                     !mobileMenu.contains(event.target) && 
                     !mobileMenuButton.contains(event.target) && 
                     mobileMenu.classList.contains('show')) {
-                    closeMobileMenu();
+                    mobileMenu.classList.remove('show');
+                    if (mobileMenuBackdrop) mobileMenuBackdrop.classList.remove('show');
+                    if (hamburgerIcon) hamburgerIcon.classList.remove('active');
+                    document.body.style.overflow = '';
                 }
             });
 
             // Close mobile menu on escape key
             document.addEventListener('keydown', function(event) {
                 if (event.key === 'Escape' && mobileMenu && mobileMenu.classList.contains('show')) {
-                    closeMobileMenu();
+                    mobileMenu.classList.remove('show');
+                    if (mobileMenuBackdrop) mobileMenuBackdrop.classList.remove('show');
+                    if (hamburgerIcon) hamburgerIcon.classList.remove('active');
+                    document.body.style.overflow = '';
                 }
             });
 
