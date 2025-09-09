@@ -195,6 +195,11 @@
             });
         }
 
+        // Global variables for testimonials rotation
+        let testimonials = [];
+        let currentTestimonialIndex = 0;
+        let testimonialInterval = null;
+
         // Function to load testimonials
         function loadTestimonials() {
             const testimonialText = document.getElementById('testimonial-text');
@@ -205,17 +210,23 @@
 
             const testimonialsCollectionRef = collection(db, `artifacts/${appId}/public/data/testimonials`);
 
-            // For simplicity, we'll just display the latest testimonial
-            // In a real app, you might cycle through them or have a dedicated section for all.
             onSnapshot(testimonialsCollectionRef, (snapshot) => {
                 if (!snapshot.empty) {
-                    // Get the last testimonial added (assuming order by timestamp if added)
-                    const latestTestimonialDoc = snapshot.docs[snapshot.docs.length - 1];
-                    const testimonial = latestTestimonialDoc.data();
-                    testimonialText.textContent = `"${testimonial.quote}"`;
-                    testimonialAuthor.textContent = `- ${testimonial.author}`;
-                    testimonialCompany.textContent = testimonial.company;
+                    // Store all testimonials
+                    testimonials = snapshot.docs.map(doc => ({
+                        id: doc.id,
+                        ...doc.data()
+                    }));
+
+                    // Start rotating testimonials
+                    startTestimonialRotation();
                 } else {
+                    // Clear any existing rotation
+                    if (testimonialInterval) {
+                        clearInterval(testimonialInterval);
+                        testimonialInterval = null;
+                    }
+                    
                     testimonialText.textContent = "No testimonials yet. Be the first!";
                     testimonialAuthor.textContent = "";
                     testimonialCompany.textContent = "";
@@ -223,6 +234,54 @@
             }, (error) => {
                 console.error("Error fetching testimonials:", error);
             });
+        }
+
+        // Function to start testimonial rotation
+        function startTestimonialRotation() {
+            if (testimonials.length === 0) return;
+
+            // Clear any existing interval
+            if (testimonialInterval) {
+                clearInterval(testimonialInterval);
+            }
+
+            // Display first testimonial immediately
+            displayTestimonial(0);
+
+            // Start rotation every 5 seconds
+            testimonialInterval = setInterval(() => {
+                currentTestimonialIndex = (currentTestimonialIndex + 1) % testimonials.length;
+                displayTestimonial(currentTestimonialIndex);
+            }, 5000);
+        }
+
+        // Function to display a specific testimonial with animation
+        function displayTestimonial(index) {
+            const testimonialText = document.getElementById('testimonial-text');
+            const testimonialAuthor = document.getElementById('testimonial-author');
+            const testimonialCompany = document.getElementById('testimonial-company');
+
+            if (!testimonialText || !testimonialAuthor || !testimonialCompany) return;
+
+            const testimonial = testimonials[index];
+            if (!testimonial) return;
+
+            // Add fade out effect
+            testimonialText.style.opacity = '0';
+            testimonialAuthor.style.opacity = '0';
+            testimonialCompany.style.opacity = '0';
+
+            // Update content after fade out
+            setTimeout(() => {
+                testimonialText.textContent = `"${testimonial.quote}"`;
+                testimonialAuthor.textContent = `- ${testimonial.author}`;
+                testimonialCompany.textContent = testimonial.company;
+
+                // Add fade in effect
+                testimonialText.style.opacity = '1';
+                testimonialAuthor.style.opacity = '1';
+                testimonialCompany.style.opacity = '1';
+            }, 300);
         }
 
         // Handle contact form submission
@@ -423,6 +482,13 @@
         .portfolio-link:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Testimonial rotation transitions */
+        #testimonial-text,
+        #testimonial-author,
+        #testimonial-company {
+            transition: opacity 0.3s ease-in-out;
         }
         .icon-bg-blue { 
             background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
