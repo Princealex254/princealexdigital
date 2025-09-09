@@ -755,18 +755,23 @@
             visibility: hidden;
             transform: translateY(-20px) scale(0.95);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
         }
 
         .mobile-menu-animated.show {
             opacity: 1;
             visibility: visible;
             transform: translateY(0) scale(1);
+            pointer-events: auto;
         }
 
         /* Mobile Menu Link Animations */
         .mobile-menu-link {
             position: relative;
             overflow: hidden;
+            cursor: pointer;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .mobile-menu-link::before {
@@ -793,7 +798,7 @@
 
         .mobile-menu-animated.show .mobile-menu-link {
             animation: slideInUp 0.4s ease-out forwards;
-            opacity: 0;
+            opacity: 1;
         }
 
         @keyframes slideInUp {
@@ -885,7 +890,7 @@
             </ul>
         </nav>
 
-        <div id="mobile-menu" class="md:hidden fixed top-20 left-4 right-4 bg-white/95 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl py-6 px-6 space-y-2 mobile-menu-animated z-40">
+        <div id="mobile-menu" class="md:hidden fixed top-20 left-4 right-4 bg-white/95 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl py-6 px-6 space-y-2 mobile-menu-animated z-40" style="display: none;">
             <a href="#hero" class="block py-3 px-4 rounded-xl text-gray-800 font-medium hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600 hover:text-white transition-all duration-300 transform hover:scale-105 mobile-menu-link">Home</a>
             <a href="#about" class="block py-3 px-4 rounded-xl text-gray-800 font-medium hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600 hover:text-white transition-all duration-300 transform hover:scale-105 mobile-menu-link">About</a>
             <a href="#services" class="block py-3 px-4 rounded-xl text-gray-800 font-medium hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600 hover:text-white transition-all duration-300 transform hover:scale-105 mobile-menu-link">Services</a>
@@ -1515,8 +1520,16 @@
             const mobileMenuBackdrop = document.getElementById('mobile-menu-backdrop');
             const hamburgerIcon = mobileMenuButton.querySelector('.hamburger-icon');
 
+            console.log('Mobile menu elements:', {
+                button: mobileMenuButton,
+                menu: mobileMenu,
+                backdrop: mobileMenuBackdrop,
+                icon: hamburgerIcon
+            });
+
             function toggleMobileMenu() {
                 const isOpen = mobileMenu.classList.contains('show');
+                console.log('Toggle mobile menu, isOpen:', isOpen);
                 
                 if (isOpen) {
                     // Close menu
@@ -1524,12 +1537,16 @@
                     mobileMenuBackdrop.classList.remove('show');
                     hamburgerIcon.classList.remove('active');
                     document.body.style.overflow = '';
+                    mobileMenu.style.display = 'none';
+                    console.log('Menu closed');
                 } else {
                     // Open menu
+                    mobileMenu.style.display = 'block';
                     mobileMenu.classList.add('show');
                     mobileMenuBackdrop.classList.add('show');
                     hamburgerIcon.classList.add('active');
                     document.body.style.overflow = 'hidden';
+                    console.log('Menu opened');
                 }
             }
 
@@ -1538,16 +1555,24 @@
                 mobileMenuBackdrop.classList.remove('show');
                 hamburgerIcon.classList.remove('active');
                 document.body.style.overflow = '';
+                mobileMenu.style.display = 'none';
             }
 
-            mobileMenuButton.addEventListener('click', toggleMobileMenu);
+            if (mobileMenuButton) {
+                mobileMenuButton.addEventListener('click', toggleMobileMenu);
+            } else {
+                console.error('Mobile menu button not found!');
+            }
 
             // Close mobile menu when clicking backdrop
             mobileMenuBackdrop.addEventListener('click', closeMobileMenu);
 
             // Close mobile menu when clicking a link inside
             document.querySelectorAll('#mobile-menu a').forEach(link => {
-                link.addEventListener('click', closeMobileMenu);
+                link.addEventListener('click', function(e) {
+                    console.log('Mobile menu link clicked:', this.href);
+                    closeMobileMenu();
+                });
             });
 
             // Close mobile menu when clicking outside (optional, but good UX)
