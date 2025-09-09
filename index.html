@@ -49,7 +49,7 @@
     <script type="module">
         // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-        import { getFirestore, collection, doc, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+        import { getFirestore, collection, doc, onSnapshot, addDoc, serverTimestamp, enableIndexedDbPersistence, CACHE_SIZE_UNLIMITED } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
 
 
@@ -68,9 +68,111 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
+        // Enable Firestore persistence for offline caching
+        enableIndexedDbPersistence(db, { cacheSizeBytes: CACHE_SIZE_UNLIMITED })
+            .then(() => {
+                console.log("Firestore persistence enabled successfully");
+            })
+            .catch((err) => {
+                if (err.code === 'failed-precondition') {
+                    console.log("Multiple tabs open, persistence can only be enabled in one tab at a time.");
+                } else if (err.code === 'unimplemented') {
+                    console.log("The current browser does not support IndexedDB persistence.");
+                } else {
+                    console.error("Error enabling Firestore persistence:", err);
+                }
+            });
+
         // Global variables for app ID and user ID
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         let userId = null; // Will be set after authentication
+
+        // Portfolio caching utilities
+        const PORTFOLIO_CACHE_KEY = `portfolio_cache_${appId}`;
+        const CACHE_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+        // Cache management functions
+        function savePortfolioToCache(portfolioItems) {
+            try {
+                const cacheData = {
+                    items: portfolioItems,
+                    timestamp: Date.now(),
+                    version: '1.0'
+                };
+                localStorage.setItem(PORTFOLIO_CACHE_KEY, JSON.stringify(cacheData));
+                console.log('Portfolio items saved to cache');
+            } catch (error) {
+                console.warn('Failed to save portfolio to cache:', error);
+            }
+        }
+
+        function loadPortfolioFromCache() {
+            try {
+                const cached = localStorage.getItem(PORTFOLIO_CACHE_KEY);
+                if (!cached) return null;
+
+                const cacheData = JSON.parse(cached);
+                const isExpired = Date.now() - cacheData.timestamp > CACHE_EXPIRY_MS;
+                
+                if (isExpired) {
+                    localStorage.removeItem(PORTFOLIO_CACHE_KEY);
+                    return null;
+                }
+
+                console.log('Portfolio items loaded from cache');
+                return cacheData.items;
+            } catch (error) {
+                console.warn('Failed to load portfolio from cache:', error);
+                localStorage.removeItem(PORTFOLIO_CACHE_KEY);
+                return null;
+            }
+        }
+
+        // Clean, reusable rendering function
+        function renderPortfolioItems(portfolioItems, container) {
+            if (!container) return;
+
+            if (!portfolioItems || portfolioItems.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-16">
+                        <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 mb-6">
+                            <i data-lucide="briefcase" class="w-10 h-10 text-blue-600"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4">No Projects Yet</h3>
+                        <p class="text-lg text-gray-600 max-w-md mx-auto">
+                            We're working on some amazing projects. Check back soon to see our latest work!
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+            portfolioItems.forEach((item, index) => {
+                const portfolioItemHTML = `
+                    <div class="portfolio-item group" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="${index * 100}">
+                        <div class="portfolio-content">
+                            <h3 class="text-xl md:text-2xl font-bold text-gray-800 mb-3 group-hover:text-brand-blue transition-colors">
+                                ${item.title}
+                            </h3>
+                            <p class="text-gray-600 mb-6 leading-relaxed">
+                                ${item.description}
+                            </p>
+                            <a href="${item.link}" target="_blank" class="portfolio-link">
+                                <span>${item.linkText || 'View Project'}</span>
+                                <i data-lucide="external-link" class="w-4 h-4"></i>
+                            </a>
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', portfolioItemHTML);
+            });
+
+            // Re-initialize Lucide icons after rendering
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
 
         // Function to update the statistics counter targets
         let statsTargets = { projects: 0, clients: 0, successRate: 0 };
@@ -134,64 +236,75 @@
         });
 
 
-        // Function to load portfolio items
+        // Enhanced portfolio loading with instant cache and silent refresh
         function loadPortfolioItems() {
             const portfolioContainer = document.getElementById('portfolio-items-container');
             if (!portfolioContainer) return;
 
-            const portfolioCollectionRef = collection(db, `artifacts/${appId}/public/data/portfolio`);
+            console.log('Loading portfolio items...');
 
-            onSnapshot(portfolioCollectionRef, (snapshot) => {
-                portfolioContainer.innerHTML = ''; // Clear existing items
-                
-                if (snapshot.empty) {
-                    portfolioContainer.innerHTML = `
-                        <div class="col-span-full text-center py-16">
-                            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 mb-6">
-                                <i data-lucide="briefcase" class="w-10 h-10 text-blue-600"></i>
-                            </div>
-                            <h3 class="text-2xl font-bold text-gray-800 mb-4">No Projects Yet</h3>
-                            <p class="text-lg text-gray-600 max-w-md mx-auto">
-                                We're working on some amazing projects. Check back soon to see our latest work!
-                            </p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                snapshot.forEach((doc) => {
-                    const item = doc.data();
-                    const portfolioItemHTML = `
-                        <div class="portfolio-item group" data-aos="fade-up" data-aos-duration="1000">
-                            <div class="portfolio-content">
-                                <h3 class="text-xl md:text-2xl font-bold text-gray-800 mb-3 group-hover:text-brand-blue transition-colors">
-                                    ${item.title}
-                                </h3>
-                                <p class="text-gray-600 mb-6 leading-relaxed">
-                                    ${item.description}
-                                </p>
-                                <a href="${item.link}" target="_blank" class="portfolio-link">
-                                    <span>${item.linkText || 'View Project'}</span>
-                                    <i data-lucide="external-link" class="w-4 h-4"></i>
-                                </a>
-                            </div>
-                        </div>
-                    `;
-                    portfolioContainer.insertAdjacentHTML('beforeend', portfolioItemHTML);
-                });
-            }, (error) => {
-                console.error("Error fetching portfolio items:", error);
+            // Step 1: Load from cache instantly (if available)
+            const cachedItems = loadPortfolioFromCache();
+            if (cachedItems) {
+                console.log('Rendering cached portfolio items instantly');
+                renderPortfolioItems(cachedItems, portfolioContainer);
+            } else {
+                console.log('No cached portfolio items found, showing loading state');
                 portfolioContainer.innerHTML = `
                     <div class="col-span-full text-center py-16">
-                        <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-red-100 mb-6">
-                            <i data-lucide="alert-circle" class="w-10 h-10 text-red-600"></i>
+                        <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 mb-6">
+                            <i data-lucide="loader-2" class="w-10 h-10 text-blue-600 animate-spin"></i>
                         </div>
-                        <h3 class="text-2xl font-bold text-gray-800 mb-4">Error Loading Projects</h3>
-                        <p class="text-lg text-gray-600">
-                            There was an error loading the portfolio items. Please try again later.
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4">Loading Projects</h3>
+                        <p class="text-lg text-gray-600 max-w-md mx-auto">
+                            Fetching our latest work...
                         </p>
                     </div>
                 `;
+            }
+
+            // Step 2: Set up Firestore listener for real-time updates
+            const portfolioCollectionRef = collection(db, `artifacts/${appId}/public/data/portfolio`);
+            
+            onSnapshot(portfolioCollectionRef, (snapshot) => {
+                console.log('Firestore portfolio data received');
+                
+                const portfolioItems = [];
+                if (!snapshot.empty) {
+                    snapshot.forEach((doc) => {
+                        portfolioItems.push({
+                            id: doc.id,
+                            ...doc.data()
+                        });
+                    });
+                }
+
+                // Save to cache for next time
+                savePortfolioToCache(portfolioItems);
+
+                // Re-render with fresh data (silent update)
+                renderPortfolioItems(portfolioItems, portfolioContainer);
+                
+                console.log(`Portfolio updated: ${portfolioItems.length} items`);
+            }, (error) => {
+                console.error("Error fetching portfolio items:", error);
+                
+                // Only show error if we don't have cached data
+                if (!cachedItems) {
+                    portfolioContainer.innerHTML = `
+                        <div class="col-span-full text-center py-16">
+                            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-red-100 mb-6">
+                                <i data-lucide="alert-circle" class="w-10 h-10 text-red-600"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-800 mb-4">Error Loading Projects</h3>
+                            <p class="text-lg text-gray-600 max-w-md mx-auto">
+                                We're having trouble loading our projects. Please try refreshing the page.
+                            </p>
+                        </div>
+                    `;
+                } else {
+                    console.log('Using cached data due to Firestore error');
+                }
             });
         }
 
