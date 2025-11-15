@@ -496,62 +496,42 @@
             if (contactForm) {
                 contactForm.addEventListener('submit', async (e) => {
                     // Prevent default form submission to avoid page refresh
-                    e.preventDefault();
+                    // e.preventDefault(); // Let the form submit normally to FormSubmit.co
 
                     const fullName = document.getElementById('full-name').value;
                     const emailAddress = document.getElementById('email-address').value;
                     const projectDetails = document.getElementById('project-details').value;
 
-                    // Show loading state
+                    // Show loading state, but don't prevent submission
                     const submitButton = contactForm.querySelector('button[type="submit"]');
-                    const originalButtonText = submitButton.innerHTML;
                     submitButton.innerHTML = '<i data-lucide="loader-2" class="w-5 h-5 mr-2 animate-spin"></i>Sending Message...';
                     submitButton.disabled = true;
 
                     try {
-                        // Save to Firebase
+                        // We still want to save the message to Firebase before the page unloads for the form submission.
                         await addDoc(collection(db, `artifacts/${appId}/public/data/messages`), {
                             fullName: fullName,
                             emailAddress: emailAddress,
                             projectDetails: projectDetails,
                             timestamp: serverTimestamp()
                         });
-
-                        // Send email via FormSubmit (without page refresh)
-                        const formData = new FormData();
-                        formData.append('name', fullName);
-                        formData.append('email', emailAddress);
-                        formData.append('message', projectDetails);
-                        formData.append('_subject', 'New Contact Message from Prince Alex Website');
-                        formData.append('_template', 'table');
-                        formData.append('_captcha', 'false');
-                        formData.append('_autoresponse', 'Thank you for contacting us! We\'ll get back to you shortly.');
-
-                        // Send email
-                        await fetch('https://formsubmit.co/princealexdigital@gmail.com', {
-                            method: 'POST',
-                            body: formData
-                        });
-
-                        // Show success toast (no auto-dismiss)
-                        showToast(
-                            `Thank you ${fullName}! Your message has been sent successfully. We'll get back to you within 24 hours.`,
-                            'success',
-                            0 // 0 means no auto-dismiss
-                        );
-
-                        // Reset form
-                        contactForm.reset();
-                        
-                        // Hide the old message div if it exists
-                        if (contactMessageDiv) {
-                            contactMessageDiv.classList.add('hidden');
-                        }
+                        // The form will now submit to FormSubmit.co via its action attribute.
+                        // The user will be redirected. The toast notifications will not be shown here.
+                        // FormSubmit.co will handle the "thank you" message and redirection.
 
                     } catch (error) {
-                        console.error("Error sending message:", error);
-                        
-                        // Show error toast (no auto-dismiss)
+                        // This will now primarily catch errors from Firebase.
+                        console.error("Error saving message to Firebase:", error);
+
+                        // If Firebase fails, show an error and re-enable the form.
+                        e.preventDefault(); // Prevent submission if Firebase fails.
+                        const originalButtonText = '<span>Send Message<i data-lucide="send" class="w-5 h-5 ml-3 group-hover:translate-x-1 transition-transform duration-300"></i></span>';
+                        submitButton.innerHTML = originalButtonText;
+                        submitButton.disabled = false;
+                        if (typeof lucide !== 'undefined') {
+                            lucide.createIcons();
+                        }
+
                         showToast(
                             "Sorry, there was an error sending your message. Please try again or contact us directly.",
                             'error',
@@ -559,13 +539,7 @@
                         );
                     } finally {
                         // Restore button state
-                        submitButton.innerHTML = originalButtonText;
-                        submitButton.disabled = false;
-                        
-                        // Re-initialize Lucide icons
-                        if (typeof lucide !== 'undefined') {
-                            lucide.createIcons();
-                        }
+                        showToast("An error occurred. Please try again.", 'error', 0);
                     }
                 });
             }
@@ -1588,19 +1562,20 @@
                             
                             <form id="contact-form" action="https://formsubmit.co/princealexdigital@gmail.com" method="POST" class="space-y-8">
                                 <input type="hidden" name="_subject" value="New Contact Message from Prince Alex Website">
-                                <input type="hidden" name="_template" value="table">
+                                <!-- Use the "name" attribute from your inputs for the template -->
+                                <input type="hidden" name="_template" value="table"> 
                                 <input type="hidden" name="_captcha" value="false">
-                                <input type="hidden" name="_next" value="https://princealex.pro/#contact">
+                                <input type="hidden" name="_next" value="https://princealex.pro/thank-you.html"> <!-- Or a dedicated thank you page -->
                                 <input type="hidden" name="_autoresponse" value="Thank you for contacting us! We'll get back to you shortly.">
                                 
                                 <div>
                                     <label for="full-name" class="block text-gray-800 text-lg font-semibold mb-3">Full Name *</label>
-                                    <input type="text" id="full-name" name="full-name" class="w-full py-4 px-6 text-gray-700 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 text-lg" placeholder="Enter your full name" required>
+                                    <input type="text" id="full-name" name="name" class="w-full py-4 px-6 text-gray-700 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 text-lg" placeholder="Enter your full name" required>
                                 </div>
                                 
                                 <div>
                                     <label for="email-address" class="block text-gray-800 text-lg font-semibold mb-3">Email Address *</label>
-                                    <input type="email" id="email-address" name="email-address" class="w-full py-4 px-6 text-gray-700 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 text-lg" placeholder="Enter your email" required>
+                                    <input type="email" id="email-address" name="email" class="w-full py-4 px-6 text-gray-700 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 text-lg" placeholder="Enter your email" required>
                                 </div>
                                 
                                 <div>
@@ -1610,7 +1585,7 @@
                                 
                                 <button type="submit" class="group relative w-full py-4 px-8 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-lg font-bold rounded-2xl shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1">
                                     <span class="relative z-10 flex items-center justify-center">
-                                        Send Message
+                                        <span>Send Message</span>
                                         <i data-lucide="send" class="w-5 h-5 ml-3 group-hover:translate-x-1 transition-transform duration-300"></i>
                                     </span>
                                     <div class="absolute inset-0 bg-gradient-to-r from-blue-700 to-purple-700 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -1869,5 +1844,3 @@
     </script>
 </body>
 </html>
-
-
