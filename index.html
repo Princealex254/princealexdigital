@@ -491,77 +491,48 @@
         // Handle contact form submission
         document.addEventListener('DOMContentLoaded', () => {
             const contactForm = document.getElementById('contact-form');
-            const contactMessageDiv = document.getElementById('contact-message');
 
             if (contactForm) {
                 contactForm.addEventListener('submit', async (e) => {
-                    // Prevent default form submission to avoid page refresh
-                    e.preventDefault();
+                    e.preventDefault(); // Prevent default but we will submit manually
 
-                    const fullName = document.getElementById('full-name').value;
-                    const emailAddress = document.getElementById('email-address').value;
-                    const projectDetails = document.getElementById('project-details').value;
-
-                    // Show loading state
                     const submitButton = contactForm.querySelector('button[type="submit"]');
                     const originalButtonText = submitButton.innerHTML;
                     submitButton.innerHTML = '<i data-lucide="loader-2" class="w-5 h-5 mr-2 animate-spin"></i>Sending Message...';
                     submitButton.disabled = true;
 
                     try {
-                        // Save to Firebase
+                        // Save message in Firebase
                         await addDoc(collection(db, `artifacts/${appId}/public/data/messages`), {
-                            fullName: fullName,
-                            emailAddress: emailAddress,
-                            projectDetails: projectDetails,
+                            fullName: document.getElementById('full-name').value,
+                            emailAddress: document.getElementById('email-address').value,
+                            projectDetails: document.getElementById('project-details').value,
                             timestamp: serverTimestamp()
                         });
 
-                        // Send email via FormSubmit (without page refresh)
-                        const formData = new FormData();
-                        formData.append('name', fullName);
-                        formData.append('email', emailAddress);
-                        formData.append('message', projectDetails);
-                        formData.append('_subject', 'New Contact Message from Prince Alex Website');
-                        formData.append('_template', 'table');
-                        formData.append('_captcha', 'false');
-                        formData.append('_autoresponse', 'Thank you for contacting us! We\'ll get back to you shortly.');
+                        // Submit to FormSubmit (via hidden iframe → no refresh)
+                        contactForm.submit();
 
-                        // Send email
-                        await fetch('https://formsubmit.co/princealexdigital@gmail.com', {
-                            method: 'POST',
-                            body: formData
-                        });
-
-                        // Show success toast (no auto-dismiss)
+                        // Toast success
                         showToast(
-                            `Thank you ${fullName}! Your message has been sent successfully. We'll get back to you within 24 hours.`,
+                            `Thank you! Your message has been sent successfully. We'll get back to you within 24 hours.`,
                             'success',
-                            0 // 0 means no auto-dismiss
+                            0
                         );
 
-                        // Reset form
                         contactForm.reset();
-                        
-                        // Hide the old message div if it exists
-                        if (contactMessageDiv) {
-                            contactMessageDiv.classList.add('hidden');
-                        }
 
                     } catch (error) {
-                        console.error("Error sending message:", error);
-                        
-                        // Show error toast (no auto-dismiss)
+                        console.error(error);
                         showToast(
-                            "Sorry, there was an error sending your message. Please try again or contact us directly.",
+                            `Sorry, there was an error sending your message. Please try again or contact us directly on +254 717 384 875.`,
                             'error',
-                            0 // 0 means no auto-dismiss
+                            0
                         );
                     } finally {
                         // Restore button state
                         submitButton.innerHTML = originalButtonText;
                         submitButton.disabled = false;
-                        
                         // Re-initialize Lucide icons
                         if (typeof lucide !== 'undefined') {
                             lucide.createIcons();
@@ -1586,26 +1557,34 @@
                             <h3 class="text-3xl font-bold text-slate-900 mb-4">Send us a Message</h3>
                             <p class="text-gray-600 mb-8 text-lg">Fill out the form below and we'll get back to you within 24 hours.</p>
                             
-                            <form id="contact-form" action="https://formsubmit.co/princealexdigital@gmail.com" method="POST" class="space-y-8">
-                                <input type="hidden" name="_subject" value="New Contact Message from Prince Alex Website">
+                            <!-- Hidden iframe to allow FormSubmit to process email WITHOUT page refresh -->
+                            <iframe name="formsubmit-frame" style="display:none;"></iframe>
+
+                            <form 
+                                id="contact-form" 
+                                action="https://formsubmit.co/princealexdigital@gmail.com"
+                                method="POST"
+                                target="formsubmit-frame"
+                                class="space-y-8"
+                            >
                                 <input type="hidden" name="_template" value="table">
                                 <input type="hidden" name="_captcha" value="false">
-                                <input type="hidden" name="_next" value="https://princealex.pro/#contact">
-                                <input type="hidden" name="_autoresponse" value="Thank you for contacting us! We'll get back to you shortly.">
+                                <input type="hidden" name="_subject" value="New Contact Message from PrinceAlex.pro">
+                                <input type="hidden" name="_autoresponse" value="Thank you for contacting Prince Alex Digital! We will respond shortly.">
                                 
                                 <div>
                                     <label for="full-name" class="block text-gray-800 text-lg font-semibold mb-3">Full Name *</label>
-                                    <input type="text" id="full-name" name="full-name" class="w-full py-4 px-6 text-gray-700 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 text-lg" placeholder="Enter your full name" required>
+                                    <input type="text" id="full-name" name="name" class="w-full py-4 px-6 text-gray-700 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 text-lg" placeholder="Enter your full name" required>
                                 </div>
                                 
                                 <div>
                                     <label for="email-address" class="block text-gray-800 text-lg font-semibold mb-3">Email Address *</label>
-                                    <input type="email" id="email-address" name="email-address" class="w-full py-4 px-6 text-gray-700 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 text-lg" placeholder="Enter your email" required>
+                                    <input type="email" id="email-address" name="email" class="w-full py-4 px-6 text-gray-700 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 text-lg" placeholder="Enter your email" required>
                                 </div>
                                 
                                 <div>
                                     <label for="project-details" class="block text-gray-800 text-lg font-semibold mb-3">Project Details *</label>
-                                    <textarea id="project-details" name="project-details" rows="6" class="w-full py-4 px-6 text-gray-700 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 text-lg resize-none" placeholder="Tell us about your project requirements, goals, and any specific details..." required></textarea>
+                                    <textarea id="project-details" name="message" rows="6" class="w-full py-4 px-6 text-gray-700 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 text-lg resize-none" placeholder="Tell us about your project requirements, goals, and any specific details..." required></textarea>
                                 </div>
                                 
                                 <button type="submit" class="group relative w-full py-4 px-8 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-lg font-bold rounded-2xl shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1">
@@ -1615,8 +1594,6 @@
                                     </span>
                                     <div class="absolute inset-0 bg-gradient-to-r from-blue-700 to-purple-700 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                                 </button>
-                                
-                                <div id="contact-message" class="mt-6 text-center hidden"></div>
                             </form>
                         </div>
                     </div>
@@ -1869,4 +1846,22 @@
     </script>
 </body>
 </html>
-
+                // Expose a global variable to the Intersection Observer
+                window.statsTargets = { projects: 0, clients: 0, successRate: 0 };
+                observer.observe(statisticsSection);
+            }
+        });
+    </script>
+    <script
+        src="https://www.chatbase.co/embed.min.js"
+        id="R1TiiZ1iAxEt-Oy6PjEEF"
+        defer>
+    </script>
+    <script>
+        // Ensure chatbaseConfig is defined before the chatbase script loads
+        window.chatbaseConfig = {
+            chatbotId: "R1TiiZ1iAxEt-Oy6PjEEF",
+        };
+    </script>
+</body>
+</html>
