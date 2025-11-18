@@ -404,9 +404,6 @@
             }, 400);
         }
 
-        // Make closeToast globally available for the inline onclick handler
-        window.closeToast = closeToast;
-
         // Function to load testimonials
         function loadTestimonials() {
             const testimonialText = document.getElementById('testimonial-text');
@@ -518,7 +515,7 @@
 
                         // Toast success
                         showToast(
-                            `Thank you! Your message has been sent successfully. For prompt feedback call/whatsapp 0717384875`,
+                            `Thank you! Your message has been sent successfully. We'll get back to you within 24 hours.`,
                             'success',
                             0
                         );
