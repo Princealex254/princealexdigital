@@ -605,9 +605,6 @@
                             jobTitle: document.getElementById('job-title').value,
                             fullName: document.getElementById('applicant-name').value,
                             emailAddress: document.getElementById('applicant-email').value,
-                            coverLetter: document.getElementById('cover-letter').value,
-                            // Note: File upload is handled by FormSubmit, not saved to Firestore directly here.
-                            // You would need Firebase Storage for that, which is more complex.
                             status: 'Received', // Initial application status
                             timestamp: serverTimestamp()
                         });
