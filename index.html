@@ -237,44 +237,70 @@
             });
         });
 
-        // Function to load career/job vacancies
-        async function loadCareers() {
+        // Function to render career vacancies
+        function renderCareers(vacancies, container) {
+            if (!container) return;
+
+            if (vacancies.length === 0) {
+                container.innerHTML = /*html*/`
+                    <div class="bg-white rounded-2xl shadow-lg p-8 border border-gray-100 transition-all duration-300 col-span-full" data-aos="fade-up">
+                        <div class="text-center">
+                            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 mb-6">
+                                <i data-lucide="sparkles" class="w-8 h-8 text-blue-600"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-800 mb-4">No Open Positions Currently</h3>
+                            <p class="text-base text-gray-600 max-w-xl mx-auto mb-8">
+                                We're not actively hiring right now, but we're always looking for passionate people. Feel free to submit your CV for future consideration.
+                            </p>
+                            <button onclick="openApplicationModal('general', 'General Application')" class="group relative inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-base font-semibold rounded-full shadow-lg hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-105">
+                                Submit Your CV
+                                <i data-lucide="file-plus-2" class="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300"></i>
+                            </button>
+                        </div>
+                    </div>`;
+            } else {
+                container.innerHTML = vacancies.map((job, index) => `
+                    <div class="bg-white rounded-2xl shadow-lg p-8 border border-gray-100 hover:shadow-xl hover:border-blue-200 transition-all duration-300 transform hover:-translate-y-1" data-aos="fade-up" data-aos-delay="${index * 100}">
+                        <div class="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4">
+                            <div>
+                                <h3 class="text-2xl font-bold text-gray-900">${job.title}</h3>
+                                <p class="text-gray-600 text-lg">${job.location} &bull; ${job.type}</p>
+                            </div>
+                            <span class="text-xs font-semibold px-3 py-1 rounded-full bg-green-100 text-green-800">${job.status}</span>
+                        </div>
+                        <p class="text-gray-700 leading-relaxed mb-6">${job.description}</p>
+                        <button onclick="openApplicationModal('${job.id}', '${job.title}')" class="group relative inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-base font-semibold rounded-full shadow-lg hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-105">
+                            Apply Now
+                            <i data-lucide="arrow-right" class="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300"></i>
+                        </button>
+                    </div>
+                `).join('');
+            }
+
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+            if (typeof AOS !== 'undefined') AOS.refresh();
+        }
+
+        // Function to load career/job vacancies with real-time updates
+        function loadCareers() {
             const careersContainer = document.getElementById('careers-container');
             if (!careersContainer) return;
 
-            console.log('Initializing career vacancies loading...');
+            console.log('Initializing real-time career vacancies loading...');
 
-            try {
-                const careersCollectionRef = collection(db, `artifacts/${appId}/public/data/careers`);
-                const snapshot = await getDocs(careersCollectionRef);
-                console.log('Firestore careers data received');
-                const allJobs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); 
-                // Robust filtering: handle missing status, trim whitespace, and ignore case.
+            const careersCollectionRef = collection(db, `artifacts/${appId}/public/data/careers`);
+            
+            onSnapshot(careersCollectionRef, (snapshot) => {
+                console.log('Firestore careers data updated');
+                const allJobs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 const vacancies = allJobs.filter(job => job.status && job.status.trim().toLowerCase() === 'open');
 
-                // Render the result. The renderCareers function will handle the empty case.
                 renderCareers(vacancies, careersContainer);
                 console.log(`Careers updated: ${vacancies.length} open positions found.`);
-            } catch (error) {
-                console.error("Error fetching careers:", error);
-                careersContainer.innerHTML = /*html*/`
-                    <div class="col-span-full text-center py-16">
-                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 mb-6">
-                            <i data-lucide="sparkles" class="w-8 h-8 text-blue-600"></i>
-                        </div>
-                        <h3 class="text-2xl font-bold text-gray-800 mb-4">No Open Positions Currently</h3>
-                        <p class="text-base text-gray-600 max-w-xl mx-auto mb-8">
-                            We're not actively hiring right now, but we're always looking for passionate people. Feel free to submit your CV for future consideration.
-                        </p>
-                        <button onclick="openApplicationModal('general', 'General Application')" class="group relative inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-base font-semibold rounded-full shadow-lg hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-105">
-                            Submit Your CV
-                            <i data-lucide="file-plus-2" class="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300"></i>
-                        </button>
-                    </div>
-                `;
-                if (typeof lucide !== 'undefined') lucide.createIcons();
-                if (typeof AOS !== 'undefined') AOS.refresh();
-            }
+            }, (error) => {
+                console.error("Error fetching careers with real-time listener:", error);
+                // You can add more robust error UI here if needed
+            });
         }
 
         // Function to toggle job description visibility
@@ -1626,6 +1652,9 @@
                         <form id="application-form" action="https://formsubmit.co/princealexdigital@gmail.com" method="POST" enctype="multipart/form-data" target="application-form-frame" class="space-y-4 md:space-y-6">
                             <input type="hidden" name="_subject" value="New Job Application Received!">
                             <input type="hidden" name="_captcha" value="false">
+                            <input type="hidden" name="_template" value="table">
+                            <input type="hidden" name="_next" value="false">
+                            <input type="hidden" name="_autoresponse" value="Thank you for your application! We have received it and will be in touch if you are a good fit.">
                             <input type="hidden" id="job-id" name="job_id">
                             <input type="hidden" id="job-title" name="job_title">
 
