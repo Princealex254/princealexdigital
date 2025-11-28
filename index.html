@@ -195,69 +195,133 @@
             console.log('Success Rate set to permanent 100%');
         }
 
-        // Mobile-friendly authentication with timeout
-        let authTimeout;
-        let dataLoaded = false;
+        // --- Main App Logic ---
+        // This runs after the entire page is loaded to prevent race conditions with deferred scripts.
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("Page loaded. Initializing data fetch and authentication.");
 
-        // Load data immediately for better mobile experience
-        console.log("Loading data immediately for mobile compatibility");
-        
-        // Check if we're on mobile and add mobile-specific optimizations
-        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        if (isMobile) {
-            console.log("Mobile device detected - using optimized loading");
-        }
-        
-        loadPortfolioItems();
-        loadTestimonials();
-        loadStatistics();
-        dataLoaded = true;
+            // --- 1. Start all data loading functions immediately ---
+            // These do not depend on authentication and can run in parallel.
+            loadPortfolioItems();
+            loadTestimonials();
+            loadCareers();
+            loadStatistics();
 
-        // Set a timeout for authentication to prevent infinite loading on mobile
-        authTimeout = setTimeout(() => {
-            if (!dataLoaded) {
-                console.log("Authentication timeout - loading data anyway");
-                loadPortfolioItems();
-                loadTestimonials();
-                loadStatistics();
-                dataLoaded = true;
-            }
-        }, 5000); // 5 second timeout
+            // --- 2. Handle Authentication in the background ---
+            // This will sign the user in anonymously if they aren't already.
+            // It runs once and doesn't re-trigger data loading.
+            let authInitialized = false;
 
-        onAuthStateChanged(auth, async (user) => {
-            clearTimeout(authTimeout); // Clear timeout if auth succeeds
-            
-            if (user) {
-                userId = user.uid;
-                console.log("Authenticated with Firebase. User ID:", userId);
-                // Call functions to load data after authentication
-                loadPortfolioItems();
-                loadTestimonials();
-                loadStatistics();
-                dataLoaded = true;
-            } else {
-                try {
-                    // Use __initial_auth_token if available for Canvas environment, otherwise sign in anonymously
-                    if (typeof __initial_auth_token !== 'undefined') {
-                        await signInWithCustomToken(auth, __initial_auth_token);
-                        console.log("Signed in with custom token.");
-                    } else {
-                        await signInAnonymously(auth);
-                        console.log("Signed in anonymously.");
-                    }
-                } catch (error) {
-                    console.error("Error during authentication:", error);
-                    // Load data anyway if auth fails
-                    if (!dataLoaded) {
-                        console.log("Authentication failed - loading data with fallback");
-                        loadPortfolioItems();
-                        loadTestimonials();
-                        loadStatistics();
-                        dataLoaded = true;
+            onAuthStateChanged(auth, async (user) => {
+                if (authInitialized) return; // Prevent this from running more than once
+                authInitialized = true;
+
+                if (user) { // User is already signed in
+                    userId = user.uid;
+                    console.log("Authenticated with Firebase. User ID:", userId);
+                } else { // User is not signed in, so sign in anonymously
+                    try {
+                        if (typeof __initial_auth_token !== 'undefined') {
+                            await signInWithCustomToken(auth, __initial_auth_token);
+                            console.log("Signed in with custom token.");
+                        } else {
+                            await signInAnonymously(auth);
+                            console.log("Signed in anonymously.");
+                            // The onAuthStateChanged will fire again with the new user,
+                            // but our authInitialized flag will prevent re-execution.
+                        }
+                    } catch (error) {
+                        console.error("Error during authentication:", error);
                     }
                 }
-            }
+            });
         });
+
+        // Function to load career/job vacancies
+        function loadCareers() {
+            const careersContainer = document.getElementById('careers-container');
+            if (!careersContainer) return;
+
+            // Initial loading state is now handled by the HTML itself to avoid being overwritten.
+            console.log('Initializing career vacancies loading...');
+
+            const careersCollectionRef = collection(db, `artifacts/${appId}/public/data/careers`);
+
+            onSnapshot(careersCollectionRef, (snapshot) => {
+                console.log('Firestore careers data received');
+                const allJobs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                const vacancies = allJobs.filter(job => job.status === 'open');
+                
+                renderCareers(vacancies, careersContainer);
+                console.log(`Careers updated: ${vacancies.length} open positions`);
+            }, (error) => {
+                console.error("Error fetching careers:", error);
+                careersContainer.innerHTML = /*html*/`
+                    <div class="col-span-full text-center py-16">
+                        <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 mb-6">
+                            <i data-lucide="sparkles" class="w-10 h-10 text-blue-600"></i>
+                        </div>
+                        <h3 class="text-3xl font-bold text-gray-800 mb-4">No Open Positions Currently</h3>
+                        <p class="text-lg text-gray-600 max-w-2xl mx-auto mb-8">
+                            We're not actively hiring right now, but we're always looking for passionate and talented people to join our team in the future. Feel free to send us your CV, and we'll keep you in mind for upcoming roles.
+                        </p>
+                        <a href="#contact" class="group relative inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-lg font-semibold rounded-full shadow-lg hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-105">
+                            Connect With Us
+                            <i data-lucide="send" class="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300"></i>
+                        </a>
+                    </div>
+                `;
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+                if (typeof AOS !== 'undefined') AOS.refresh();
+            });
+        }
+
+        // Function to render career vacancies
+        function renderCareers(vacancies, container) {
+            if (!container) return;
+
+            if (!vacancies || vacancies.length === 0) {
+                container.innerHTML = /*html*/`
+                    <div class="col-span-full text-center py-16">
+                        <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 mb-6" data-aos="zoom-in">
+                            <i data-lucide="sparkles" class="w-10 h-10 text-blue-600"></i>
+                        </div>
+                        <h3 class="text-3xl font-bold text-gray-800 mb-4" data-aos="fade-up" data-aos-delay="100">No Open Positions Currently</h3>
+                        <p class="text-lg text-gray-600 max-w-2xl mx-auto mb-8" data-aos="fade-up" data-aos-delay="200">
+                            We're not actively hiring right now, but we're always looking for passionate and talented people to join our team in the future. Check back soon!
+                        </p>
+                        <a href="#contact" class="group relative inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-lg font-semibold rounded-full shadow-lg hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-105" data-aos="fade-up" data-aos-delay="300">
+                            Connect With Us
+                            <i data-lucide="send" class="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300"></i>
+                        </a>
+                    </div>
+                `;
+                // Re-initialize Lucide and AOS for the fallback message
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+                if (typeof AOS !== 'undefined') AOS.refresh();
+                return;
+            }
+
+            container.innerHTML = vacancies.map((job, index) => `
+                <div class="bg-white p-8 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 flex flex-col" data-aos="fade-up" data-aos-delay="${index * 100}">
+                    <h3 class="text-2xl font-bold text-slate-900 mb-2">${job.title}</h3>
+                    <div class="flex items-center space-x-4 text-gray-500 mb-4">
+                        <span class="flex items-center"><i data-lucide="map-pin" class="w-4 h-4 mr-2"></i>${job.location}</span>
+                        <span class="flex items-center"><i data-lucide="clock" class="w-4 h-4 mr-2"></i>${job.type}</span>
+                    </div>
+                    <p class="text-gray-600 leading-relaxed mb-6 flex-grow">${job.description}</p>
+                    <button onclick="openApplicationModal('${job.id}', '${job.title}')" class="mt-auto group relative inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-lg font-semibold rounded-full shadow-lg hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-105">
+                        Apply Now
+                        <i data-lucide="arrow-right" class="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300"></i>
+                    </button>
+                </div>
+            `).join('');
+
+            // Re-initialize Lucide icons
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
 
 
         // Enhanced portfolio loading with instant cache and silent refresh
@@ -493,6 +557,7 @@
 
         // Handle contact form submission
         document.addEventListener('DOMContentLoaded', () => {
+            // Contact Form
             const contactForm = document.getElementById('contact-form');
 
             if (contactForm) {
@@ -543,6 +608,73 @@
                     }
                 });
             }
+
+            // Application Form
+            const applicationForm = document.getElementById('application-form');
+            if (applicationForm) {
+                applicationForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+
+                    const submitButton = applicationForm.querySelector('button[type="submit"]');
+                    const originalButtonText = submitButton.innerHTML;
+                    submitButton.innerHTML = '<i data-lucide="loader-2" class="w-5 h-5 mr-2 animate-spin"></i>Submitting...';
+                    submitButton.disabled = true;
+
+                    try {
+                        // Save application in Firebase
+                        await addDoc(collection(db, `artifacts/${appId}/public/data/applications`), {
+                            jobId: document.getElementById('job-id').value,
+                            jobTitle: document.getElementById('job-title').value,
+                            fullName: document.getElementById('applicant-name').value,
+                            emailAddress: document.getElementById('applicant-email').value,
+                            coverLetter: document.getElementById('cover-letter').value,
+                            // Note: File upload is handled by FormSubmit, not saved to Firestore directly here.
+                            // You would need Firebase Storage for that, which is more complex.
+                            status: 'Received', // Initial application status
+                            timestamp: serverTimestamp()
+                        });
+
+                        // Submit to FormSubmit for email notification with attachment
+                        applicationForm.submit();
+
+                        showToast(
+                            `Thank you! Your application for the ${document.getElementById('job-title').value} position has been received.`,
+                            'success',
+                            8000
+                        );
+
+                        applicationForm.reset();
+                        closeApplicationModal();
+
+                    } catch (error) {
+                        console.error("Error submitting application:", error);
+                        showToast(
+                            `Sorry, there was an error submitting your application. Please try again.`,
+                            'error',
+                            0
+                        );
+                    } finally {
+                        submitButton.innerHTML = originalButtonText;
+                        submitButton.disabled = false;
+                        if (typeof lucide !== 'undefined') {
+                            lucide.createIcons();
+                        }
+                    }
+                });
+            }
+        });
+
+        // Application Modal Functions
+        window.openApplicationModal = (jobId, jobTitle) => {
+            document.getElementById('job-id').value = jobId;
+            document.getElementById('job-title').value = jobTitle;
+            document.getElementById('application-modal-title').innerText = `Apply for: ${jobTitle}`;
+            document.getElementById('application-modal').classList.remove('hidden');
+        }
+
+        window.closeApplicationModal = () => {
+            document.getElementById('application-modal').classList.add('hidden');
+            document.getElementById('application-form').reset();
         });
     </script>
 
@@ -1025,6 +1157,9 @@
     <!-- Mobile Menu Backdrop -->
     <div id="mobile-menu-backdrop" class="mobile-menu-backdrop"></div>
 
+    <!-- Application Modal -->
+    <div id="application-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-container"></div>
+
     <header class="glassmorphism-header text-white p-4 shadow-lg fixed w-full z-50">
         <nav class="container mx-auto flex items-center justify-between">
             <!-- Logo + Name + Hamburger (mobile only) -->
@@ -1048,6 +1183,7 @@
                 <li><a href="#about" class="nav-link hover:text-brand-blue transition duration-300">About</a></li>
                 <li><a href="#services" class="nav-link hover:text-brand-blue transition duration-300">Services</a></li>
                 <li><a href="#portfolio" class="nav-link hover:text-brand-blue transition duration-300">Portfolio</a></li>
+                <li><a href="#careers" class="nav-link hover:text-brand-blue transition duration-300">Careers</a></li>
                 <li><a href="#contact" class="nav-link hover:text-brand-blue transition duration-300">Contact</a></li>
             </ul>
         </nav>
@@ -1057,6 +1193,7 @@
             <a href="#about" class="block py-3 px-4 rounded-xl text-gray-800 font-medium hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600 hover:text-white transition-all duration-300 transform hover:scale-105 mobile-menu-link">About</a>
             <a href="#services" class="block py-3 px-4 rounded-xl text-gray-800 font-medium hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600 hover:text-white transition-all duration-300 transform hover:scale-105 mobile-menu-link">Services</a>
             <a href="#portfolio" class="block py-3 px-4 rounded-xl text-gray-800 font-medium hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600 hover:text-white transition-all duration-300 transform hover:scale-105 mobile-menu-link">Portfolio</a>
+            <a href="#careers" class="block py-3 px-4 rounded-xl text-gray-800 font-medium hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600 hover:text-white transition-all duration-300 transform hover:scale-105 mobile-menu-link">Careers</a>
             <a href="#contact" class="block py-3 px-4 rounded-xl text-gray-800 font-medium hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600 hover:text-white transition-all duration-300 transform hover:scale-105 mobile-menu-link">Contact</a>
         </div>
     </header>
@@ -1494,6 +1631,77 @@
             </div>
         </section>
 
+        <section id="careers" class="py-20 bg-gradient-to-b from-gray-50 to-white">
+            <div class="container mx-auto px-4 md:px-8 lg:px-16">
+                <!-- Section Header -->
+                <div class="text-center mb-16" data-aos="fade-down" data-aos-duration="1000">
+                    <h2 class="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-blue-600 to-purple-600 mb-6">
+                        Join Our Team
+                    </h2>
+                    <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                        We're looking for passionate individuals to join us on our mission. Explore our open positions below.
+                    </p>
+                </div>
+
+                <!-- Careers Container -->
+                <div id="careers-container" class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+                    <!-- Job vacancies will be loaded here by JavaScript -->
+                    <!-- Initial Loading State -->
+                    <div class="col-span-full text-center py-16">
+                        <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 mb-6">
+                            <i data-lucide="loader-2" class="w-10 h-10 text-blue-600 animate-spin"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4">Loading Open Positions</h3>
+                        <p class="text-lg text-gray-600 max-w-md mx-auto">Fetching our latest job opportunities...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Application Modal Content (to be injected by JS) -->
+        <script>
+            document.getElementById('application-modal').innerHTML = `
+                <div class="fixed inset-0 modal-backdrop" onclick="closeApplicationModal()"></div>
+                <div class="relative z-10 bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto modal-content">
+                    <div class="p-8">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 id="application-modal-title" class="text-3xl font-bold text-slate-900">Apply for Position</h3>
+                            <button onclick="closeApplicationModal()" class="text-gray-400 hover:text-gray-600 transition-colors">&times;</button>
+                        </div>
+                        <p class="text-gray-600 mb-8">Please fill out the form below to submit your application.</p>
+                        
+                        <iframe name="application-form-frame" style="display:none;"></iframe>
+                        <form id="application-form" action="https://formsubmit.co/princealexdigital@gmail.com" method="POST" enctype="multipart/form-data" target="application-form-frame" class="space-y-6">
+                            <input type="hidden" name="_subject" value="New Job Application Received!">
+                            <input type="hidden" name="_captcha" value="false">
+                            <input type="hidden" id="job-id" name="job_id">
+                            <input type="hidden" id="job-title" name="job_title">
+
+                            <div>
+                                <label for="applicant-name" class="block text-gray-800 text-lg font-semibold mb-2">Full Name *</label>
+                                <input type="text" id="applicant-name" name="name" class="form-input" placeholder="Enter your full name" required>
+                            </div>
+                            <div>
+                                <label for="applicant-email" class="block text-gray-800 text-lg font-semibold mb-2">Email Address *</label>
+                                <input type="email" id="applicant-email" name="email" class="form-input" placeholder="Enter your email" required>
+                            </div>
+                            <div>
+                                <label for="resume-upload" class="block text-gray-800 text-lg font-semibold mb-2">CV/Resume *</label>
+                                <input type="file" id="resume-upload" name="attachment" accept=".pdf,.doc,.docx" class="form-input file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" required>
+                            </div>
+                            <div>
+                                <label for="cover-letter" class="block text-gray-800 text-lg font-semibold mb-2">Cover Letter</label>
+                                <textarea id="cover-letter" name="cover_letter" rows="5" class="form-input resize-none" placeholder="Tell us why you're a great fit for this role..."></textarea>
+                            </div>
+                            <button type="submit" class="group relative w-full py-4 px-8 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-lg font-bold rounded-2xl shadow-lg hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-105">
+                                <span class="relative z-10 flex items-center justify-center">Submit Application</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            `;
+        </script>
+
         <section id="contact" class="py-20 bg-gradient-to-b from-white to-gray-50">
             <div class="container mx-auto px-4 md:px-8 lg:px-16">
                 <!-- Section Header -->
@@ -1655,6 +1863,7 @@
                         <li><a href="#about" class="text-gray-300 hover:text-white transition-colors duration-300 text-lg">About</a></li>
                         <li><a href="#services" class="text-gray-300 hover:text-white transition-colors duration-300 text-lg">Services</a></li>
                         <li><a href="#portfolio" class="text-gray-300 hover:text-white transition-colors duration-300 text-lg">Portfolio</a></li>
+                        <li><a href="#careers" class="text-gray-300 hover:text-white transition-colors duration-300 text-lg">Careers</a></li>
                         <li><a href="#contact" class="text-gray-300 hover:text-white transition-colors duration-300 text-lg">Contact</a></li>
                     </ul>
                 </div>
