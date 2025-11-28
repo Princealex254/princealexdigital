@@ -49,7 +49,7 @@
     <script type="module">
         // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-        import { getFirestore, collection, doc, onSnapshot, addDoc, serverTimestamp, enableIndexedDbPersistence, CACHE_SIZE_UNLIMITED } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+        import { getFirestore, collection, doc, onSnapshot, addDoc, serverTimestamp, enableIndexedDbPersistence, CACHE_SIZE_UNLIMITED, getDocs } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
 
 
@@ -162,7 +162,7 @@
                             ${item.description}
                         </p>
                         <a href="${item.link}" target="_blank" class="portfolio-link">
-                            <span>${item.linkText || 'View Project'}</span>
+                            <span>${item.linkText || 'View Project'}</span> 
                             <i data-lucide="external-link" class="w-4 h-4"></i>
                         </a>
                     </div>
@@ -238,100 +238,70 @@
         });
 
         // Function to load career/job vacancies
-        function loadCareers() {
+        async function loadCareers() {
             const careersContainer = document.getElementById('careers-container');
             if (!careersContainer) return;
 
-            // Initial loading state is now handled by the HTML itself to avoid being overwritten.
             console.log('Initializing career vacancies loading...');
 
-            const careersCollectionRef = collection(db, `artifacts/${appId}/public/data/careers`);
-
-            onSnapshot(careersCollectionRef, (snapshot) => {
+            try {
+                const careersCollectionRef = collection(db, `artifacts/${appId}/public/data/careers`);
+                const snapshot = await getDocs(careersCollectionRef);
                 console.log('Firestore careers data received');
-                const allJobs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                const vacancies = allJobs.filter(job => job.status === 'open');
-                
+                const allJobs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); 
+                // Robust filtering: handle missing status, trim whitespace, and ignore case.
+                const vacancies = allJobs.filter(job => job.status && job.status.trim().toLowerCase() === 'open');
+
+                // Render the result. The renderCareers function will handle the empty case.
                 renderCareers(vacancies, careersContainer);
-                console.log(`Careers updated: ${vacancies.length} open positions`);
-            }, (error) => {
+                console.log(`Careers updated: ${vacancies.length} open positions found.`);
+            } catch (error) {
                 console.error("Error fetching careers:", error);
                 careersContainer.innerHTML = /*html*/`
                     <div class="col-span-full text-center py-16">
-                        <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 mb-6">
-                            <i data-lucide="sparkles" class="w-10 h-10 text-blue-600"></i>
+                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 mb-6">
+                            <i data-lucide="sparkles" class="w-8 h-8 text-blue-600"></i>
                         </div>
-                        <h3 class="text-3xl font-bold text-gray-800 mb-4">No Open Positions Currently</h3>
-                        <p class="text-lg text-gray-600 max-w-2xl mx-auto mb-8">
-                            We're not actively hiring right now, but we're always looking for passionate and talented people to join our team in the future. Feel free to send us your CV, and we'll keep you in mind for upcoming roles.
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4">No Open Positions Currently</h3>
+                        <p class="text-base text-gray-600 max-w-xl mx-auto mb-8">
+                            We're not actively hiring right now, but we're always looking for passionate people. Feel free to submit your CV for future consideration.
                         </p>
-                        <a href="#contact" class="group relative inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-lg font-semibold rounded-full shadow-lg hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-105">
-                            Connect With Us
-                            <i data-lucide="send" class="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300"></i>
-                        </a>
+                        <button onclick="openApplicationModal('general', 'General Application')" class="group relative inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-base font-semibold rounded-full shadow-lg hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-105">
+                            Submit Your CV
+                            <i data-lucide="file-plus-2" class="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300"></i>
+                        </button>
                     </div>
                 `;
                 if (typeof lucide !== 'undefined') lucide.createIcons();
                 if (typeof AOS !== 'undefined') AOS.refresh();
-            });
-        }
-
-        // Function to render career vacancies
-        function renderCareers(vacancies, container) {
-            if (!container) return;
-
-            if (!vacancies || vacancies.length === 0) {
-                container.innerHTML = /*html*/`
-                    <div class="col-span-full text-center py-16">
-                        <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 mb-6" data-aos="zoom-in">
-                            <i data-lucide="sparkles" class="w-10 h-10 text-blue-600"></i>
-                        </div>
-                        <h3 class="text-3xl font-bold text-gray-800 mb-4" data-aos="fade-up" data-aos-delay="100">No Open Positions Currently</h3>
-                        <p class="text-lg text-gray-600 max-w-2xl mx-auto mb-8" data-aos="fade-up" data-aos-delay="200">
-                            We're not actively hiring right now, but we're always looking for passionate and talented people to join our team in the future. Check back soon!
-                        </p>
-                        <a href="#contact" class="group relative inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-lg font-semibold rounded-full shadow-lg hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-105" data-aos="fade-up" data-aos-delay="300">
-                            Connect With Us
-                            <i data-lucide="send" class="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300"></i>
-                        </a>
-                    </div>
-                `;
-                // Re-initialize Lucide and AOS for the fallback message
-                if (typeof lucide !== 'undefined') lucide.createIcons();
-                if (typeof AOS !== 'undefined') AOS.refresh();
-                return;
-            }
-
-            container.innerHTML = vacancies.map((job, index) => `
-                <div class="bg-white p-8 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 flex flex-col" data-aos="fade-up" data-aos-delay="${index * 100}">
-                    <h3 class="text-2xl font-bold text-slate-900 mb-2">${job.title}</h3>
-                    <div class="flex items-center space-x-4 text-gray-500 mb-4">
-                        <span class="flex items-center"><i data-lucide="map-pin" class="w-4 h-4 mr-2"></i>${job.location}</span>
-                        <span class="flex items-center"><i data-lucide="clock" class="w-4 h-4 mr-2"></i>${job.type}</span>
-                    </div>
-                    <p class="text-gray-600 leading-relaxed mb-6 flex-grow">${job.description}</p>
-                    <button onclick="openApplicationModal('${job.id}', '${job.title}')" class="mt-auto group relative inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-lg font-semibold rounded-full shadow-lg hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-105">
-                        Apply Now
-                        <i data-lucide="arrow-right" class="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300"></i>
-                    </button>
-                </div>
-            `).join('');
-
-            // Re-initialize Lucide icons
-            if (typeof lucide !== 'undefined') {
-                lucide.createIcons();
             }
         }
+
+        // Function to toggle job description visibility
+        window.toggleDescription = (jobId) => {
+            const shortDesc = document.getElementById(`desc-short-${jobId}`);
+            const fullDesc = document.getElementById(`desc-full-${jobId}`);
+
+            if (shortDesc && fullDesc) {
+                shortDesc.classList.toggle('hidden');
+                fullDesc.classList.toggle('hidden');
+            }
+
+            // Optional: Re-initialize AOS to handle layout shifts if you have animations below
+            if (typeof AOS !== 'undefined') {
+                AOS.refresh();
+            }
+        };
 
 
         // Enhanced portfolio loading with instant cache and silent refresh
-        function loadPortfolioItems() {
+        async function loadPortfolioItems() {
             const portfolioContainer = document.getElementById('portfolio-items-container');
             if (!portfolioContainer) return;
 
             console.log('Loading portfolio items...');
 
-            // Step 1: Load from cache instantly (if available)
+            // Step 1: Try to load from cache instantly for a super-fast feel on repeat visits.
             const cachedItems = loadPortfolioFromCache();
             if (cachedItems) {
                 console.log('Rendering cached portfolio items instantly');
@@ -351,29 +321,10 @@
                 `;
             }
 
-            // Step 2: Set up Firestore listener with timeout for mobile
-            const portfolioCollectionRef = collection(db, `artifacts/${appId}/public/data/portfolio`);
-            
-            // Set a timeout for Firestore connection
-            const firestoreTimeout = setTimeout(() => {
-                console.log('Firestore connection timeout - showing fallback content');
-                if (!cachedItems) {
-                    portfolioContainer.innerHTML = `
-                        <div class="col-span-full text-center py-16">
-                            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 mb-6">
-                                <i data-lucide="briefcase" class="w-10 h-10 text-blue-600"></i>
-                            </div>
-                            <h3 class="text-2xl font-bold text-gray-800 mb-4">Projects Coming Soon</h3>
-                            <p class="text-lg text-gray-600 max-w-md mx-auto">
-                                We're working on some amazing projects. Check back soon to see our latest work!
-                            </p>
-                        </div>
-                    `;
-                }
-            }, 10000); // 10 second timeout for mobile
-
-            onSnapshot(portfolioCollectionRef, (snapshot) => {
-                clearTimeout(firestoreTimeout); // Clear timeout if data loads
+            // Step 2: Fetch fresh data from Firestore.
+            try {
+                const portfolioCollectionRef = collection(db, `artifacts/${appId}/public/data/portfolio`);
+                const snapshot = await getDocs(portfolioCollectionRef);
                 console.log('Firestore portfolio data received');
                 
                 const portfolioItems = [];
@@ -393,10 +344,8 @@
                 renderPortfolioItems(portfolioItems, portfolioContainer);
                 
                 console.log(`Portfolio updated: ${portfolioItems.length} items`);
-            }, (error) => {
-                clearTimeout(firestoreTimeout); // Clear timeout on error
+            } catch (error) {
                 console.error("Error fetching portfolio items:", error);
-                
                 // Only show error if we don't have cached data
                 if (!cachedItems) {
                     portfolioContainer.innerHTML = `
@@ -413,7 +362,7 @@
                 } else {
                     console.log('Using cached data due to Firestore error');
                 }
-            });
+            }
         }
 
         // Global variables for testimonials rotation
@@ -472,13 +421,13 @@
         window.closeToast = closeToast;
 
         // Function to load testimonials
-        function loadTestimonials() {
+        async function loadTestimonials() { 
             const testimonialText = document.getElementById('testimonial-text');
             const testimonialAuthor = document.getElementById('testimonial-author');
             const testimonialCompany = document.getElementById('testimonial-company');
 
             if (!testimonialText || !testimonialAuthor || !testimonialCompany) return;
-
+            try { 
             const testimonialsCollectionRef = collection(db, `artifacts/${appId}/public/data/testimonials`);
 
             onSnapshot(testimonialsCollectionRef, (snapshot) => {
@@ -504,7 +453,10 @@
                 }
             }, (error) => {
                 console.error("Error fetching testimonials:", error);
-            });
+            });    
+            } catch (error) {
+                console.error("Error fetching testimonials:", error); 
+            }
         }
 
         // Function to start testimonial rotation
@@ -675,7 +627,7 @@
         window.closeApplicationModal = () => {
             document.getElementById('application-modal').classList.add('hidden');
             document.getElementById('application-form').reset();
-        });
+        };
     </script>
 
     <style>
@@ -1258,7 +1210,7 @@
                 <!-- Founder Section -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
                     <!-- Image -->
-                    <div class="relative">
+                    <div class="relative"> 
                         <div class="relative z-10">
                             <img src="founder.jpg" alt="Alex Senerwa Keverenge" class="rounded-3xl shadow-2xl object-cover w-full h-96 lg:h-[450px]" loading="lazy">
                         </div>
@@ -1665,36 +1617,38 @@
                 <div class="relative z-10 bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto modal-content">
                     <div class="p-8">
                         <div class="flex justify-between items-start mb-4">
-                            <h3 id="application-modal-title" class="text-3xl font-bold text-slate-900">Apply for Position</h3>
+                            <h3 id="application-modal-title" class="text-2xl md:text-3xl font-bold text-slate-900">Apply for Position</h3>
                             <button onclick="closeApplicationModal()" class="text-gray-400 hover:text-gray-600 transition-colors">&times;</button>
                         </div>
                         <p class="text-gray-600 mb-8">Please fill out the form below to submit your application.</p>
                         
                         <iframe name="application-form-frame" style="display:none;"></iframe>
-                        <form id="application-form" action="https://formsubmit.co/princealexdigital@gmail.com" method="POST" enctype="multipart/form-data" target="application-form-frame" class="space-y-6">
+                        <form id="application-form" action="https://formsubmit.co/princealexdigital@gmail.com" method="POST" enctype="multipart/form-data" target="application-form-frame" class="space-y-4 md:space-y-6">
                             <input type="hidden" name="_subject" value="New Job Application Received!">
                             <input type="hidden" name="_captcha" value="false">
                             <input type="hidden" id="job-id" name="job_id">
                             <input type="hidden" id="job-title" name="job_title">
 
-                            <div>
-                                <label for="applicant-name" class="block text-gray-800 text-lg font-semibold mb-2">Full Name *</label>
-                                <input type="text" id="applicant-name" name="name" class="form-input" placeholder="Enter your full name" required>
+                            <div class="space-y-3">
+                                <label for="applicant-name" class="block text-gray-800 text-lg font-semibold">Full Name *</label>
+                                <input type="text" id="applicant-name" name="name" class="w-full py-4 px-6 text-gray-700 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 text-lg" placeholder="Enter your full name" required>
                             </div>
-                            <div>
-                                <label for="applicant-email" class="block text-gray-800 text-lg font-semibold mb-2">Email Address *</label>
-                                <input type="email" id="applicant-email" name="email" class="form-input" placeholder="Enter your email" required>
+                            <div class="space-y-3">
+                                <label for="applicant-email" class="block text-gray-800 text-lg font-semibold">Email Address *</label>
+                                <input type="email" id="applicant-email" name="email" class="w-full py-4 px-6 text-gray-700 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 text-lg" placeholder="Enter your email" required>
                             </div>
-                            <div>
-                                <label for="resume-upload" class="block text-gray-800 text-lg font-semibold mb-2">CV/Resume *</label>
-                                <input type="file" id="resume-upload" name="attachment" accept=".pdf,.doc,.docx" class="form-input file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" required>
+                            <div class="space-y-3">
+                                <label for="resume-upload" class="block text-gray-800 text-lg font-semibold">CV/Resume *</label>
+                                <input type="file" id="resume-upload" name="attachment" accept=".pdf,.doc,.docx" class="w-full text-gray-700 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 text-lg file:mr-4 file:py-4 file:px-6 file:rounded-l-xl file:border-0 file:text-lg file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 cursor-pointer" required>
                             </div>
-                            <div>
-                                <label for="cover-letter" class="block text-gray-800 text-lg font-semibold mb-2">Cover Letter</label>
-                                <textarea id="cover-letter" name="cover_letter" rows="5" class="form-input resize-none" placeholder="Tell us why you're a great fit for this role..."></textarea>
+                            <div class="space-y-3">
+                                <label for="cover-letter" class="block text-gray-800 text-lg font-semibold">Cover Letter</label>
+                                <textarea id="cover-letter" name="cover_letter" rows="5" class="w-full py-4 px-6 text-gray-700 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 text-lg resize-none" placeholder="Tell us why you're a great fit for this role..."></textarea>
                             </div>
-                            <button type="submit" class="group relative w-full py-4 px-8 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-lg font-bold rounded-2xl shadow-lg hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-105">
-                                <span class="relative z-10 flex items-center justify-center">Submit Application</span>
+                            <button type="submit" class="group relative w-full py-4 px-8 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-lg font-bold rounded-2xl shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1">
+                                <span class="relative z-10 flex items-center justify-center">
+                                    Submit Application
+                                </span>
                             </button>
                         </form>
                     </div>
