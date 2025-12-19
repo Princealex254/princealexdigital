@@ -1153,6 +1153,37 @@
     </script>
 </head>
 <body class="bg-white text-gray-800">
+    <!-- 🎄 Festive Season Banner -->
+    <div id="festive-banner" class="fixed top-24 left-0 right-0 z-40">
+      <div class="bg-gradient-to-r from-red-700 via-green-700 to-red-700 text-white px-4 py-3 shadow-lg relative overflow-hidden">
+
+        <!-- Decorative Christmas Trees -->
+        <span class="absolute left-4 bottom-1 text-2xl opacity-80">🎄</span>
+        <span class="absolute left-12 bottom-1 text-xl opacity-60">🎄</span>
+        <span class="absolute right-14 bottom-1 text-xl opacity-60">🎄</span>
+        <span class="absolute right-6 bottom-1 text-2xl opacity-80">🎄</span>
+
+        <p class="text-sm md:text-base font-semibold flex items-center justify-center gap-2 text-center">
+          <!-- Christmas Cap -->
+          <span class="text-xl">🎅</span>
+
+          Merry Christmas & Happy New Year 🎉
+          <span class="hidden sm:inline">
+            — Wishing you growth, success & digital excellence in the coming year!
+          </span>
+        </p>
+
+        <!-- Close Button -->
+        <button
+          onclick="document.getElementById('festive-banner').style.display='none'"
+          class="absolute right-4 top-1/2 -translate-y-1/2 text-white/80 hover:text-white text-xl font-bold"
+          aria-label="Close banner"
+        >
+          ×
+        </button>
+      </div>
+    </div>
+
     <div class="scroll-progress-container">
         <div class="scroll-progress-bar" id="progressBar"></div>
     </div>
@@ -1205,6 +1236,7 @@
     </header>
 
     <main>
+    <main class="pt-24">
         <section id="hero" class="relative min-h-screen flex items-center justify-center overflow-hidden">
             <!-- Modern gradient background -->
             <div class="absolute inset-0 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900"></div>
@@ -2205,6 +2237,19 @@
             chatbotId: "R1TiiZ1iAxEt-Oy6PjEEF",
         };
     </script>
+    <script>
+      (function () {
+        const today = new Date();
+        const hideAfter = new Date(today.getFullYear(), 0, 5); // Jan 5
+    const showFrom = new Date(today.getFullYear(), 11, 1); // Dec 1
+
+    // Hide if strictly between Jan 5 and Dec 1 (i.e. not festive season)
+    if (today > hideAfter && today < showFrom) {
+          const banner = document.getElementById('festive-banner');
+          if (banner) banner.style.display = 'none';
+    }
+      })();
+    </script>
 </body>
 </html>
     <script>
@@ -2215,6 +2260,3 @@
     </script>
 </body>
 </html>
-
-
-
