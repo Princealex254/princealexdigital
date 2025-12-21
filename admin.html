@@ -394,7 +394,7 @@
                                         <i class="fas fa-external-link-alt mr-2"></i>
                                         ${data.linkText}
                                     </a>
-                                    <button onclick="editPortfolioItem('${docSnap.id}', '${data.title}', '${data.description}', '${data.imageUrl}', '${data.link}', '${data.linkText}')" 
+                                    <button onclick="editPortfolioItem('${docSnap.id}', '${JSON.stringify(data.title).slice(1,-1)}', '${JSON.stringify(data.description).slice(1,-1)}', '${data.imageUrl}', '${data.link}', '${data.linkText}')" 
                                             class="inline-flex items-center px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors">
                                         <i class="fas fa-edit mr-2"></i>
                                         Edit
@@ -487,7 +487,7 @@
                                         <p class="text-gray-500">${data.company}</p>
                                     </div>
                                     <div class="flex gap-2">
-                                        <button onclick="editTestimonial('${docSnap.id}', '${data.quote}', '${data.author}', '${data.company}')" 
+                                        <button onclick="editTestimonial('${docSnap.id}', '${JSON.stringify(data.quote).slice(1,-1)}', '${JSON.stringify(data.author).slice(1,-1)}', '${JSON.stringify(data.company).slice(1,-1)}')" 
                                                 class="inline-flex items-center px-3 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors">
                                             <i class="fas fa-edit mr-2"></i>
                                             Edit
@@ -718,14 +718,10 @@
                             <div>
                                 <h3 class="text-xl font-bold text-gray-800">${data.title}</h3>
                                 <p class="text-gray-600">${data.location} - ${data.type}</p>
-                                <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full ${data.status === 'open' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">${data.status}</span>
                                 <span class="mt-2 inline-block px-3 py-1 text-xs font-semibold rounded-full ${data.status === 'open' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">${data.status}</span>
                             </div>
-                            <button onclick="deleteJobPosting('${docSnap.id}')" class="inline-flex items-center px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
-                                <i class="fas fa-trash mr-2"></i>Delete
-                            </button>
                             <div class="flex flex-col sm:flex-row gap-2 flex-shrink-0 ml-4">
-                                <button onclick="editJobPosting('${docSnap.id}', \`${data.title}\`, \`${data.location}\`, \`${data.type}\`, \`${data.description}\`, \`${data.status}\`)" class="inline-flex items-center justify-center px-3 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors text-sm">
+                                <button onclick="editJobPosting('${docSnap.id}', '${JSON.stringify(data.title).slice(1,-1)}', '${JSON.stringify(data.location).slice(1,-1)}', '${data.type}', '${JSON.stringify(data.description).slice(1,-1)}', '${data.status}')" class="inline-flex items-center justify-center px-3 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors text-sm">
                                     <i class="fas fa-edit mr-2"></i>Edit
                                 </button>
                                 <button onclick="toggleJobStatus('${docSnap.id}', '${data.status}')" class="inline-flex items-center justify-center px-3 py-2 ${toggleButtonColor} text-white rounded-lg transition-colors text-sm">
