@@ -1153,35 +1153,41 @@
     </script>
 </head>
 <body class="bg-white text-gray-800">
-    <!-- 🎄 Festive Season Banner -->
-    <div id="festive-banner" class="fixed top-24 left-0 right-0 z-40">
-      <div class="bg-gradient-to-r from-red-700 via-green-700 to-red-700 text-white px-4 py-3 shadow-lg relative overflow-hidden">
+    <!-- New Year 2026 Overlay -->
+    <div id="new-year-overlay" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-sm transition-opacity" onclick="document.getElementById('new-year-overlay').classList.add('hidden')"></div>
+        
+        <!-- Modal Content -->
+        <div class="relative bg-white rounded-3xl shadow-2xl max-w-lg w-full p-8 text-center overflow-hidden transform transition-all scale-100">
+            <!-- Decorative Background -->
+            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600"></div>
+            
+            <!-- Content -->
+            <div class="relative z-10">
+                <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-blue-50 mb-6 animate-bounce">
+                    <span class="text-4xl">🎉</span>
+                </div>
+                
+                <h2 class="text-3xl md:text-4xl font-black text-slate-900 mb-4">
+                    Happy New Year 2026!
+                </h2>
+                
+                <p class="text-lg text-gray-600 mb-8 leading-relaxed">
+                    Wishing you a year filled with innovation, growth, and digital success. Thank you for being part of the Prince Alex Digital journey!
+                </p>
+                
+                <button onclick="document.getElementById('new-year-overlay').classList.add('hidden')" 
+                        class="group relative inline-flex items-center justify-center px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-lg font-semibold rounded-full shadow-lg hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-105">
+                    Let's Go! 🚀
+                </button>
+            </div>
 
-        <!-- Decorative Christmas Trees -->
-        <span class="absolute left-4 bottom-1 text-2xl opacity-80">🎄</span>
-        <span class="absolute left-12 bottom-1 text-xl opacity-60">🎄</span>
-        <span class="absolute right-14 bottom-1 text-xl opacity-60">🎄</span>
-        <span class="absolute right-6 bottom-1 text-2xl opacity-80">🎄</span>
-
-        <p class="text-sm md:text-base font-semibold flex items-center justify-center gap-2 text-center">
-          <!-- Christmas Cap -->
-          <span class="text-xl">🎅</span>
-
-          Merry Christmas & Happy New Year 🎉
-          <span class="hidden sm:inline">
-            — Wishing you growth, success & digital excellence in the coming year!
-          </span>
-        </p>
-
-        <!-- Close Button -->
-        <button
-          onclick="document.getElementById('festive-banner').style.display='none'"
-          class="absolute right-4 top-1/2 -translate-y-1/2 text-white/80 hover:text-white text-xl font-bold"
-          aria-label="Close banner"
-        >
-          ×
-        </button>
-      </div>
+            <!-- Decorative Elements -->
+            <div class="absolute top-10 left-10 w-3 h-3 bg-yellow-400 rounded-full opacity-50 animate-pulse"></div>
+            <div class="absolute bottom-10 right-10 w-4 h-4 bg-purple-400 rounded-full opacity-50 animate-pulse" style="animation-delay: 1s;"></div>
+            <div class="absolute top-1/2 right-4 w-2 h-2 bg-blue-400 rounded-full opacity-50 animate-pulse" style="animation-delay: 0.5s;"></div>
+        </div>
     </div>
 
     <div class="scroll-progress-container">
@@ -2238,17 +2244,22 @@
         };
     </script>
     <script>
-      (function () {
-        const today = new Date();
-        const hideAfter = new Date(today.getFullYear(), 0, 5); // Jan 5
-    const showFrom = new Date(today.getFullYear(), 11, 1); // Dec 1
+        document.addEventListener('DOMContentLoaded', () => {
+            const overlay = document.getElementById('new-year-overlay');
+            if (!overlay) return;
 
-    // Hide if strictly between Jan 5 and Dec 1 (i.e. not festive season)
-    if (today > hideAfter && today < showFrom) {
-          const banner = document.getElementById('festive-banner');
-          if (banner) banner.style.display = 'none';
-    }
-      })();
+            const now = new Date();
+            // Target date: January 6th, 2026
+            const expiryDate = new Date('2026-01-06T23:59:59');
+
+            // Show overlay if current date is before expiry date
+            if (now < expiryDate) {
+                // Small delay for better UX
+                setTimeout(() => {
+                    overlay.classList.remove('hidden');
+                }, 1000);
+            }
+        });
     </script>
 </body>
 </html>
@@ -2260,4 +2271,3 @@
     </script>
 </body>
 </html>
-
