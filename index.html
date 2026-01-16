@@ -89,94 +89,6 @@
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         let userId = null; // Will be set after authentication
 
-        // Portfolio caching utilities
-        const PORTFOLIO_CACHE_KEY = `portfolio_cache_${appId}`;
-        const CACHE_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 hours
-
-        // Cache management functions
-        function savePortfolioToCache(portfolioItems) {
-            try {
-                const cacheData = {
-                    items: portfolioItems,
-                    timestamp: Date.now(),
-                    version: '1.0'
-                };
-                localStorage.setItem(PORTFOLIO_CACHE_KEY, JSON.stringify(cacheData));
-                console.log('Portfolio items saved to cache');
-            } catch (error) {
-                console.warn('Failed to save portfolio to cache:', error);
-            }
-        }
-
-        function loadPortfolioFromCache() {
-            try {
-                const cached = localStorage.getItem(PORTFOLIO_CACHE_KEY);
-                if (!cached) return null;
-
-                const cacheData = JSON.parse(cached);
-                const isExpired = Date.now() - cacheData.timestamp > CACHE_EXPIRY_MS;
-                
-                if (isExpired) {
-                    localStorage.removeItem(PORTFOLIO_CACHE_KEY);
-                    return null;
-                }
-
-                console.log('Portfolio items loaded from cache');
-                return cacheData.items;
-            } catch (error) {
-                console.warn('Failed to load portfolio from cache:', error);
-                localStorage.removeItem(PORTFOLIO_CACHE_KEY);
-                return null;
-            }
-        }
-
-        // Clean, reusable rendering function with responsive layout
-        function renderPortfolioItems(portfolioItems, container) {
-            if (!container) return;
-
-            console.log('Rendering portfolio items:', portfolioItems?.length || 0, 'items');
-
-            if (!portfolioItems || portfolioItems.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-16 min-w-[280px] md:min-w-0 md:col-span-full">
-                        <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 mb-6">
-                            <i data-lucide="briefcase" class="w-10 h-10 text-blue-600"></i>
-                        </div>
-                        <h3 class="text-2xl font-bold text-gray-800 mb-4">No Projects Yet</h3>
-                        <p class="text-lg text-gray-600 max-w-md mx-auto">
-                            We're working on some amazing projects. Check back soon to see our latest work!
-                        </p>
-                    </div>
-                `;
-                return;
-            }
-
-            // Generate portfolio items HTML
-            container.innerHTML = portfolioItems.map((item, index) => `
-                <div class="portfolio-item group" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="${index * 100}">
-                    <div class="portfolio-content">
-                        <h3 class="text-xl md:text-2xl font-bold text-gray-800 mb-3 group-hover:text-brand-blue transition-colors">
-                            ${item.title}
-                        </h3>
-                        <p class="text-gray-600 mb-6 leading-relaxed">
-                            ${item.description}
-                        </p>
-                        <a href="${item.link}" target="_blank" class="portfolio-link">
-                            <span>${item.linkText || 'View Project'}</span> 
-                            <i data-lucide="external-link" class="w-4 h-4"></i>
-                        </a>
-                    </div>
-                </div>
-            `).join('');
-
-            console.log('Portfolio HTML rendered, container children:', container.children.length);
-
-            // Re-initialize Lucide icons after rendering
-            if (typeof lucide !== 'undefined') {
-                lucide.createIcons();
-            }
-        }
-
         // Function to update the statistics counter targets
         let statsTargets = { successRate:100 }; // Always 100% for Success Rate
         function updateStatsTargets(stats) {
@@ -202,9 +114,7 @@
 
             // --- 1. Start all data loading functions immediately ---
             // These do not depend on authentication and can run in parallel.
-            loadPortfolioItems();
             loadTestimonials();
-            loadCareers();
             loadStatistics();
 
             // --- 2. Handle Authentication in the background ---
@@ -236,160 +146,6 @@
                 }
             });
         });
-
-        // Function to render career vacancies
-        function renderCareers(vacancies, container) {
-            if (!container) return;
-
-            if (vacancies.length === 0) {
-                container.innerHTML = /*html*/`
-                    <div class="bg-white rounded-2xl shadow-lg p-8 border border-gray-100 transition-all duration-300 col-span-full" data-aos="fade-up">
-                        <div class="text-center">
-                            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 mb-6">
-                                <i data-lucide="sparkles" class="w-8 h-8 text-blue-600"></i>
-                            </div>
-                            <h3 class="text-2xl font-bold text-gray-800 mb-4">No Open Positions Currently</h3>
-                            <p class="text-base text-gray-600 max-w-xl mx-auto mb-8">
-                                We're not actively hiring right now, but we're always looking for passionate people. Feel free to submit your CV for future consideration.
-                            </p>
-                            <button onclick="openApplicationModal('general', 'General Application')" class="group relative inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-base font-semibold rounded-full shadow-lg hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-105">
-                                Submit Your CV
-                                <i data-lucide="file-plus-2" class="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300"></i>
-                            </button>
-                        </div>
-                    </div>`;
-            } else {
-                container.innerHTML = vacancies.map((job, index) => `
-                    <div class="bg-white rounded-2xl shadow-lg p-8 border border-gray-100 hover:shadow-xl hover:border-blue-200 transition-all duration-300 transform hover:-translate-y-1" data-aos="fade-up" data-aos-delay="${index * 100}">
-                        <div class="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4">
-                            <div>
-                                <h3 class="text-2xl font-bold text-gray-900">${job.title}</h3>
-                                <p class="text-gray-600 text-lg">${job.location} &bull; ${job.type}</p>
-                            </div>
-                            <span class="text-xs font-semibold px-3 py-1 rounded-full bg-green-100 text-green-800">${job.status}</span>
-                        </div>
-                        <p class="text-gray-700 leading-relaxed mb-6">${job.description}</p>
-                        <button onclick="openApplicationModal('${job.id}', '${job.title}')" class="group relative inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-base font-semibold rounded-full shadow-lg hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-105">
-                            Apply Now
-                            <i data-lucide="arrow-right" class="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300"></i>
-                        </button>
-                    </div>
-                `).join('');
-            }
-
-            if (typeof lucide !== 'undefined') lucide.createIcons();
-            if (typeof AOS !== 'undefined') AOS.refresh();
-        }
-
-        // Function to load career/job vacancies with real-time updates
-        function loadCareers() {
-            const careersContainer = document.getElementById('careers-container');
-            if (!careersContainer) return;
-
-            console.log('Initializing real-time career vacancies loading...');
-
-            const careersCollectionRef = collection(db, `artifacts/${appId}/public/data/careers`);
-            
-            onSnapshot(careersCollectionRef, (snapshot) => {
-                console.log('Firestore careers data updated');
-                const allJobs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                const vacancies = allJobs.filter(job => job.status && job.status.trim().toLowerCase() === 'open');
-
-                renderCareers(vacancies, careersContainer);
-                console.log(`Careers updated: ${vacancies.length} open positions found.`);
-            }, (error) => {
-                console.error("Error fetching careers with real-time listener:", error);
-                // You can add more robust error UI here if needed
-            });
-        }
-
-        // Function to toggle job description visibility
-        window.toggleDescription = (jobId) => {
-            const shortDesc = document.getElementById(`desc-short-${jobId}`);
-            const fullDesc = document.getElementById(`desc-full-${jobId}`);
-
-            if (shortDesc && fullDesc) {
-                shortDesc.classList.toggle('hidden');
-                fullDesc.classList.toggle('hidden');
-            }
-
-            // Optional: Re-initialize AOS to handle layout shifts if you have animations below
-            if (typeof AOS !== 'undefined') {
-                AOS.refresh();
-            }
-        };
-
-
-        // Enhanced portfolio loading with instant cache and silent refresh
-        async function loadPortfolioItems() {
-            const portfolioContainer = document.getElementById('portfolio-items-container');
-            if (!portfolioContainer) return;
-
-            console.log('Loading portfolio items...');
-
-            // Step 1: Try to load from cache instantly for a super-fast feel on repeat visits.
-            const cachedItems = loadPortfolioFromCache();
-            if (cachedItems) {
-                console.log('Rendering cached portfolio items instantly');
-                renderPortfolioItems(cachedItems, portfolioContainer);
-            } else {
-                console.log('No cached portfolio items found, showing loading state');
-                portfolioContainer.innerHTML = `
-                    <div class="col-span-full text-center py-16">
-                        <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 mb-6">
-                            <i data-lucide="loader-2" class="w-10 h-10 text-blue-600 animate-spin"></i>
-                        </div>
-                        <h3 class="text-2xl font-bold text-gray-800 mb-4">Loading Projects</h3>
-                        <p class="text-lg text-gray-600 max-w-md mx-auto">
-                            Fetching our latest work...
-                        </p>
-                    </div>
-                `;
-            }
-
-            // Step 2: Fetch fresh data from Firestore.
-            try {
-                const portfolioCollectionRef = collection(db, `artifacts/${appId}/public/data/portfolio`);
-                const snapshot = await getDocs(portfolioCollectionRef);
-                console.log('Firestore portfolio data received');
-                
-                const portfolioItems = [];
-                if (!snapshot.empty) {
-                    snapshot.forEach((doc) => {
-                        portfolioItems.push({
-                            id: doc.id,
-                            ...doc.data()
-                        });
-                    });
-                }
-
-                // Save to cache for next time
-                savePortfolioToCache(portfolioItems);
-
-                // Re-render with fresh data (silent update)
-                renderPortfolioItems(portfolioItems, portfolioContainer);
-                
-                console.log(`Portfolio updated: ${portfolioItems.length} items`);
-            } catch (error) {
-                console.error("Error fetching portfolio items:", error);
-                // Only show error if we don't have cached data
-                if (!cachedItems) {
-                    portfolioContainer.innerHTML = `
-                        <div class="col-span-full text-center py-16">
-                            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 mb-6">
-                                <i data-lucide="briefcase" class="w-10 h-10 text-blue-600"></i>
-                            </div>
-                            <h3 class="text-2xl font-bold text-gray-800 mb-4">Projects Coming Soon</h3>
-                            <p class="text-lg text-gray-600 max-w-md mx-auto">
-                                We're working on some amazing projects. Check back soon to see our latest work!
-                            </p>
-                        </div>
-                    `;
-                } else {
-                    console.log('Using cached data due to Firestore error');
-                }
-            }
-        }
 
         // Global variables for testimonials rotation
         let testimonials = [];
@@ -533,124 +289,6 @@
             }, 300);
         }
 
-        // Handle contact form submission
-        document.addEventListener('DOMContentLoaded', () => {
-            // Contact Form
-            const contactForm = document.getElementById('contact-form');
-
-            if (contactForm) {
-                contactForm.addEventListener('submit', async (e) => {
-                    e.preventDefault(); // Prevent default but we will submit manually
-
-                    const submitButton = contactForm.querySelector('button[type="submit"]');
-                    const originalButtonText = submitButton.innerHTML;
-                    submitButton.innerHTML = '<i data-lucide="loader-2" class="w-5 h-5 mr-2 animate-spin"></i>Sending Message...';
-                    submitButton.disabled = true;
-
-                    try {
-                        // Save message in Firebase
-                        await addDoc(collection(db, `artifacts/${appId}/public/data/messages`), {
-                            fullName: document.getElementById('full-name').value,
-                            emailAddress: document.getElementById('email-address').value,
-                            projectDetails: document.getElementById('project-details').value,
-                            timestamp: serverTimestamp()
-                        });
-
-                        // Submit to FormSubmit (via hidden iframe → no refresh)
-                        contactForm.submit();
-
-                        // Toast success
-                        showToast(
-                            `Thank you! Your message has been sent. For prompt feedback, call or WhatsApp us at 0717384875.`,
-                            'success',
-                            0
-                        );
-
-                        contactForm.reset();
-
-                    } catch (error) {
-                        console.error(error);
-                        showToast(
-                            `Sorry, there was an error sending your message. Please try again or contact us directly on +254 717 384 875.`,
-                            'error',
-                            0
-                        );
-                    } finally {
-                        // Restore button state
-                        submitButton.innerHTML = originalButtonText;
-                        submitButton.disabled = false;
-                        // Re-initialize Lucide icons
-                        if (typeof lucide !== 'undefined') {
-                            lucide.createIcons();
-                        }
-                    }
-                });
-            }
-
-            // Application Form
-            const applicationForm = document.getElementById('application-form');
-            if (applicationForm) {
-                applicationForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-
-                    const submitButton = applicationForm.querySelector('button[type="submit"]');
-                    const originalButtonText = submitButton.innerHTML;
-                    submitButton.innerHTML = '<i data-lucide="loader-2" class="w-5 h-5 mr-2 animate-spin"></i>Submitting...';
-                    submitButton.disabled = true;
-
-                    try {
-                        // Save application in Firebase
-                        await addDoc(collection(db, `artifacts/${appId}/public/data/applications`), {
-                            jobId: document.getElementById('job-id').value,
-                            jobTitle: document.getElementById('job-title').value,
-                            fullName: document.getElementById('applicant-name').value,
-                            emailAddress: document.getElementById('applicant-email').value,
-                            status: 'Received', // Initial application status
-                            timestamp: serverTimestamp()
-                        });
-
-                        // Submit to FormSubmit for email notification with attachment
-                        applicationForm.submit();
-
-                        showToast(
-                            `Thank you! Your application for the ${document.getElementById('job-title').value} position has been received.`,
-                            'success',
-                            8000
-                        );
-
-                        applicationForm.reset();
-                        closeApplicationModal();
-
-                    } catch (error) {
-                        console.error("Error submitting application:", error);
-                        showToast(
-                            `Sorry, there was an error submitting your application. Please try again.`,
-                            'error',
-                            0
-                        );
-                    } finally {
-                        submitButton.innerHTML = originalButtonText;
-                        submitButton.disabled = false;
-                        if (typeof lucide !== 'undefined') {
-                            lucide.createIcons();
-                        }
-                    }
-                });
-            }
-        });
-
-        // Application Modal Functions
-        window.openApplicationModal = (jobId, jobTitle) => {
-            document.getElementById('job-id').value = jobId;
-            document.getElementById('job-title').value = jobTitle;
-            document.getElementById('application-modal-title').innerText = `Apply for: ${jobTitle}`;
-            document.getElementById('application-modal').classList.remove('hidden');
-        }
-
-        window.closeApplicationModal = () => {
-            document.getElementById('application-modal').classList.add('hidden');
-            document.getElementById('application-form').reset();
-        };
     </script>
 
     <style>
@@ -1142,7 +780,7 @@
         "@type": "ContactPoint",
         "telephone": "+254717384875",
         "contactType": "customer service",
-        "email": "princealexdigital@gmail.com",
+        "email": "info@princealex.pro",
         "areaServed": "KE",
         "availableLanguage": "English"
       },
@@ -1200,48 +838,43 @@
     <!-- Mobile Menu Backdrop -->
     <div id="mobile-menu-backdrop" class="mobile-menu-backdrop"></div>
 
-    <!-- Application Modal -->
-    <div id="application-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4"></div>
-
     <header class="glassmorphism-header text-white p-4 shadow-lg fixed w-full z-50">
         <nav class="container mx-auto flex items-center justify-between">
             <!-- Logo + Name + Hamburger (mobile only) -->
             <div class="flex items-center space-x-3">
                 <img src="mylogo.png" alt="Prince Alex Digital Logo" class="rounded-full w-14 h-14 object-contain" loading="lazy" width="56" height="56">
                 <span class="text-2xl font-bold text-white">Prince Alex Digital</span>
-
-                <!-- Hamburger (mobile only) -->
-                <button id="mobile-menu-button" class="ml-2 block md:hidden relative w-10 h-10 flex items-center justify-center rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-white/30 group">
-                    <div class="hamburger-icon">
-                        <span class="hamburger-line"></span>
-                        <span class="hamburger-line"></span>
-                        <span class="hamburger-line"></span>
-                    </div>
-                </button>
             </div>
+
+            <!-- Hamburger (mobile only) -->
+            <button id="mobile-menu-button" class="ml-2 block md:hidden relative w-10 h-10 flex items-center justify-center rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-white/30 group">
+                <div class="hamburger-icon">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </div>
+            </button>
 
             <!-- Desktop Menu -->
             <ul class="hidden md:flex space-x-6 text-lg">
-                <li><a href="#hero" class="nav-link hover:text-brand-blue transition duration-300">Home</a></li>
-                <li><a href="#about" class="nav-link hover:text-brand-blue transition duration-300">About</a></li>
-                <li><a href="#services" class="nav-link hover:text-brand-blue transition duration-300">Services</a></li>
-                <li><a href="#portfolio" class="nav-link hover:text-brand-blue transition duration-300">Portfolio</a></li>
-                <li><a href="#careers" class="nav-link hover:text-brand-blue transition duration-300">Careers</a></li>
-                <li><a href="#contact" class="nav-link hover:text-brand-blue transition duration-300">Contact</a></li>
+                <li><a href="/" class="nav-link active">Home</a></li>
+                <li><a href="/about" class="nav-link">About</a></li>
+                <li><a href="/services" class="nav-link">Services</a></li>
+                <li><a href="/portfolio" class="nav-link">Portfolio</a></li>
+                <li><a href="/careers" class="nav-link">Careers</a></li>
+                <li><a href="/contact" class="nav-link">Contact</a></li>
             </ul>
         </nav>
-
         <div id="mobile-menu" class="md:hidden fixed top-20 left-4 right-4 bg-white/95 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl py-6 px-6 space-y-2 mobile-menu-animated z-40">
-            <a href="#hero" class="block py-3 px-4 rounded-xl text-gray-800 font-medium hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600 hover:text-white transition-all duration-300 transform hover:scale-105 mobile-menu-link">Home</a>
-            <a href="#about" class="block py-3 px-4 rounded-xl text-gray-800 font-medium hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600 hover:text-white transition-all duration-300 transform hover:scale-105 mobile-menu-link">About</a>
-            <a href="#services" class="block py-3 px-4 rounded-xl text-gray-800 font-medium hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600 hover:text-white transition-all duration-300 transform hover:scale-105 mobile-menu-link">Services</a>
-            <a href="#portfolio" class="block py-3 px-4 rounded-xl text-gray-800 font-medium hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600 hover:text-white transition-all duration-300 transform hover:scale-105 mobile-menu-link">Portfolio</a>
-            <a href="#careers" class="block py-3 px-4 rounded-xl text-gray-800 font-medium hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600 hover:text-white transition-all duration-300 transform hover:scale-105 mobile-menu-link">Careers</a>
-            <a href="#contact" class="block py-3 px-4 rounded-xl text-gray-800 font-medium hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600 hover:text-white transition-all duration-300 transform hover:scale-105 mobile-menu-link">Contact</a>
+            <a href="/" class="block py-3 px-4 rounded-xl text-gray-800 font-medium hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600 hover:text-white transition-all duration-300 transform hover:scale-105 mobile-menu-link">Home</a>
+            <a href="/about" class="block py-3 px-4 rounded-xl text-gray-800 font-medium hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600 hover:text-white transition-all duration-300 transform hover:scale-105 mobile-menu-link">About</a>
+            <a href="/services" class="block py-3 px-4 rounded-xl text-gray-800 font-medium hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600 hover:text-white transition-all duration-300 transform hover:scale-105 mobile-menu-link">Services</a>
+            <a href="/portfolio" class="block py-3 px-4 rounded-xl text-gray-800 font-medium hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600 hover:text-white transition-all duration-300 transform hover:scale-105 mobile-menu-link">Portfolio</a>
+            <a href="/careers" class="block py-3 px-4 rounded-xl text-gray-800 font-medium hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600 hover:text-white transition-all duration-300 transform hover:scale-105 mobile-menu-link">Careers</a>
+            <a href="/contact" class="block py-3 px-4 rounded-xl text-gray-800 font-medium hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600 hover:text-white transition-all duration-300 transform hover:scale-105 mobile-menu-link">Contact</a>
         </div>
     </header>
 
-    <main>
     <main class="pt-24">
         <section id="hero" class="relative min-h-screen flex items-center justify-center overflow-hidden">
             <!-- Modern gradient background -->
@@ -1265,389 +898,21 @@
                 
                 <!-- Modern typography -->
                 <h1 class="text-4xl sm:text-5xl md:text-7xl font-black leading-tight mb-6 bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent">
-                    Prince Alex Digital
+                    Web Design & Digital Marketing Agency in Kenya
                 </h1>
-                <h2 class="text-2xl md:text-3xl font-semibold text-blue-200 mb-8">
-                    Web Design & Digital Marketing
-                </h2>
                 <p class="text-xl md:text-2xl max-w-3xl mx-auto mb-12 text-gray-300 leading-relaxed">
-                    Led by Alex Senerwa, we bring powerful design and tech together to grow your business online.
+                    We help businesses grow with web design, hosting, branding, software solutions, and digital marketing.
                 </p>
                 
                 <!-- Modern CTA button -->
                 <div class="flex flex-col sm:flex-row gap-4 justify-center items-center w-full max-w-xs sm:max-w-none mx-auto">
-                    <a href="#contact" class="group relative px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-lg font-semibold rounded-full shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1">
+                <a href="/contact" class="group relative px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-lg font-semibold rounded-full shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1">
                         <span class="relative z-10">Get Started</span>
                         <div class="absolute inset-0 bg-gradient-to-r from-blue-700 to-purple-700 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     </a>
-                    <a href="#about" class="px-8 py-4 border-2 border-white/30 text-white text-lg font-semibold rounded-full hover:bg-white/10 hover:border-white/50 transition-all duration-300 backdrop-blur-sm">
+                <a href="/about" class="px-8 py-4 border-2 border-white/30 text-white text-lg font-semibold rounded-full hover:bg-white/10 hover:border-white/50 transition-all duration-300 backdrop-blur-sm">
                         Learn More
                     </a>
-                </div>
-            </div>
-        </section>
-
-        <section id="about" class="py-20 bg-gradient-to-b from-white to-gray-50">
-            <div class="container mx-auto px-4 md:px-8 lg:px-16">
-                <!-- Section Header -->
-                <div class="text-center mb-16" data-aos="fade-down" data-aos-duration="1000">
-                    <h2 class="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-blue-600 to-purple-600 mb-6">
-                        About Us
-                    </h2>
-                    <p class="text-xl leading-relaxed text-gray-600 max-w-3xl mx-auto">
-                        At Prince Alex Digital, we transform businesses into powerful online brands. We blend creativity, technology, and strategy to deliver digital experiences that are visually striking, high-performing, and built for growth.
-                    </p>
-                </div>
-
-                <!-- Founder Section -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
-                    <!-- Image -->
-                    <div class="relative"> 
-                        <div class="relative z-10">
-                            <img src="founder.jpg" alt="Alex Senerwa Keverenge" class="rounded-3xl shadow-2xl object-cover w-full h-96 lg:h-[450px]" loading="lazy">
-                        </div>
-                        <!-- Decorative elements -->
-                        <div class="absolute -top-4 -right-4 w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full opacity-20"></div>
-                        <div class="absolute -bottom-4 -left-4 w-32 h-32 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full opacity-20"></div>
-                    </div>
-
-                    <!-- Content -->
-                    <div class="space-y-8">
-                        <div>
-                            <h3 class="text-4xl md:text-5xl font-black text-slate-900 mb-4">Meet Alex Senerwa Keverenge</h3>
-                            <p class="text-2xl text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 font-semibold mb-8">
-                                Founder & Digital Solutions Expert
-                            </p>
-                        </div>
-                        
-                        <div id="founder-bio" class="space-y-6 text-lg leading-relaxed text-gray-700">
-                            <p>
-                                Alex Senerwa Keverenge is the visionary behind Prince Alex Digital, a brand built to empower businesses and individuals online. Passionate about technology and design, he specializes in crafting powerful digital identities and results-driven strategies.
-                            </p>
-                            <p class="hidden lg:block" data-bio-expandable>
-                                With a sharp focus on client needs, Alex transforms ideas into innovative, practical, and visually striking digital solutions. His mission is simple: use design and technology to boost growth, elevate brands, and deliver real impact.
-                            </p>
-                        </div>
-
-                        <!-- Read More Button - Mobile Only -->
-                        <div class="lg:hidden pt-2">
-                            <button id="read-more-bio" class="font-semibold text-blue-600 hover:text-blue-800 transition-colors">Read More...</button>
-                        </div>
-
-                        <!-- Founder Signature -->
-                        <div class="pt-6">
-                            <p class="text-lg font-semibold text-slate-800">— Alex Senerwa Keverenge</p>
-                            <p class="text-md text-gray-600">
-                                Founder, Prince Alex Digital
-                            </p>
-                        </div>
-
-                        <!-- Stats or highlights -->
-                        <div class="pt-8">
-                            <div class="text-center p-6 bg-white rounded-2xl shadow-lg max-w-xs mx-auto">
-                                <div class="text-3xl font-bold text-blue-600 mb-2">5+</div>
-                                <div class="text-gray-600">Years Experience</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- CTA Section -->
-        <section id="cta-after-about" class="bg-gradient-to-b from-gray-50 to-slate-50 py-20">
-            <div class="container mx-auto px-4 md:px-8 lg:px-16">
-                <div class="bg-gradient-to-r from-blue-50 to-purple-50 p-8 rounded-3xl flex flex-col lg:flex-row items-center justify-between gap-8 shadow-lg" data-aos="fade-up">
-                    <p class="text-2xl md:text-3xl font-bold text-slate-800 text-center lg:text-left max-w-2xl">
-                        Ready to transform your brand and make an impact?
-                    </p>
-                    <a href="#contact" class="group relative inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-lg font-semibold rounded-full shadow-lg hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-105 flex-shrink-0">
-                        <span class="relative z-10">Start Your Project</span>
-                        <i data-lucide="arrow-right" class="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300"></i>
-                        <div class="absolute inset-0 bg-gradient-to-r from-blue-700 to-purple-700 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    </a>
-                </div>
-            </div>
-        </section>
-
-        <section id="mission-values" class="py-20 bg-gradient-to-br from-slate-50 to-blue-50">
-            <div class="container mx-auto px-4 md:px-8 lg:px-16">
-                <!-- Mission Statement -->
-                <div class="text-center mb-20" data-aos="fade-up" data-aos-duration="1000">
-                    <div class="relative max-w-4xl mx-auto">
-                        <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-12 rounded-3xl shadow-2xl relative overflow-hidden">
-                            <!-- Background decoration -->
-                            <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
-                            <div class="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-12 -translate-x-12"></div>
-                            
-                            <div class="relative z-10">
-                                <h2 class="text-4xl md:text-5xl font-black mb-6">Our Promise to You</h2>
-                                <p class="text-xl md:text-2xl leading-relaxed max-w-3xl mx-auto">
-                                    When you choose Prince Alex Digital, you’re choosing a partner dedicated to elevating your brand with precision, creativity, and unmatched professionalism.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Values Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div class="group bg-white p-8 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="100">
-                        <div class="flex flex-col items-center text-center">
-                            <div class="p-6 rounded-2xl mb-6 icon-bg-blue group-hover:scale-110 transition-transform duration-300">
-                                <i data-lucide="award" class="w-12 h-12 text-blue-600"></i>
-                            </div>
-                            <h3 class="text-2xl font-bold text-slate-900 mb-4">Digital Excellence</h3>
-                            <p class="text-gray-600 leading-relaxed text-lg">
-                                Delivering high-quality digital solutions that exceed expectations
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="group bg-white p-8 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="200">
-                        <div class="flex flex-col items-center text-center">
-                            <div class="p-6 rounded-2xl mb-6 icon-bg-green group-hover:scale-110 transition-transform duration-300">
-                                <i data-lucide="target" class="w-12 h-12 text-green-600"></i>
-                            </div>
-                            <h3 class="text-2xl font-bold text-slate-900 mb-4">Client-Focused</h3>
-                            <p class="text-gray-600 leading-relaxed text-lg">
-                                Understanding your business goals and translating them into digital success
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="group bg-white p-8 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="300">
-                        <div class="flex flex-col items-center text-center">
-                            <div class="p-6 rounded-2xl mb-6 icon-bg-purple group-hover:scale-110 transition-transform duration-300">
-                                <i data-lucide="lightbulb" class="w-12 h-12 text-purple-600"></i>
-                            </div>
-                            <h3 class="text-2xl font-bold text-slate-900 mb-4">Innovation</h3>
-                            <p class="text-gray-600 leading-relaxed text-lg">
-                                Staying ahead of digital trends to provide cutting-edge solutions
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="services" class="py-20 bg-gradient-to-b from-white to-gray-50">
-            <div class="container mx-auto px-4 md:px-8 lg:px-16">
-                <!-- Section Header -->
-                <div class="text-center mb-16" data-aos="fade-down" data-aos-duration="1000">
-                    <h2 class="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-blue-600 to-purple-600 mb-6">
-                        Our Digital Services
-                    </h2>
-                    <p class="text-xl leading-relaxed text-gray-600 max-w-3xl mx-auto">
-                        Comprehensive digital solutions designed to elevate your business and drive growth
-                    </p>
-                </div>
-
-                <!-- Accordion Container -->
-                <div id="services-accordion" class="max-w-4xl mx-auto space-y-4" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
-
-                    <!-- Service 1: Web Design -->
-                    <div class="accordion-item bg-white border border-gray-200 rounded-2xl shadow-sm transition-all duration-300 overflow-hidden">
-                        <button class="accordion-header w-full flex justify-between items-center p-6 text-left">
-                            <span class="flex items-center gap-4">
-                                <i data-lucide="layout-template" class="w-6 h-6 text-blue-600"></i>
-                                <span class="text-xl font-bold text-slate-800">Web Design & Development</span>
-                            </span>
-                            <i data-lucide="chevron-down" class="accordion-chevron w-6 h-6 text-gray-500 transition-transform duration-300"></i>
-                        </button>
-                        <div class="accordion-content max-h-0 transition-all duration-500 ease-in-out">
-                            <div class="px-6 pb-6 pt-2 text-gray-600 text-lg leading-relaxed">
-                                <p class="mb-6">Custom, responsive websites that look great and perform excellently across all devices.</p>
-                                <ul class="space-y-3">
-                                    <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500"></i>Responsive Design</li>
-                                    <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500"></i>SEO Optimized</li>
-                                    <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500"></i>Fast Loading</li>
-                                    <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500"></i>Modern UI/UX</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Service 2: Web Hosting -->
-                    <div class="accordion-item bg-white border border-gray-200 rounded-2xl shadow-sm transition-all duration-300 overflow-hidden">
-                        <button class="accordion-header w-full flex justify-between items-center p-6 text-left">
-                            <span class="flex items-center gap-4">
-                                <i data-lucide="server" class="w-6 h-6 text-green-600"></i>
-                                <span class="text-xl font-bold text-slate-800">Web Hosting & Domains</span>
-                            </span>
-                            <i data-lucide="chevron-down" class="accordion-chevron w-6 h-6 text-gray-500 transition-transform duration-300"></i>
-                        </button>
-                        <div class="accordion-content max-h-0 transition-all duration-500 ease-in-out">
-                            <div class="px-6 pb-6 pt-2 text-gray-600 text-lg leading-relaxed">
-                                <p class="mb-6">Reliable hosting solutions with domain registration to get your business online.</p>
-                                <ul class="space-y-3">
-                                    <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500"></i>99.9% Uptime</li>
-                                    <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500"></i>SSL Certificates</li>
-                                    <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500"></i>Daily Backups</li>
-                                    <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500"></i>24/7 Support</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Service 3: Graphic Design -->
-                    <div class="accordion-item bg-white border border-gray-200 rounded-2xl shadow-sm transition-all duration-300 overflow-hidden">
-                        <button class="accordion-header w-full flex justify-between items-center p-6 text-left">
-                            <span class="flex items-center gap-4">
-                                <i data-lucide="palette" class="w-6 h-6 text-purple-600"></i>
-                                <span class="text-xl font-bold text-slate-800">Graphic Design</span>
-                            </span>
-                            <i data-lucide="chevron-down" class="accordion-chevron w-6 h-6 text-gray-500 transition-transform duration-300"></i>
-                        </button>
-                        <div class="accordion-content max-h-0 transition-all duration-500 ease-in-out">
-                            <div class="px-6 pb-6 pt-2 text-gray-600 text-lg leading-relaxed">
-                                <p class="mb-6">Professional visual identity and marketing materials that make your brand stand out.</p>
-                                <ul class="space-y-3">
-                                    <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500"></i>Logo Design</li>
-                                    <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500"></i>Brand Identity</li>
-                                    <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500"></i>Print Design</li>
-                                    <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500"></i>Digital Graphics</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Service: App & Software Design -->
-                    <div class="accordion-item bg-white border border-gray-200 rounded-2xl shadow-sm transition-all duration-300 overflow-hidden">
-                        <button class="accordion-header w-full flex justify-between items-center p-6 text-left">
-                            <span class="flex items-center gap-4">
-                                <i data-lucide="app-window" class="w-6 h-6 text-cyan-600"></i>
-                                <span class="text-xl font-bold text-slate-800">App & Software Design</span>
-                            </span>
-                            <i data-lucide="chevron-down" class="accordion-chevron w-6 h-6 text-gray-500 transition-transform duration-300"></i>
-                        </button>
-                        <div class="accordion-content max-h-0 transition-all duration-500 ease-in-out">
-                            <div class="px-6 pb-6 pt-2 text-gray-600 text-lg leading-relaxed">
-                                <p class="mb-6">We design clean and user-friendly interfaces for apps and software.</p>
-                                <ul class="space-y-3">
-                                    <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500"></i>Mobile App UI/UX</li>
-                                    <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500"></i>Software UI/UX</li>
-                                    <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500"></i>Web App Design</li>
-                                    <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500"></i>Wireframes & Prototypes</li>
-                                    <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500"></i>Dashboard Design</li>
-                                    <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500"></i>App Icons & Splash Screens</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Service 4: Social Media -->
-                    <div class="accordion-item bg-white border border-gray-200 rounded-2xl shadow-sm transition-all duration-300 overflow-hidden">
-                        <button class="accordion-header w-full flex justify-between items-center p-6 text-left">
-                            <span class="flex items-center gap-4">
-                                <i data-lucide="share-2" class="w-6 h-6 text-pink-600"></i>
-                                <span class="text-xl font-bold text-slate-800">Social Media Management</span>
-                            </span>
-                            <i data-lucide="chevron-down" class="accordion-chevron w-6 h-6 text-gray-500 transition-transform duration-300"></i>
-                        </button>
-                        <div class="accordion-content max-h-0 transition-all duration-500 ease-in-out">
-                            <div class="px-6 pb-6 pt-2 text-gray-600 text-lg leading-relaxed">
-                                <p class="mb-6">Strategic social media presence to engage your audience and grow your brand.</p>
-                                <ul class="space-y-3">
-                                    <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500"></i>Content Creation</li>
-                                    <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500"></i>Strategy Planning</li>
-                                    <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500"></i>Analytics</li>
-                                    <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500"></i>Community Management</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Service 5: CV Revamping -->
-                    <div class="accordion-item bg-white border border-gray-200 rounded-2xl shadow-sm transition-all duration-300 overflow-hidden">
-                        <button class="accordion-header w-full flex justify-between items-center p-6 text-left">
-                            <span class="flex items-center gap-4">
-                                <i data-lucide="file-text" class="w-6 h-6 text-orange-600"></i>
-                                <span class="text-xl font-bold text-slate-800">CV Revamping & Editorial</span>
-                            </span>
-                            <i data-lucide="chevron-down" class="accordion-chevron w-6 h-6 text-gray-500 transition-transform duration-300"></i>
-                        </button>
-                        <div class="accordion-content max-h-0 transition-all duration-500 ease-in-out">
-                            <div class="px-6 pb-6 pt-2 text-gray-600 text-lg leading-relaxed">
-                                <p class="mb-6">Professional CV redesign and editorial services to help you land your dream job.</p>
-                                <ul class="space-y-3">
-                                    <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500"></i>Modern Templates</li>
-                                    <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500"></i>ATS Optimization</li>
-                                    <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500"></i>Content Writing</li>
-                                    <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500"></i>Cover Letters</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Service 6: Digital Marketing -->
-                    <div class="accordion-item bg-white border border-gray-200 rounded-2xl shadow-sm transition-all duration-300 overflow-hidden">
-                        <button class="accordion-header w-full flex justify-between items-center p-6 text-left">
-                            <span class="flex items-center gap-4">
-                                <i data-lucide="zap" class="w-6 h-6 text-indigo-600"></i>
-                                <span class="text-xl font-bold text-slate-800">Digital Marketing</span>
-                            </span>
-                            <i data-lucide="chevron-down" class="accordion-chevron w-6 h-6 text-gray-500 transition-transform duration-300"></i>
-                        </button>
-                        <div class="accordion-content max-h-0 transition-all duration-500 ease-in-out">
-                            <div class="px-6 pb-6 pt-2 text-gray-600 text-lg leading-relaxed">
-                                <p class="mb-6">Tailored digital marketing strategies designed to boost your online presence and drive conversions.</p>
-                                <ul class="space-y-3">
-                                    <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500"></i>SEO</li>
-                                    <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500"></i>Social Media Ads</li>
-                                    <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500"></i>Google Ads</li>
-                                    <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-green-500"></i>Brand Awareness Campaigns</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="portfolio" class="py-20 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
-            <!-- Background decoration -->
-            <div class="absolute inset-0">
-                <div class="absolute top-1/4 right-1/4 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse"></div>
-                <div class="absolute bottom-1/4 left-1/4 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse" style="animation-delay: 2s;"></div>
-            </div>
-
-            <div class="container mx-auto px-4 md:px-8 lg:px-16 relative z-10">
-                <!-- Section Header -->
-                <div class="text-center mb-20" data-aos="fade-down" data-aos-duration="1000">
-                    <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 mb-8">
-                        <i data-lucide="briefcase" class="w-10 h-10 text-blue-600"></i>
-                    </div>
-                    <h2 class="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-blue-600 to-purple-600 mb-6">
-                        Our Recent Work
-                    </h2>
-                    <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                        Showcasing our latest projects and creative solutions that drive real results for our clients
-                    </p>
-                </div>
-
-                <!-- Portfolio Container with Mobile Scroll -->
-                <div class="relative">
-                    <!-- Mobile Scroll Indicator -->
-                    <div class="md:hidden flex justify-center mb-6">
-                        <div class="flex items-center space-x-2 text-sm text-gray-500 scroll-indicator">
-                            <i data-lucide="arrow-left" class="w-4 h-4"></i>
-                            <span>Swipe to see more projects</span>
-                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                        </div>
-                    </div>
-                    
-                    <!-- Portfolio Container with Responsive Layout -->
-                    <div id="portfolio-items-container" 
-                         class="flex space-x-4 overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-8 md:space-x-0 md:overflow-visible scrollbar-hide pb-4">
-                        <div class="text-center py-16 min-w-[280px] md:min-w-0 md:col-span-full">
-                            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 mb-6">
-                                <i data-lucide="loader-2" class="w-10 h-10 text-blue-600 animate-spin"></i>
-                            </div>
-                            <h3 class="text-2xl font-bold text-gray-800 mb-4">Loading Projects</h3>
-                            <p class="text-lg text-gray-600">Please wait while we load our latest work...</p>
-                        </div>
-                    </div>
                 </div>
             </div>
         </section>
@@ -1705,6 +970,8 @@
                 </div>
 
                 <!-- Testimonial Card -->
+                <div class="max-w-3xl mx-auto" data-aos="fade-up" data-aos-duration="1000">
+                    <div class="bg-white rounded-3xl shadow-2xl p-10 relative overflow-hidden">
                 <div class="max-w-4xl mx-auto" data-aos="fade-up" data-aos-duration="1000">
                     <div class="bg-white rounded-3xl shadow-2xl p-12 relative overflow-hidden">
                         <!-- Background decoration -->
@@ -1718,6 +985,7 @@
                             </div>
                             
                             <!-- Testimonial content -->
+                            <p id="testimonial-text" class="text-xl md:text-2xl text-gray-700 italic mb-8 leading-relaxed">
                             <p id="testimonial-text" class="text-2xl md:text-3xl text-gray-700 italic mb-8 leading-relaxed">
                                 Loading testimonials...
                             </p>
@@ -1730,7 +998,9 @@
                             
                             <!-- Coming soon message -->
                             <div class="mt-12 pt-8 border-t border-gray-200">
-                                <p class="text-lg text-gray-600">More testimonials coming soon!</p>
+                                <p class="text-lg text-gray-600">
+                                More testimonials coming soon! See our work in the <a href="/portfolio" class="text-blue-600 hover:underline font-semibold">Portfolio</a>.
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -1738,211 +1008,6 @@
             </div>
         </section>
 
-        <section id="careers" class="py-20 bg-gradient-to-b from-gray-50 to-white">
-            <div class="container mx-auto px-4 md:px-8 lg:px-16">
-                <!-- Section Header -->
-                <div class="text-center mb-16" data-aos="fade-down" data-aos-duration="1000">
-                    <h2 class="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-blue-600 to-purple-600 mb-6">
-                        Join Our Team
-                    </h2>
-                    <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-                        We're looking for passionate individuals to join us on our mission. Explore our open positions below.
-                    </p>
-                </div>
-
-                <!-- Careers Container -->
-                <div id="careers-container" class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
-                    <!-- Job vacancies will be loaded here by JavaScript -->
-                    <!-- Initial Loading State -->
-                    <div class="col-span-full text-center py-16">
-                        <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 mb-6">
-                            <i data-lucide="loader-2" class="w-10 h-10 text-blue-600 animate-spin"></i>
-                        </div>
-                        <h3 class="text-2xl font-bold text-gray-800 mb-4">Loading Open Positions</h3>
-                        <p class="text-lg text-gray-600 max-w-md mx-auto">Fetching our latest job opportunities...</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Application Modal Content (to be injected by JS) -->
-        <script>
-            document.getElementById('application-modal').innerHTML = `
-                <div class="fixed inset-0 modal-backdrop" onclick="closeApplicationModal()"></div>
-                <div class="relative z-10 bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto modal-content">
-                    <div class="p-8">
-                        <div class="flex justify-between items-start mb-4">
-                            <h3 id="application-modal-title" class="text-2xl md:text-3xl font-bold text-slate-900">Apply for Position</h3>
-                            <button onclick="closeApplicationModal()" class="text-gray-400 hover:text-gray-600 transition-colors">&times;</button>
-                        </div>
-                        <p class="text-gray-600 mb-8">Please fill out the form below to submit your application.</p>
-                        
-                        <iframe name="application-form-frame" style="display:none;"></iframe>
-                        <form id="application-form" action="https://formsubmit.co/princealexdigital@gmail.com" method="POST" enctype="multipart/form-data" target="application-form-frame" class="space-y-4 md:space-y-6">
-                            <input type="hidden" name="_subject" value="New Job Application Received!">
-                            <input type="hidden" name="_captcha" value="false">
-                            <input type="hidden" name="_template" value="table">
-                            <input type="hidden" name="_next" value="false">
-                            <input type="hidden" name="_autoresponse" value="Thank you for your application! We have received it and will be in touch if you are a good fit.">
-                            <input type="hidden" id="job-id" name="job_id">
-                            <input type="hidden" id="job-title" name="job_title">
-
-                            <div class="space-y-3">
-                                <label for="applicant-name" class="block text-gray-800 text-lg font-semibold">Full Name *</label>
-                                <input type="text" id="applicant-name" name="name" class="w-full py-4 px-6 text-gray-700 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 text-lg" placeholder="Enter your full name" required>
-                            </div>
-                            <div class="space-y-3">
-                                <label for="applicant-email" class="block text-gray-800 text-lg font-semibold">Email Address *</label>
-                                <input type="email" id="applicant-email" name="email" class="w-full py-4 px-6 text-gray-700 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 text-lg" placeholder="Enter your email" required>
-                            </div>
-                            <div class="space-y-3">
-                                <label for="resume-upload" class="block text-gray-800 text-lg font-semibold">CV/Resume *</label>
-                                <input type="file" id="resume-upload" name="attachment" accept=".pdf,.doc,.docx" class="w-full text-gray-700 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 text-lg file:mr-4 file:py-4 file:px-6 file:rounded-l-xl file:border-0 file:text-lg file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 cursor-pointer" required>
-                            </div>
-                            <div class="space-y-3">
-                                <label for="cover-letter-upload" class="block text-gray-800 text-lg font-semibold">Cover Letter</label>
-                                <input type="file" id="cover-letter-upload" name="cover_letter" accept=".pdf,.doc,.docx" class="w-full text-gray-700 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 text-lg file:mr-4 file:py-4 file:px-6 file:rounded-l-xl file:border-0 file:text-lg file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 cursor-pointer">
-                            </div>
-                            <button type="submit" class="group relative w-full py-4 px-8 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-lg font-bold rounded-2xl shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1">
-                                <span class="relative z-10 flex items-center justify-center">
-                                    Submit Application
-                                </span>
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            `;
-        </script>
-
-        <section id="contact" class="py-20 bg-gradient-to-b from-white to-gray-50">
-            <div class="container mx-auto px-4 md:px-8 lg:px-16">
-                <!-- Section Header -->
-                <div class="text-center mb-16" data-aos="fade-down" data-aos-duration="1000">
-                    <h2 class="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-blue-600 to-purple-600 mb-6">
-                        Get In Touch
-                    </h2>
-                    <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-                        Ready to start your next project? Let's discuss how we can help you achieve your goals.
-                    </p>
-                </div>
-
-                <!-- Contact Content -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
-                    <!-- Contact Information -->
-                    <div class="bg-white rounded-3xl shadow-xl p-10 relative overflow-hidden border border-gray-100" data-aos="fade-right" data-aos-duration="1000">
-                        <!-- Background decoration -->
-                        <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full -translate-y-16 translate-x-16"></div>
-                        <div class="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full translate-y-12 -translate-x-12"></div>
-                        
-                        <div class="relative z-10">
-                            <h3 class="text-3xl font-bold text-slate-900 mb-8">Contact Information</h3>
-                            <div class="space-y-8">
-                                <div class="flex items-center group">
-                                    <div class="p-4 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-500 text-white mr-6 group-hover:scale-110 transition-transform duration-300">
-                                        <i data-lucide="mail" class="w-6 h-6"></i>
-                                    </div>
-                                    <div>
-                                        <p class="font-bold text-gray-800 text-lg">Email</p>
-                                        <a href="mailto:princealexdigital@gmail.com" class="text-gray-600 hover:text-blue-600 transition-colors duration-300 text-lg">princealexdigital@gmail.com</a>
-                                    </div>
-                                </div>
-                                <div class="flex items-center group">
-                                    <div class="p-4 rounded-2xl bg-gradient-to-r from-green-500 to-blue-500 text-white mr-6 group-hover:scale-110 transition-transform duration-300">
-                                        <i data-lucide="phone" class="w-6 h-6"></i>
-                                    </div>
-                                    <div>
-                                        <p class="font-bold text-gray-800 text-lg">Phone</p>
-                                        <a href="tel:+254717384875" class="text-gray-600 hover:text-green-600 transition-colors duration-300 text-lg">0717384875</a>
-                                    </div>
-                                </div>
-                                <div class="flex items-center group">
-                                    <div class="p-4 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 text-white mr-6 group-hover:scale-110 transition-transform duration-300">
-                                        <i data-lucide="map-pin" class="w-6 h-6"></i>
-                                    </div>
-                                    <div>
-                                        <p class="font-bold text-gray-800 text-lg">Location</p>
-                                        <p class="text-gray-600 text-lg">Kenya</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-center group">
-                                    <div class="p-4 rounded-2xl bg-gradient-to-r from-orange-500 to-red-500 text-white mr-6 group-hover:scale-110 transition-transform duration-300">
-                                        <i data-lucide="clock" class="w-6 h-6"></i>
-                                    </div>
-                                    <div>
-                                        <p class="font-bold text-gray-800 text-lg">Business Hours</p>
-                                        <p class="text-gray-600 text-lg">Mon - Frid: 8AM - 6PM</p>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <h3 class="text-3xl font-bold text-slate-900 mb-6 mt-12">Find Us</h3>
-                            <div class="w-full h-80 bg-gray-100 rounded-2xl overflow-hidden shadow-inner">
-                                <iframe
-                                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15959.043590012224!2d36.81228225!3d-1.286389!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f1172d84d0d5d%3A0xf57297e7f6d3d9a!2sNairobi%2C%20Kenya!5e0!3m2!1sen!2sus!4m2!3m1!1s0x182f1172d84d0d5d%3A0xf57297e7f6d3d9a"
-                                    width="100%"
-                                    height="100%"
-                                    style="border:0;"
-                                    allowfullscreen=""
-                                    loading="lazy"
-                                    referrerpolicy="no-referrer-when-downgrade">
-                                </iframe>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Contact Form -->
-                    <div class="bg-white rounded-3xl shadow-xl p-10 relative overflow-hidden border border-gray-100" data-aos="fade-left" data-aos-duration="1000">
-                        <!-- Background decoration -->
-                        <div class="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full -translate-y-16 -translate-x-16"></div>
-                        <div class="absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full translate-y-12 translate-x-12"></div>
-                        
-                        <div class="relative z-10">
-                            <h3 class="text-3xl font-bold text-slate-900 mb-4">Send us a Message</h3>
-                            <p class="text-gray-600 mb-8 text-lg">Fill out the form below and we'll get back to you within 24 hours.</p>
-                            
-                            <!-- Hidden iframe to allow FormSubmit to process email WITHOUT page refresh -->
-                            <iframe name="formsubmit-frame" style="display:none;"></iframe>
-
-                            <form 
-                                id="contact-form" 
-                                action="https://formsubmit.co/princealexdigital@gmail.com"
-                                method="POST"
-                                target="formsubmit-frame"
-                                class="space-y-8"
-                            >
-                                <input type="hidden" name="_template" value="table">
-                                <input type="hidden" name="_captcha" value="false">
-                                <input type="hidden" name="_subject" value="New Contact Message from PrinceAlex.pro">
-                                <input type="hidden" name="_autoresponse" value="Thank you for contacting Prince Alex Digital! We will respond shortly.">
-                                
-                                <div class="relative floating-label-group">
-                                    <input type="text" id="full-name" name="name" class="floating-input w-full py-4 px-6 text-gray-700 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500 transition-all duration-300 text-lg" placeholder=" " required>
-                                    <label for="full-name" class="floating-label absolute top-4 left-6 text-gray-500 text-lg pointer-events-none origin-top-left">Full Name *</label>
-                                </div>
-                                
-                                <div class="relative floating-label-group">
-                                    <input type="email" id="email-address" name="email" class="floating-input w-full py-4 px-6 text-gray-700 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500 transition-all duration-300 text-lg" placeholder=" " required>
-                                    <label for="email-address" class="floating-label absolute top-4 left-6 text-gray-500 text-lg pointer-events-none origin-top-left">Email Address *</label>
-                                </div>
-                                
-                                <div class="relative floating-label-group">
-                                    <textarea id="project-details" name="message" rows="6" class="floating-input w-full py-4 px-6 text-gray-700 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500 transition-all duration-300 text-lg resize-none" placeholder=" " required></textarea>
-                                    <label for="project-details" class="floating-label absolute top-4 left-6 text-gray-500 text-lg pointer-events-none origin-top-left">Project Details *</label>
-                                </div>
-                                
-                                <button type="submit" class="group relative w-full py-4 px-8 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-lg font-bold rounded-2xl shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1">
-                                    <span class="relative z-10 flex items-center justify-center">
-                                        Send Message
-                                        <i data-lucide="send" class="w-5 h-5 ml-3 group-hover:translate-x-1 transition-transform duration-300"></i>
-                                    </span>
-                                    <div class="absolute inset-0 bg-gradient-to-r from-blue-700 to-purple-700 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
     </main>
 
     <footer class="bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 text-white py-16 relative overflow-hidden">
@@ -1971,12 +1036,12 @@
                 <div class="text-center md:text-left">
                     <h3 class="text-2xl font-bold text-white mb-6">Quick Links</h3>
                     <ul class="space-y-4">
-                        <li><a href="#hero" class="text-gray-300 hover:text-white transition-colors duration-300 text-lg">Home</a></li>
-                        <li><a href="#about" class="text-gray-300 hover:text-white transition-colors duration-300 text-lg">About</a></li>
-                        <li><a href="#services" class="text-gray-300 hover:text-white transition-colors duration-300 text-lg">Services</a></li>
-                        <li><a href="#portfolio" class="text-gray-300 hover:text-white transition-colors duration-300 text-lg">Portfolio</a></li>
-                        <li><a href="#careers" class="text-gray-300 hover:text-white transition-colors duration-300 text-lg">Careers</a></li>
-                        <li><a href="#contact" class="text-gray-300 hover:text-white transition-colors duration-300 text-lg">Contact</a></li>
+                    <li><a href="/" class="text-gray-300 hover:text-white transition-colors duration-300 text-lg">Home</a></li>
+                    <li><a href="/about" class="text-gray-300 hover:text-white transition-colors duration-300 text-lg">About</a></li>
+                    <li><a href="/services" class="text-gray-300 hover:text-white transition-colors duration-300 text-lg">Services</a></li>
+                    <li><a href="/portfolio" class="text-gray-300 hover:text-white transition-colors duration-300 text-lg">Portfolio</a></li>
+                    <li><a href="/careers" class="text-gray-300 hover:text-white transition-colors duration-300 text-lg">Careers</a></li>
+                    <li><a href="/contact" class="text-gray-300 hover:text-white transition-colors duration-300 text-lg">Contact</a></li>
                     </ul>
                 </div>
 
@@ -1993,7 +1058,7 @@
                     </div>
                     <div class="mt-8">
                         <p class="text-gray-300 text-lg mb-2">Get in touch</p>
-                        <a href="mailto:princealexdigital@gmail.com" class="text-blue-400 hover:text-blue-300 transition-colors duration-300 text-lg">princealexdigital@gmail.com</a>
+                        <a href="mailto:info@princealex.pro" class="text-blue-400 hover:text-blue-300 transition-colors duration-300 text-lg">info@princealex.pro</a>
                     </div>
                 </div>
             </div>
@@ -2176,61 +1241,6 @@
                 observer.observe(statisticsSection);
             }
         });
-
-        // Accordion functionality for the services section
-        document.addEventListener('DOMContentLoaded', () => {
-            const accordionContainer = document.getElementById('services-accordion');
-            if (accordionContainer) {
-                const accordionItems = accordionContainer.querySelectorAll('.accordion-item');
-
-                accordionItems.forEach(item => {
-                    const header = item.querySelector('.accordion-header');
-                    const content = item.querySelector('.accordion-content');
-                    const chevron = item.querySelector('.accordion-chevron');
-
-                    header.addEventListener('click', () => {
-                        const isOpen = item.classList.contains('open');
-
-                        // Close all other items
-                        accordionItems.forEach(otherItem => {
-                            otherItem.classList.remove('open', 'shadow-lg', 'border-blue-200');
-                            otherItem.querySelector('.accordion-content').style.maxHeight = '0px';
-                            otherItem.querySelector('.accordion-chevron').classList.remove('rotate-180');
-                        });
-
-                        // Open the clicked item if it was closed
-                        if (!isOpen) {
-                            item.classList.add('open', 'shadow-lg', 'border-blue-200');
-                            content.style.maxHeight = content.scrollHeight + 'px';
-                            chevron.classList.add('rotate-180');
-                        }
-                        // If it was already open, the loop above will have closed it.
-                    });
-                });
-            }
-
-            // Collapsible Founder Bio on Mobile
-            const readMoreBtn = document.getElementById('read-more-bio');
-            const expandableContent = document.querySelectorAll('[data-bio-expandable]');
-
-            if (readMoreBtn && expandableContent.length > 0) {
-                readMoreBtn.addEventListener('click', () => {
-                    const isExpanded = readMoreBtn.getAttribute('data-expanded') === 'true';
-
-                    expandableContent.forEach(el => {
-                        el.classList.toggle('hidden');
-                    });
-
-                    if (isExpanded) {
-                        readMoreBtn.textContent = 'Read More...';
-                        readMoreBtn.setAttribute('data-expanded', 'false');
-                    } else {
-                        readMoreBtn.textContent = 'Read Less';
-                        readMoreBtn.setAttribute('data-expanded', 'true');
-                    }
-                });
-            }
-        });
     </script>
     <script
         src="https://www.chatbase.co/embed.min.js"
@@ -2250,25 +1260,14 @@
 
             const now = new Date();
             // Target date: January 6th, 2026
-            const expiryDate = new Date('2026-01-06T23:59:59');
+            const expiryDate = new Date('2026-01-06T00:00:00');
+            const hasBeenShown = localStorage.getItem('newYearOverlayShown_2026');
 
-            // Show overlay if current date is before expiry date
-            if (now < expiryDate) {
-                // Small delay for better UX
-                setTimeout(() => {
-                    overlay.classList.remove('hidden');
-                }, 1000);
+            if (!hasBeenShown && now < expiryDate) {
+                overlay.classList.remove('hidden');
+                localStorage.setItem('newYearOverlayShown_2026', 'true');
             }
         });
     </script>
 </body>
 </html>
-    <script>
-        // Ensure chatbaseConfig is defined before the chatbase script loads
-        window.chatbaseConfig = {
-            chatbotId: "R1TiiZ1iAxEt-Oy6PjEEF",
-        };
-    </script>
-</body>
-</html>
-
