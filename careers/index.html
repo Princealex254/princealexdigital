@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Careers – Jobs at Prince Alex Digital (Kenya)</title>
+    <meta name="description" content="Join Prince Alex Digital. Explore open roles in web design, graphic design, digital marketing, and social media. Apply online and submit your CV.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://www.princealex.pro/careers">
+
+    <!-- Open Graph (for sharing) -->
+    <meta property="og:title" content="Careers | Prince Alex Digital">
+    <meta property="og:description" content="Explore open roles and submit your CV to Prince Alex Digital.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.princealex.pro/careers">
+    <meta property="og:image" content="https://www.princealex.pro/mylogo.png">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://unpkg.com">
+    <link rel="preconnect" href="https://www.gstatic.com">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"></noscript>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <style>
+        :root { --primary-color: #6366f1; --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        body { font-family: 'Inter', sans-serif; background-color: #ffffff; color: #0f172a; }
+        .glassmorphism-header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        .nav-link { position: relative; overflow: hidden; display: inline-block; }
+        .nav-link::after { content: ''; position: absolute; width: 100%; height: 2px; bottom: 0; left: 0; background: var(--gradient-primary); transform: translateX(-100%); transition: transform 0.4s; }
+        .nav-link:hover::after { transform: translateX(0%); }
+        
+        /* Mobile Menu */
+        .mobile-menu-animated { opacity: 0; visibility: hidden; transform: translateY(-20px) scale(0.95); transition: all 0.2s; display: none; }
+        .mobile-menu-animated.show { opacity: 1; visibility: visible; transform: translateY(0) scale(1); display: block; }
+        .mobile-menu-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); opacity: 0; visibility: hidden; transition: all 0.3s; z-index: 35; }
+        .mobile-menu-backdrop.show { opacity: 1; visibility: visible; }
+        .hamburger-icon { display: flex; flex-direction: column; justify-content: space-between; width: 20px; height: 16px; }
+        .hamburger-line { height: 2px; width: 100%; background: white; transition: 0.3s; }
+        .hamburger-icon.active .hamburger-line:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .hamburger-icon.active .hamburger-line:nth-child(2) { opacity: 0; }
+        .hamburger-icon.active .hamburger-line:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+        
+        /* Toast */
+        .toast-notification { position: fixed; top: 20px; right: 20px; z-index: 1000; padding: 20px; border-radius: 16px; color: white; transform: translateX(400px); transition: all 0.4s; }
+        .toast-notification.show { transform: translateX(0); }
+        .toast-notification.success { background: linear-gradient(135deg, #10b981, #059669); }
+        .toast-notification.error { background: linear-gradient(135deg, #ef4444, #dc2626); }
+    </style>
+</head>
+<body class="bg-white text-gray-800 overflow-x-hidden">
+    <div id="mobile-menu-backdrop" class="mobile-menu-backdrop"></div>
+    <div id="toast-container"></div>
+    <div id="application-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4"></div>
+
+    <header class="glassmorphism-header text-white p-4 shadow-lg fixed w-full z-50">
+        <nav class="container mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <img src="mylogo.png" alt="Prince Alex Digital – Web Design and Digital Marketing Agency in Kenya" class="rounded-full w-14 h-14 object-contain">
+                <span class="text-2xl font-bold text-white">Prince Alex Digital</span>
+            </div>
+            <button id="mobile-menu-button" class="ml-2 block md:hidden relative w-10 h-10 flex items-center justify-center rounded-xl bg-white/10 backdrop-blur-sm border border-white/20">
+                <div class="hamburger-icon"><span class="hamburger-line"></span><span class="hamburger-line"></span><span class="hamburger-line"></span></div>
+            </button>
+            <ul class="hidden md:flex space-x-6 text-lg">
+            <li><a href="/" class="nav-link hover:text-brand-blue transition duration-300">Home</a></li>
+            <li><a href="/about" class="nav-link hover:text-brand-blue transition duration-300">About</a></li>
+            <li><a href="/services" class="nav-link hover:text-brand-blue transition duration-300">Services</a></li>
+            <li><a href="/portfolio" class="nav-link hover:text-brand-blue transition duration-300">Portfolio</a></li>
+            <li><a href="/careers" class="nav-link hover:text-brand-blue transition duration-300 text-blue-400">Careers</a></li>
+            <li><a href="/contact" class="nav-link hover:text-brand-blue transition duration-300">Contact</a></li>
+            </ul>
+        </nav>
+        <div id="mobile-menu" class="md:hidden fixed top-20 left-4 right-4 bg-white/95 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl py-6 px-6 space-y-2 mobile-menu-animated z-40">
+        <a href="/" class="block py-3 px-4 rounded-xl text-gray-800 font-medium hover:bg-blue-50">Home</a>
+        <a href="/about" class="block py-3 px-4 rounded-xl text-gray-800 font-medium hover:bg-blue-50">About</a>
+        <a href="/services" class="block py-3 px-4 rounded-xl text-gray-800 font-medium hover:bg-blue-50">Services</a>
+        <a href="/portfolio" class="block py-3 px-4 rounded-xl text-gray-800 font-medium hover:bg-blue-50">Portfolio</a>
+        <a href="/careers" class="block py-3 px-4 rounded-xl text-gray-800 font-medium hover:bg-blue-50 bg-blue-50 text-blue-600">Careers</a>
+        <a href="/contact" class="block py-3 px-4 rounded-xl text-gray-800 font-medium hover:bg-blue-50">Contact</a>
+        </div>
+    </header>
+
+    <main class="pt-24">
+        <section id="careers" class="py-20 bg-gradient-to-b from-gray-50 to-white">
+            <div class="container mx-auto px-4 md:px-8 lg:px-16">
+                <div class="text-center mb-16" data-aos="fade-down">
+                    <h1 class="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-blue-600 to-purple-600 mb-6">Careers at Prince Alex Digital</h1>
+                    <p class="text-lg text-gray-600 max-w-3xl mx-auto">We're looking for passionate individuals to join us on our mission. Explore our open positions below.</p>
+                </div>
+                <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">Open Positions</h2>
+                <div id="careers-container" class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+                    <!-- Static SEO Fallback Content -->
+                    <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 border border-gray-100" data-aos="fade-up">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="text-xl font-bold">Senior Web Developer</h3>
+                                <p class="text-gray-600">Nairobi, Kenya &bull; Full-time</p>
+                            </div>
+                            <span class="text-xs font-semibold px-3 py-1 rounded-full bg-green-100 text-green-800">Open</span>
+                        </div>
+                        <p id="static-job-1" class="text-gray-700 mb-2 line-clamp-4">We are looking for an experienced Web Developer to join our team. You will be responsible for building and maintaining modern, responsive websites for our clients.</p>
+                        <button onclick="toggleDescription('static-job-1', this)" class="text-blue-600 font-semibold text-sm mb-6 hover:underline">Read More</button>
+                    <a href="/contact" class="px-6 py-3 bg-blue-600 text-white rounded-full inline-block">Learn More & Apply</a>
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 border border-gray-100" data-aos="fade-up" data-aos-delay="100">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="text-xl font-bold">Digital Marketing Specialist</h3>
+                                <p class="text-gray-600">Remote, Kenya &bull; Part-time</p>
+                            </div>
+                            <span class="text-xs font-semibold px-3 py-1 rounded-full bg-green-100 text-green-800">Open</span>
+                        </div>
+                        <p id="static-job-2" class="text-gray-700 mb-2 line-clamp-4">Join our marketing team to create and manage digital campaigns, including SEO, SEM, and social media advertising to drive client success.</p>
+                        <button onclick="toggleDescription('static-job-2', this)" class="text-blue-600 font-semibold text-sm mb-6 hover:underline">Read More</button>
+                    <a href="/contact" class="px-6 py-3 bg-blue-600 text-white rounded-full inline-block">Learn More & Apply</a>
+                    </div>
+                    <noscript>
+                      <div class="bg-white rounded-2xl shadow-lg p-8 col-span-full">
+                        <h3 class="text-2xl font-bold mb-2">Open Positions</h3>
+                        <p class="text-gray-600">Please enable JavaScript to view our current openings. You can also email your CV to <a href="mailto:info@princealex.pro" class="text-blue-600 hover:underline">info@princealex.pro</a>.</p>
+                      </div>
+                    </noscript>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 text-white py-16 relative overflow-hidden">
+        <div class="container mx-auto px-4 md:px-8 lg:px-16 relative z-10">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+                <div class="text-center md:text-left">
+                <a href="/" class="inline-flex items-center text-3xl font-black text-white mb-6">
+                        <div class="w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center mr-4"><img src="mylogo.png" alt="Prince Alex Digital – Web Design and Digital Marketing Agency in Kenya" class="w-12 h-12 object-contain"></div>
+                        Prince Alex Digital
+                    </a>
+                    <p class="text-gray-300 text-lg leading-relaxed max-w-md mx-auto md:mx-0">Prince Alex Digital provides web design, branding, and digital marketing services in Kenya.</p>
+                </div>
+                <div class="text-center md:text-left">
+                    <h3 class="text-2xl font-bold text-white mb-6">Quick Links</h3>
+                    <ul class="space-y-4">
+                    <li><a href="/" class="text-gray-300 hover:text-white transition-colors duration-300 text-lg">Home</a></li>
+                    <li><a href="/about" class="text-gray-300 hover:text-white transition-colors duration-300 text-lg">About</a></li>
+                    <li><a href="/services" class="text-gray-300 hover:text-white transition-colors duration-300 text-lg">Services</a></li>
+                    <li><a href="/portfolio" class="text-gray-300 hover:text-white transition-colors duration-300 text-lg">Portfolio</a></li>
+                    <li><a href="/careers" class="text-gray-300 hover:text-white transition-colors duration-300 text-lg">Careers</a></li>
+                    <li><a href="/contact" class="text-gray-300 hover:text-white transition-colors duration-300 text-lg">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="text-center md:text-left">
+                    <h3 class="text-2xl font-bold text-white mb-6">Follow Us</h3>
+                    <div class="flex justify-center md:justify-start space-x-6">
+                        <a href="https://www.facebook.com/princealexdigital" class="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center text-white hover:scale-110 transition-transform duration-300 shadow-lg"><i class="fab fa-facebook text-xl"></i></a>
+                    </div>
+                    <div class="mt-8">
+                        <p class="text-gray-300 text-lg mb-2">Get in touch</p>
+                        <a href="mailto:info@princealex.pro" class="text-blue-400 hover:text-blue-300 transition-colors duration-300 text-lg">info@princealex.pro</a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 text-lg">© 2026 Prince Alex Digital. All rights reserved.</p>
+                <p class="text-gray-500 text-sm">Made with ❤️ in Kenya</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, addDoc, serverTimestamp, enableIndexedDbPersistence, CACHE_SIZE_UNLIMITED } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCW0BqYOirnrPRkgvSvtSjK2-OGVTa71uQ",
+            authDomain: "princealexdigital-4848c.firebaseapp.com",
+            projectId: "princealexdigital-4848c",
+            storageBucket: "princealexdigital-4848c.firebasestorage.app",
+            messagingSenderId: "1316427677",
+            appId: "1:1316427677:web:21bdffbf2095d1d5064174"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        const appId = 'default-app-id';
+
+        enableIndexedDbPersistence(db, { cacheSizeBytes: CACHE_SIZE_UNLIMITED }).catch(err => console.log("Persistence error:", err.code));
+
+        function renderCareers(vacancies, container) {
+            if (!container) return;
+            if (vacancies.length === 0) {
+                container.innerHTML = `<div class="bg-white rounded-2xl shadow-lg p-8 col-span-full text-center"><h3 class="text-2xl font-bold mb-4">No Open Positions Currently</h3><p class="text-gray-600 mb-8">We're not actively hiring right now.</p><button onclick="openApplicationModal('general', 'General Application')" class="px-6 py-3 bg-blue-600 text-white rounded-full">Submit Your CV</button></div>`;
+            } else {
+                container.innerHTML = vacancies.map((job, index) => `
+                    <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 border border-gray-100 hover:shadow-xl transition-all" data-aos="fade-up" data-aos-delay="${index * 100}">
+                        <div class="flex justify-between items-start mb-4"><div><h3 class="text-xl font-bold">${job.title}</h3><p class="text-gray-600">${job.location} &bull; ${job.type}</p></div><span class="text-xs font-semibold px-3 py-1 rounded-full bg-green-100 text-green-800">${job.status}</span></div>
+                        <p id="desc-${job.id}" class="text-gray-700 mb-2 line-clamp-4">${job.description}</p>
+                        <button onclick="toggleDescription('desc-${job.id}', this)" class="text-blue-600 font-semibold text-sm mb-6 hover:underline">Read More</button>
+                        <button onclick="openApplicationModal('${job.id}', '${job.title}')" class="px-6 py-3 bg-blue-600 text-white rounded-full">Apply Now</button>
+                    </div>
+                `).join('');
+            }
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        function loadCareers() {
+            const container = document.getElementById('careers-container');
+            if (!container) return;
+            onSnapshot(collection(db, `artifacts/${appId}/public/data/careers`), (snapshot) => {
+                const vacancies = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter(job => job.status === 'open');
+                renderCareers(vacancies, container);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCareers();
+            onAuthStateChanged(auth, (user) => { if (!user) signInAnonymously(auth); });
+
+            // Application Form Logic
+            document.addEventListener('submit', async (e) => {
+                if (e.target && e.target.id === 'application-form') {
+                    e.preventDefault();
+                    const form = e.target;
+
+                    // Honeypot Check
+                    const honeypot = form.querySelector('input[name="_honey"]');
+                    if (honeypot && honeypot.value) return;
+
+                    // Rate Limiting (60 seconds)
+                    const lastSubmit = localStorage.getItem('lastApplicationSubmit');
+                    if (lastSubmit && (Date.now() - parseInt(lastSubmit) < 60000)) {
+                        showToast('<i class="fas fa-clock mr-2"></i> Please wait a minute before submitting another application.', 'error');
+                        return;
+                    }
+
+                    const btn = form.querySelector('button[type="submit"]');
+                    const originalText = btn.innerHTML;
+                    btn.innerHTML = 'Submitting...'; btn.disabled = true;
+                    
+                    try {
+                        localStorage.setItem('lastApplicationSubmit', Date.now().toString());
+                        await addDoc(collection(db, `artifacts/${appId}/public/data/applications`), {
+                            jobId: document.getElementById('job-id').value,
+                            jobTitle: document.getElementById('job-title').value,
+                            fullName: document.getElementById('applicant-name').value,
+                            emailAddress: document.getElementById('applicant-email').value,
+                            status: 'Received', timestamp: serverTimestamp()
+                        });
+                        
+                        // Handle FormSubmit submission via iframe
+                        const iframe = document.getElementsByName('application-form-frame')[0];
+                        
+                        const handleLoad = () => {
+                            showToast('<i class="fas fa-check-circle mr-2"></i> Application received! We will review your details and get back to you shortly.', 'success');
+                            form.reset(); 
+                            closeApplicationModal();
+                            btn.innerHTML = originalText; 
+                            btn.disabled = false;
+                            iframe.removeEventListener('load', handleLoad);
+                        };
+                        
+                        iframe.addEventListener('load', handleLoad);
+                        form.submit();
+                    } catch (error) { 
+                        showToast('<i class="fas fa-exclamation-circle mr-2"></i> Unable to submit application. Please try again or email info@princealex.pro', 'error'); 
+                        btn.innerHTML = originalText; 
+                        btn.disabled = false;
+                    }
+                }
+            });
+        });
+
+        window.showToast = (msg, type) => {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast-notification ${type} show`;
+            toast.innerHTML = msg;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 10000);
+        };
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            AOS.init({ once: true, duration: 1000 });
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+
+            // Mobile Menu
+            const btn = document.getElementById('mobile-menu-button');
+            const menu = document.getElementById('mobile-menu');
+            const backdrop = document.getElementById('mobile-menu-backdrop');
+            const icon = btn ? btn.querySelector('.hamburger-icon') : null;
+            function toggleMenu() {
+                menu.classList.toggle('show');
+                backdrop.classList.toggle('show');
+                if(icon) icon.classList.toggle('active');
+                document.body.style.overflow = menu.classList.contains('show') ? 'hidden' : '';
+            }
+            if(btn) btn.addEventListener('click', (e) => { e.stopPropagation(); toggleMenu(); });
+            if(backdrop) backdrop.addEventListener('click', toggleMenu);
+
+            // Modal Injection
+            document.getElementById('application-modal').innerHTML = `
+                <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" onclick="closeApplicationModal()"></div>
+                <div class="relative z-10 bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-8">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 id="application-modal-title" class="text-2xl font-bold">Apply</h3>
+                        <button onclick="closeApplicationModal()" class="text-gray-400 hover:text-gray-600">&times;</button>
+                    </div>
+                    <iframe name="application-form-frame" style="display:none;"></iframe>
+                    <form id="application-form" action="https://formsubmit.co/info@princealex.pro" method="POST" enctype="multipart/form-data" target="application-form-frame" class="space-y-4">
+                        <input type="hidden" name="_subject" value="New Job Application">
+                        <input type="hidden" name="_captcha" value="false">
+                        <!-- Honeypot field -->
+                        <input type="text" name="_honey" style="display:none !important" tabindex="-1" autocomplete="off">
+                        <input type="hidden" id="job-id" name="job_id">
+                        <input type="hidden" id="job-title" name="job_title">
+                        <div><label class="block font-semibold">Full Name</label><input type="text" id="applicant-name" name="name" class="w-full p-3 border rounded-xl" required></div>
+                        <div><label class="block font-semibold">Email</label><input type="email" id="applicant-email" name="email" class="w-full p-3 border rounded-xl" required></div>
+                        <div><label class="block font-semibold">CV/Resume</label><input type="file" id="resume-upload" name="attachment" class="w-full p-3 border rounded-xl" required></div>
+                        <button type="submit" class="w-full py-3 bg-blue-600 text-white font-bold rounded-xl">Submit Application</button>
+                    </form>
+                </div>
+            `;
+        });
+
+        window.openApplicationModal = (id, title) => {
+            document.getElementById('job-id').value = id;
+            document.getElementById('job-title').value = title;
+            document.getElementById('application-modal-title').innerText = `Apply for: ${title}`;
+            document.getElementById('application-modal').classList.remove('hidden');
+        };
+        window.closeApplicationModal = () => {
+            document.getElementById('application-modal').classList.add('hidden');
+            document.getElementById('application-form').reset();
+        };
+
+        window.toggleDescription = (id, btn) => {
+            const el = document.getElementById(id);
+            if (el.classList.contains('line-clamp-4')) {
+                el.classList.remove('line-clamp-4');
+                btn.innerText = 'Read Less';
+            } else {
+                el.classList.add('line-clamp-4');
+                btn.innerText = 'Read More';
+            }
+        };
+    </script>
+    <script>
+        window.chatbaseConfig = {
+            chatbotId: "R1TiiZ1iAxEt-Oy6PjEEF",
+        };
+        
+        const loadChatbase = () => {
+            if (window.chatbaseLoaded) return;
+            window.chatbaseLoaded = true;
+            const script = document.createElement('script');
+            script.src = "https://www.chatbase.co/embed.min.js";
+            script.id = "R1TiiZ1iAxEt-Oy6PjEEF";
+            document.body.appendChild(script);
+        };
+
+        ['mouseover', 'keydown', 'touchstart', 'scroll'].forEach(event => {
+            window.addEventListener(event, loadChatbase, { once: true, passive: true });
+        });
+        
+        setTimeout(loadChatbase, 5000);
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Prince Alex Digital",
+      "url": "https://www.princealex.pro"
+    }
+    </script>
+</body>
+</html>
