@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact | Prince Alex Digital</title>
+    <!-- Primary SEO -->
+    <meta name="description" content="Contact Prince Alex Digital in Kenya for web design, SEO, digital marketing, and graphic design. Get a quote in 24 hours. Email info@princealex.pro or call 0717384875.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://www.princealex.pro/contact">
+
+    <!-- Open Graph / Social -->
+    <meta property="og:title" content="Contact | Prince Alex Digital">
+    <meta property="og:description" content="Get a quote for web design, SEO, digital marketing, and graphic design in Kenya. We reply within 24 hours.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.princealex.pro/contact">
+    <meta property="og:image" content="https://www.princealex.pro/mylogo.png">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://unpkg.com">
+    <link rel="preconnect" href="https://www.gstatic.com">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"></noscript>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <style>
+        :root { --primary-color: #6366f1; --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        body { font-family: 'Inter', sans-serif; background-color: #ffffff; color: #0f172a; }
+        .glassmorphism-header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        .nav-link { position: relative; overflow: hidden; display: inline-block; }
+        .nav-link::after { content: ''; position: absolute; width: 100%; height: 2px; bottom: 0; left: 0; background: var(--gradient-primary); transform: translateX(-100%); transition: transform 0.4s; }
+        .nav-link:hover::after { transform: translateX(0%); }
+        
+        /* Mobile Menu */
+        .mobile-menu-animated { opacity: 0; visibility: hidden; transform: translateY(-20px) scale(0.95); transition: all 0.2s; display: none; }
+        .mobile-menu-animated.show { opacity: 1; visibility: visible; transform: translateY(0) scale(1); display: block; }
+        .mobile-menu-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); opacity: 0; visibility: hidden; transition: all 0.3s; z-index: 35; }
+        .mobile-menu-backdrop.show { opacity: 1; visibility: visible; }
+        .hamburger-icon { display: flex; flex-direction: column; justify-content: space-between; width: 20px; height: 16px; }
+        .hamburger-line { height: 2px; width: 100%; background: white; transition: 0.3s; }
+        .hamburger-icon.active .hamburger-line:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .hamburger-icon.active .hamburger-line:nth-child(2) { opacity: 0; }
+        .hamburger-icon.active .hamburger-line:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+        /* Floating Label */
+        .floating-input:focus ~ .floating-label, .floating-input:not(:placeholder-shown) ~ .floating-label { transform: translateY(-1.25rem) scale(0.8); background-color: white; padding: 0 0.25rem; color: #2563eb; }
+        .floating-input:not(:placeholder-shown):not(:focus) ~ .floating-label { color: #6b7280; }
+        .floating-label { transition: all 0.2s ease-in-out; }
+        
+        /* Toast */
+        .toast-notification { position: fixed; top: 20px; right: 20px; z-index: 1000; padding: 20px; border-radius: 16px; color: white; transform: translateX(400px); transition: all 0.4s; }
+        .toast-notification.show { transform: translateX(0); }
+        .toast-notification.success { background: linear-gradient(135deg, #10b981, #059669); }
+        .toast-notification.error { background: linear-gradient(135deg, #ef4444, #dc2626); }
+    </style>
+</head>
+<body class="bg-white text-gray-800 overflow-x-hidden">
+    <div id="mobile-menu-backdrop" class="mobile-menu-backdrop"></div>
+    <div id="toast-container"></div>
+
+    <header class="glassmorphism-header text-white p-4 shadow-lg fixed w-full z-50">
+        <nav class="container mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <img src="mylogo.png" alt="Prince Alex Digital – Web Design and Digital Marketing Agency in Kenya" class="rounded-full w-14 h-14 object-contain">
+                <span class="text-2xl font-bold text-white">Prince Alex Digital</span>
+            </div>
+            <button id="mobile-menu-button" class="ml-2 block md:hidden relative w-10 h-10 flex items-center justify-center rounded-xl bg-white/10 backdrop-blur-sm border border-white/20">
+                <div class="hamburger-icon"><span class="hamburger-line"></span><span class="hamburger-line"></span><span class="hamburger-line"></span></div>
+            </button>
+            <ul class="hidden md:flex space-x-6 text-lg">
+            <li><a href="/" class="nav-link hover:text-brand-blue transition duration-300">Home</a></li>
+            <li><a href="/about" class="nav-link hover:text-brand-blue transition duration-300">About</a></li>
+            <li><a href="/services" class="nav-link hover:text-brand-blue transition duration-300">Services</a></li>
+            <li><a href="/portfolio" class="nav-link hover:text-brand-blue transition duration-300">Portfolio</a></li>
+            <li><a href="/careers" class="nav-link hover:text-brand-blue transition duration-300">Careers</a></li>
+            <li><a href="/contact" class="nav-link hover:text-brand-blue transition duration-300 text-blue-400">Contact</a></li>
+            </ul>
+        </nav>
+        <div id="mobile-menu" class="md:hidden fixed top-20 left-4 right-4 bg-white/95 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl py-6 px-6 space-y-2 mobile-menu-animated z-40">
+        <a href="/" class="block py-3 px-4 rounded-xl text-gray-800 font-medium hover:bg-blue-50">Home</a>
+        <a href="/about" class="block py-3 px-4 rounded-xl text-gray-800 font-medium hover:bg-blue-50">About</a>
+        <a href="/services" class="block py-3 px-4 rounded-xl text-gray-800 font-medium hover:bg-blue-50">Services</a>
+        <a href="/portfolio" class="block py-3 px-4 rounded-xl text-gray-800 font-medium hover:bg-blue-50">Portfolio</a>
+        <a href="/careers" class="block py-3 px-4 rounded-xl text-gray-800 font-medium hover:bg-blue-50">Careers</a>
+        <a href="/contact" class="block py-3 px-4 rounded-xl text-gray-800 font-medium hover:bg-blue-50 bg-blue-50 text-blue-600">Contact</a>
+        </div>
+    </header>
+
+    <main class="pt-24">
+        <section id="contact" class="py-20 bg-gradient-to-b from-white to-gray-50">
+            <div class="container mx-auto px-4 md:px-8 lg:px-16">
+                <div class="text-center mb-16" data-aos="fade-down">
+                    <h1 class="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-blue-600 to-purple-600 mb-6">Contact Prince Alex Digital</h1>
+                    <p class="text-lg text-gray-600 max-w-3xl mx-auto">Tell us what you need—web design, SEO, digital marketing, or graphics. We respond within 24 hours.</p>
+                    <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center items-center">
+                        <a href="tel:+254717384875" class="inline-flex items-center px-6 py-3 rounded-full bg-slate-900 text-white font-semibold hover:bg-slate-800 transition-all hover:-translate-y-1 shadow-lg"><i data-lucide="phone" class="w-5 h-5 mr-2"></i>Call Now</a>
+                        <a href="mailto:info@princealex.pro" class="inline-flex items-center px-6 py-3 rounded-full bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-all hover:-translate-y-1 shadow-lg"><i data-lucide="mail" class="w-5 h-5 mr-2"></i>Email Us</a>
+                        <a href="https://wa.me/254717384875?text=Hi%20Prince%20Alex%20Digital%2C%20I%27d%20like%20a%20quote%20for..." class="inline-flex items-center px-6 py-3 rounded-full bg-green-600 text-white font-semibold hover:bg-green-700 transition-all hover:-translate-y-1 shadow-lg"><i class="fab fa-whatsapp text-xl mr-2"></i>WhatsApp</a>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                    <!-- Contact Information -->
+                    <div class="bg-white rounded-2xl shadow-xl p-6 md:p-10 relative overflow-hidden border border-gray-100" data-aos="fade-right" data-aos-duration="1000">
+                        <!-- Background decoration -->
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full -translate-y-16 translate-x-16"></div>
+                        <div class="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full translate-y-12 -translate-x-12"></div>
+                        
+                        <div class="relative z-10">
+                            <h2 class="text-2xl font-bold text-slate-900 mb-8">Contact Information</h2>
+                            <div class="space-y-8">
+                                <div class="flex items-center group">
+                                    <div class="p-4 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-500 text-white mr-6 group-hover:scale-110 transition-transform duration-300">
+                                        <i data-lucide="mail" class="w-6 h-6"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-gray-800 text-lg">Email</p>
+                                        <a href="mailto:info@princealex.pro" class="text-gray-600 hover:text-blue-600 transition-colors duration-300 text-base">info@princealex.pro</a>
+                                    </div>
+                                </div>
+                                <div class="flex items-center group">
+                                    <div class="p-4 rounded-2xl bg-gradient-to-r from-green-500 to-blue-500 text-white mr-6 group-hover:scale-110 transition-transform duration-300">
+                                        <i data-lucide="phone" class="w-6 h-6"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-gray-800 text-lg">Phone</p>
+                                        <a href="tel:+254717384875" class="text-gray-600 hover:text-green-600 transition-colors duration-300 text-base">0717384875</a>
+                                    </div>
+                                </div>
+                                <div class="flex items-center group">
+                                    <div class="p-4 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 text-white mr-6 group-hover:scale-110 transition-transform duration-300">
+                                        <i data-lucide="map-pin" class="w-6 h-6"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-gray-800 text-lg">Location</p>
+                                        <p class="text-gray-600 text-base">Kenya</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center group">
+                                    <div class="p-4 rounded-2xl bg-gradient-to-r from-orange-500 to-red-500 text-white mr-6 group-hover:scale-110 transition-transform duration-300">
+                                        <i data-lucide="clock" class="w-6 h-6"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-gray-800 text-lg">Business Hours</p>
+                                        <p class="text-gray-600 text-base">Mon – Fri: 8:00 AM – 6:00 PM</p>
+                                        <p class="text-gray-600 text-base">Sat: 9:00 AM – 2:00 PM</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <h2 class="text-2xl font-bold text-slate-900 mb-6 mt-12">Find Us</h2>
+                            <div class="w-full h-80 bg-gray-100 rounded-2xl overflow-hidden shadow-inner">
+                                <iframe
+                                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15959.043590012224!2d36.81228225!3d-1.286389!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f1172d84d0d5d%3A0xf57297e7f6d3d9a!2sNairobi%2C%20Kenya!5e0!3m2!1sen!2sus!4m2!3m1!1s0x182f1172d84d0d5d%3A0xf57297e7f6d3d9a"
+                                    width="100%"
+                                    height="100%"
+                                    style="border:0;"
+                                    allowfullscreen=""
+                                    loading="lazy"
+                                    referrerpolicy="no-referrer-when-downgrade">
+                                </iframe>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Form -->
+                    <div class="bg-white rounded-2xl shadow-xl p-6 md:p-10 relative overflow-hidden border border-gray-100" data-aos="fade-left" data-aos-duration="1000">
+                        <!-- Background decoration -->
+                        <div class="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full -translate-y-16 -translate-x-16"></div>
+                        <div class="absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full translate-y-12 translate-x-12"></div>
+                        
+                        <div class="relative z-10">
+                            <h2 class="text-2xl font-bold text-slate-900 mb-4">Send us a Message</h2>
+                            <p class="text-gray-600 mb-8 text-base">Fill out the form below and we'll get back to you within 24 hours.</p>
+                            
+                            <iframe name="formsubmit-frame" style="display:none;"></iframe>
+                            <form id="contact-form" action="https://formsubmit.co/info@princealex.pro" method="POST" target="formsubmit-frame" class="space-y-8">
+                                <input type="hidden" name="_subject" value="New Contact Message">
+                                <input type="hidden" name="_captcha" value="false">
+                                <!-- Honeypot field (hidden) -->
+                                <input type="text" name="website_hp" style="display:none !important" tabindex="-1" autocomplete="off">
+                                <div class="relative floating-label-group">
+                                    <input type="text" id="full-name" name="name" autocomplete="name" class="floating-input w-full py-3 px-4 text-gray-700 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500 transition-all duration-300 text-base" placeholder=" " required>
+                                    <label for="full-name" class="floating-label absolute top-3 left-4 text-gray-500 text-base pointer-events-none origin-top-left">Full Name *</label>
+                                </div>
+                                <div class="relative floating-label-group">
+                                    <input type="email" id="email-address" name="email" autocomplete="email" class="floating-input w-full py-3 px-4 text-gray-700 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500 transition-all duration-300 text-base" placeholder=" " required>
+                                    <label for="email-address" class="floating-label absolute top-3 left-4 text-gray-500 text-base pointer-events-none origin-top-left">Email Address *</label>
+                                </div>
+                                <div class="relative">
+                                    <select id="topic" name="topic" class="w-full py-3 px-4 text-gray-700 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500 transition-all duration-300 text-base appearance-none" required>
+                                        <option value="" disabled selected>What do you need?</option>
+                                        <option>Website Design / Development</option>
+                                        <option>SEO</option>
+                                        <option>Digital Marketing</option>
+                                        <option>Graphic Design</option>
+                                        <option>Other</option>
+                                    </select>
+                                    <div class="absolute inset-y-0 right-0 flex items-center px-6 pointer-events-none text-gray-500">
+                                        <i data-lucide="chevron-down" class="w-5 h-5"></i>
+                                    </div>
+                                </div>
+                                <div class="relative floating-label-group">
+                                    <textarea id="project-details" name="message" rows="6" class="floating-input w-full py-3 px-4 text-gray-700 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500 transition-all duration-300 text-base resize-none" placeholder=" " required></textarea>
+                                    <label for="project-details" class="floating-label absolute top-3 left-4 text-gray-500 text-base pointer-events-none origin-top-left">Project Details *</label>
+                                </div>
+                                <button type="submit" class="group relative w-full py-3 px-6 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-lg font-bold rounded-2xl shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1">
+                                    <span class="relative z-10 flex items-center justify-center">
+                                        Send Message
+                                        <i data-lucide="send" class="w-5 h-5 ml-3 group-hover:translate-x-1 transition-transform duration-300"></i>
+                                    </span>
+                                    <div class="absolute inset-0 bg-gradient-to-r from-blue-700 to-purple-700 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 text-white py-16 relative overflow-hidden">
+        <div class="container mx-auto px-4 md:px-8 lg:px-16 relative z-10">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+                <div class="text-center md:text-left">
+                <a href="/" class="inline-flex items-center text-3xl font-black text-white mb-6">
+                        <div class="w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center mr-4"><img src="mylogo.png" alt="Prince Alex Digital – Web Design and Digital Marketing Agency in Kenya" class="w-12 h-12 object-contain"></div>
+                        Prince Alex Digital
+                    </a>
+                    <p class="text-gray-300 text-lg leading-relaxed max-w-md mx-auto md:mx-0">Prince Alex Digital provides web design, branding, and digital marketing services in Kenya.</p>
+                </div>
+                <div class="text-center md:text-left">
+                    <h3 class="text-2xl font-bold text-white mb-6">Quick Links</h3>
+                    <ul class="space-y-4">
+                    <li><a href="/" class="text-gray-300 hover:text-white transition-colors duration-300 text-lg">Home</a></li>
+                    <li><a href="/about" class="text-gray-300 hover:text-white transition-colors duration-300 text-lg">About</a></li>
+                    <li><a href="/services" class="text-gray-300 hover:text-white transition-colors duration-300 text-lg">Services</a></li>
+                    <li><a href="/portfolio" class="text-gray-300 hover:text-white transition-colors duration-300 text-lg">Portfolio</a></li>
+                    <li><a href="/careers" class="text-gray-300 hover:text-white transition-colors duration-300 text-lg">Careers</a></li>
+                    <li><a href="/contact" class="text-gray-300 hover:text-white transition-colors duration-300 text-lg">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="text-center md:text-left">
+                    <h3 class="text-2xl font-bold text-white mb-6">Follow Us</h3>
+                    <div class="flex justify-center md:justify-start space-x-6">
+                        <a href="https://www.facebook.com/princealexdigital" class="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center text-white hover:scale-110 transition-transform duration-300 shadow-lg"><i class="fab fa-facebook text-xl"></i></a>
+                    </div>
+                    <div class="mt-8">
+                        <p class="text-gray-300 text-lg mb-2">Get in touch</p>
+                        <a href="mailto:info@princealex.pro" class="text-blue-400 hover:text-blue-300 transition-colors duration-300 text-lg">info@princealex.pro</a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 text-lg">© 2026 Prince Alex Digital. All rights reserved.</p>
+                <p class="text-gray-500 text-sm">Made with ❤️ in Kenya</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, enableIndexedDbPersistence, CACHE_SIZE_UNLIMITED } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCW0BqYOirnrPRkgvSvtSjK2-OGVTa71uQ",
+            authDomain: "princealexdigital-4848c.firebaseapp.com",
+            projectId: "princealexdigital-4848c",
+            storageBucket: "princealexdigital-4848c.firebasestorage.app",
+            messagingSenderId: "1316427677",
+            appId: "1:1316427677:web:21bdffbf2095d1d5064174"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        const appId = 'default-app-id';
+
+        enableIndexedDbPersistence(db, { cacheSizeBytes: CACHE_SIZE_UNLIMITED }).catch(err => console.log("Persistence error:", err.code));
+
+        document.addEventListener('DOMContentLoaded', () => {
+            onAuthStateChanged(auth, (user) => { if (!user) signInAnonymously(auth); });
+
+            const contactForm = document.getElementById('contact-form');
+            if (contactForm) {
+                contactForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+
+                    // --- SPAM PROTECTION ---
+                    // 1. Honeypot Check
+                    const honeypot = contactForm.querySelector('input[name="website_hp"]');
+                    if (honeypot && honeypot.value) return; // Silent block
+
+                    // 2. Cooldown Check (60 seconds)
+                    const lastSubmit = localStorage.getItem('lastContactSubmit');
+                    if (lastSubmit && (Date.now() - parseInt(lastSubmit) < 60000)) {
+                        showToast('<i class="fas fa-clock mr-2"></i> Please wait 60 seconds before sending another message.', 'error');
+                        return;
+                    }
+
+                    // 3. Content Checks
+                    const msg = document.getElementById('project-details').value.trim();
+                    const email = document.getElementById('email-address').value.trim();
+
+                    if (msg.length < 10) { showToast('<i class="fas fa-pen mr-2"></i> Message is too short. Please write at least 10 characters.', 'error'); return; }
+                    if ((msg.match(/https?:\/\//gi) || []).length > 1) { showToast('<i class="fas fa-link mr-2"></i> Message contains too many links.', 'error'); return; }
+                    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showToast('<i class="fas fa-envelope mr-2"></i> Please enter a valid email address.', 'error'); return; }
+
+                    // Set cooldown timestamp
+                    localStorage.setItem('lastContactSubmit', Date.now().toString());
+                    // -----------------------
+
+                    const btn = contactForm.querySelector('button[type="submit"]');
+                    const originalText = btn.innerHTML;
+                    btn.innerHTML = 'Sending...'; btn.disabled = true;
+                    try {
+                        await addDoc(collection(db, `artifacts/${appId}/public/data/messages`), {
+                            fullName: document.getElementById('full-name').value,
+                            emailAddress: document.getElementById('email-address').value,
+                            topic: document.getElementById('topic').value,
+                            projectDetails: document.getElementById('project-details').value,
+                            timestamp: serverTimestamp()
+                        });
+                        
+                        // Handle FormSubmit submission via iframe
+                        const iframe = document.getElementsByName('formsubmit-frame')[0];
+                        
+                        const handleLoad = () => {
+                            showToast('<i class="fas fa-check-circle mr-2"></i> Thank you! Your message has been sent. We will get back to you within 24 hours.', 'success');
+                            contactForm.reset();
+                            btn.innerHTML = originalText; 
+                            btn.disabled = false;
+                            iframe.removeEventListener('load', handleLoad);
+                        };
+                        
+                        iframe.addEventListener('load', handleLoad);
+                        contactForm.submit();
+                    } catch (error) { 
+                        showToast('<i class="fas fa-exclamation-circle mr-2"></i> Unable to send message. Please try again or email info@princealex.pro', 'error'); 
+                        btn.innerHTML = originalText; 
+                        btn.disabled = false;
+                    }
+                });
+            }
+        });
+
+        window.showToast = (msg, type) => {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast-notification ${type} show`;
+            toast.innerHTML = msg;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 10000);
+        };
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            AOS.init({ once: true, duration: 1000 });
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+
+            // Mobile Menu
+            const btn = document.getElementById('mobile-menu-button');
+            const menu = document.getElementById('mobile-menu');
+            const backdrop = document.getElementById('mobile-menu-backdrop');
+            const icon = btn ? btn.querySelector('.hamburger-icon') : null;
+            function toggleMenu() {
+                menu.classList.toggle('show');
+                backdrop.classList.toggle('show');
+                if(icon) icon.classList.toggle('active');
+                document.body.style.overflow = menu.classList.contains('show') ? 'hidden' : '';
+            }
+            if(btn) btn.addEventListener('click', (e) => { e.stopPropagation(); toggleMenu(); });
+            if(backdrop) backdrop.addEventListener('click', toggleMenu);
+        });
+    </script>
+    <script>
+        window.chatbaseConfig = {
+            chatbotId: "R1TiiZ1iAxEt-Oy6PjEEF",
+        };
+        
+        const loadChatbase = () => {
+            if (window.chatbaseLoaded) return;
+            window.chatbaseLoaded = true;
+            const script = document.createElement('script');
+            script.src = "https://www.chatbase.co/embed.min.js";
+            script.id = "R1TiiZ1iAxEt-Oy6PjEEF";
+            document.body.appendChild(script);
+        };
+
+        ['mouseover', 'keydown', 'touchstart', 'scroll'].forEach(event => {
+            window.addEventListener(event, loadChatbase, { once: true, passive: true });
+        });
+        
+        setTimeout(loadChatbase, 5000);
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Prince Alex Digital",
+      "url": "https://www.princealex.pro",
+      "logo": "https://www.princealex.pro/mylogo.png",
+      "contactPoint": [{
+        "@type": "ContactPoint",
+        "telephone": "+254717384875",
+        "contactType": "customer service",
+        "email": "info@princealex.pro",
+        "areaServed": "KE",
+        "availableLanguage": ["en"]
+      }]
+    }
+    </script>
+</body>
+</html>
