@@ -8,6 +8,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <!-- Quill Rich Text Editor -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
     <style>
         :root {
             --primary: #6B0F1A;
@@ -454,7 +458,7 @@
                         </div>
                         <div class="form-group">
                             <label>Email Message</label>
-                            <textarea id="message" rows="10" placeholder="Dear Client, ..." required></textarea>
+                            <div id="editor-container" style="height: 300px; background: white;"></div>
                         </div>
                         <button type="submit" class="btn-send">
                             <i class="fas fa-paper-plane"></i> Send Email
@@ -528,6 +532,20 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
+
+        // Initialize Quill Editor
+        const quill = new Quill('#editor-container', {
+            theme: 'snow',
+            placeholder: 'Dear Client, ...',
+            modules: {
+                toolbar: [
+                    ['bold', 'italic', 'underline'],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'header': [1, 2, 3, false] }],
+                    ['link', 'clean']
+                ]
+            }
+        });
 
         let historyUnsubscribe = null;
         let historyCache = [];
@@ -622,6 +640,13 @@
         // Saving to Mail Collection (Similar to Admin pattern)
         document.getElementById('emailForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            // Validate Quill Content
+            if (quill.getText().trim().length === 0) {
+                showToast("Please enter an email message.", "error");
+                return;
+            }
+
             const loader = document.getElementById('loader');
             const sendBtn = e.target.querySelector('.btn-send');
             sendBtn.disabled = true;
@@ -629,13 +654,13 @@
 
             const recipient = document.getElementById('recipient').value;
             const subject = document.getElementById('subject').value;
-            const message = document.getElementById('message').value;
+            const message = quill.root.innerHTML;
 
             // Construct HTML content for the email
             const htmlContent = `
                 <div style="font-family: 'Poppins', sans-serif; color: #333; line-height: 1.6;">
                     <h2 style="color: #6B0F1A; border-bottom: 2px solid #C9A24D; padding-bottom: 10px;">${subject}</h2>
-                    <p>${message.replace(/\n/g, '<br>')}</p>
+                    <div style="font-size: 1rem;">${message}</div>
                     <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; font-size: 0.9em; color: #555;">
                         <p style="margin: 0; font-weight: bold; color: #6B0F1A;">Prince Alex Digital</p>
                         <p style="margin: 5px 0; font-size: 0.85em;">
@@ -668,6 +693,7 @@
                 await addDoc(collection(db, "mail"), mailData);
                 showToast("Email queued successfully!");
                 document.getElementById('emailForm').reset();
+                quill.setContents([]); // Clear editor content
             } catch (error) {
                 console.error("Error saving email: ", error);
                 showToast("Failed to queue email. Check console.", 'error');
@@ -843,5 +869,4 @@
     </script>
 
 </body>
-
 </html>
