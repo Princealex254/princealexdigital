@@ -321,15 +321,15 @@
         }
 
         // Portfolio management
-        async function addPortfolioItem(title, description, imageUrl, link, linkText) {
+        async function addPortfolioItem(title, description, link, linkText, status) {
             try {
                 showLoading();
                 await addDoc(collection(db, `artifacts/${appId}/public/data/portfolio`), {
                     title: title,
                     description: description,
-                    imageUrl: imageUrl,
                     link: link,
                     linkText: linkText || "View Project",
+                    status: status || 'show',
                     createdAt: serverTimestamp()
                 });
                 showMessage("Portfolio item added successfully!", "success");
@@ -355,6 +355,24 @@
             }
         }
 
+        async function togglePortfolioStatus(id, currentStatus) {
+            const newStatus = currentStatus === 'show' ? 'hide' : 'show';
+            if (!confirm(`Are you sure you want to ${newStatus === 'hide' ? 'hide' : 'show'} this project?`)) return;
+
+            try {
+                showLoading();
+                await updateDoc(doc(db, `artifacts/${appId}/public/data/portfolio`, id), {
+                    status: newStatus
+                });
+                showMessage(`Project status changed to ${newStatus}.`, "success");
+            } catch (error) {
+                console.error("Error toggling portfolio status:", error);
+                showMessage("Failed to change status: " + error.message, "error");
+            } finally {
+                hideLoading();
+            }
+        }
+
         function loadPortfolio() {
             const portfolioRef = collection(db, `artifacts/${appId}/public/data/portfolio`);
             const q = query(portfolioRef, orderBy('createdAt', 'desc'));
@@ -375,6 +393,11 @@
                 
                 snapshot.forEach((docSnap) => {
                     const data = docSnap.data();
+                    const status = data.status || 'show';
+                    const toggleButtonText = status === 'show' ? 'Hide' : 'Show';
+                    const toggleButtonIcon = status === 'show' ? 'fa-eye-slash' : 'fa-eye';
+                    const toggleButtonColor = status === 'show' ? 'bg-gray-500 hover:bg-gray-600' : 'bg-green-500 hover:bg-green-600';
+                    
                     const item = document.createElement('div');
                     item.className = 'bg-white rounded-xl shadow-lg p-6 card-hover fade-in';
                     item.innerHTML = `
@@ -386,7 +409,10 @@
                                 </div>
                             ` : ''}
                             <div class="flex-1">
-                                <h3 class="text-xl font-bold text-gray-800 mb-2">${data.title}</h3>
+                                <div class="flex justify-between items-start mb-2">
+                                    <h3 class="text-xl font-bold text-gray-800">${data.title}</h3>
+                                    <span class="px-3 py-1 text-xs font-semibold rounded-full ${status === 'show' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">${status}</span>
+                                </div>
                                 <p class="text-gray-600 mb-4">${data.description}</p>
                                 <div class="flex flex-col sm:flex-row gap-3">
                                     <a href="${data.link}" target="_blank" 
@@ -394,10 +420,15 @@
                                         <i class="fas fa-external-link-alt mr-2"></i>
                                         ${data.linkText}
                                     </a>
-                                    <button onclick="editPortfolioItem('${docSnap.id}', '${JSON.stringify(data.title).slice(1,-1)}', '${JSON.stringify(data.description).slice(1,-1)}', '${data.imageUrl}', '${data.link}', '${data.linkText}')" 
+                                    <button onclick="editPortfolioItem('${docSnap.id}', '${JSON.stringify(data.title).slice(1,-1)}', '${JSON.stringify(data.description).slice(1,-1)}', '${data.link}', '${data.linkText}', '${status}')" 
                                             class="inline-flex items-center px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors">
                                         <i class="fas fa-edit mr-2"></i>
                                         Edit
+                                    </button>
+                                    <button onclick="togglePortfolioStatus('${docSnap.id}', '${status}')" 
+                                            class="inline-flex items-center px-4 py-2 ${toggleButtonColor} text-white rounded-lg transition-colors">
+                                        <i class="fas ${toggleButtonIcon} mr-2"></i>
+                                        ${toggleButtonText}
                                     </button>
                                     <button onclick="deletePortfolioItem('${docSnap.id}')" 
                                             class="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
@@ -830,10 +861,10 @@
                 e.preventDefault();
                 const title = e.target.title.value;
                 const description = e.target.description.value;
-                const imageUrl = e.target.imageUrl.value;
                 const link = e.target.link.value;
                 const linkText = e.target.linkText.value;
-                addPortfolioItem(title, description, imageUrl, link, linkText);
+                const status = e.target.status.value;
+                addPortfolioItem(title, description, link, linkText, status);
             });
 
             // Testimonial form
@@ -899,13 +930,13 @@
         });
 
         // Edit functions
-        async function editPortfolioItem(id, title, description, imageUrl, link, linkText) {
+        async function editPortfolioItem(id, title, description, link, linkText, status) {
             // Populate the form with existing data
             document.getElementById('portfolio-form').title.value = title;
             document.getElementById('portfolio-form').description.value = description;
-            document.getElementById('portfolio-form').imageUrl.value = imageUrl || '';
             document.getElementById('portfolio-form').link.value = link;
             document.getElementById('portfolio-form').linkText.value = linkText || 'View Project';
+            document.getElementById('portfolio-form').status.value = status || 'show';
             
             // Change form button text and add update functionality
             const submitBtn = document.querySelector('#portfolio-form button[type="submit"]');
@@ -922,18 +953,18 @@
                 e.preventDefault();
                 const updatedTitle = newForm.title.value;
                 const updatedDescription = newForm.description.value;
-                const updatedImageUrl = newForm.imageUrl.value;
                 const updatedLink = newForm.link.value;
                 const updatedLinkText = newForm.linkText.value;
+                const updatedStatus = newForm.status.value;
                 
                 try {
                     showLoading();
                     await updateDoc(doc(db, `artifacts/${appId}/public/data/portfolio`, id), {
                         title: updatedTitle,
                         description: updatedDescription,
-                        imageUrl: updatedImageUrl,
                         link: updatedLink,
                         linkText: updatedLinkText,
+                        status: updatedStatus,
                         updatedAt: serverTimestamp()
                     });
                     showMessage("Portfolio item updated successfully!", "success");
@@ -1003,6 +1034,7 @@
         window.deletePortfolioItem = deletePortfolioItem;
         window.deleteTestimonial = deleteTestimonial;
         window.editPortfolioItem = editPortfolioItem;
+        window.togglePortfolioStatus = togglePortfolioStatus;
         window.editTestimonial = editTestimonial;
         window.deleteMessage = deleteMessage;
         window.editJobPosting = editJobPosting;
@@ -1297,12 +1329,6 @@
                                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                                            placeholder="Enter project title">
                                 </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Image URL</label>
-                                    <input name="imageUrl" type="url" required 
-                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                                           placeholder="https://example.com/image.jpg">
-                                </div>
                                 <div class="md:col-span-2">
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
                                     <textarea name="description" rows="3" required 
@@ -1320,6 +1346,13 @@
                                     <input name="linkText" type="text" 
                                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                                            placeholder="View Project" value="View Project">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Display Status</label>
+                                    <select name="status" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                                        <option value="show">Show on Website</option>
+                                        <option value="hide">Hide from Website</option>
+                                    </select>
                                 </div>
                             </div>
                             <button type="submit" class="mt-6 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors">
