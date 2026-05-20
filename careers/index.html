@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Careers – Jobs at Prince Alex Digital (Kenya)</title>
     <meta name="description" content="Join Prince Alex Digital. Explore open roles in web design, graphic design, digital marketing, and social media. Apply online and submit your CV.">
     <meta name="robots" content="index, follow">
@@ -85,7 +85,7 @@
         </div>
     </header>
 
-    <main class="pt-24">
+    <main class="pt-24 overflow-x-hidden">
         <section class="py-24 bg-gradient-to-br from-blue-50 via-white to-purple-50">
             <div class="container mx-auto px-6 text-center max-w-4xl" data-aos="fade-down">
                 <h1 class="text-4xl md:text-6xl font-black mb-6">
@@ -386,7 +386,7 @@
         };
     </script>
     <script>
-    fetch("chat-widget.html")
+    fetch("./chat-widget.html")
       .then(response => response.text())
       .then(data => {
         document.getElementById("chat-widget").innerHTML = data;
