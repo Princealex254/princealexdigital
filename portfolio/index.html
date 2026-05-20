@@ -11,9 +11,12 @@
     <link rel="preconnect" href="https://cdn.tailwindcss.com">
     <link rel="preconnect" href="https://unpkg.com">
     <link rel="preconnect" href="https://www.gstatic.com">
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"></noscript>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"></noscript>
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <style>
         :root { --primary-color: #6366f1; --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
@@ -43,6 +46,477 @@
         .hamburger-icon.active .hamburger-line:nth-child(1) { transform: translateY(7px) rotate(45deg); }
         .hamburger-icon.active .hamburger-line:nth-child(2) { opacity: 0; }
         .hamburger-icon.active .hamburger-line:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+        
+        :root {
+            --chat-primary: #1e3a8a;
+            --chat-accent: #f59e0b;
+            --chat-bg: #f8fafc;
+            --chat-text: #1e293b;
+            --chat-white: #ffffff;
+            --chat-user-msg: #dcfce7;
+            --chat-bot-msg: #f1f5f9;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+        }
+        
+        * { box-sizing: border-box; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        
+        /* Floating Toggle Button */
+        #chat-btn {
+          position: fixed;
+          bottom: 25px;
+          right: 25px;
+          background: var(--chat-primary);
+          color: var(--chat-white);
+          border: none;
+          width: 60px;
+          height: 60px;
+          border-radius: 50%;
+          cursor: pointer;
+          font-size: 24px;
+          z-index: 1000;
+          box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+          transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        
+        #chat-btn:hover {
+          transform: scale(1.1);
+          background: #1e40af;
+          box-shadow: 0 0 20px rgba(30, 58, 138, 0.5);
+        }
+        
+        .pulse {
+          animation: pulse-animation 2s infinite;
+        }
+        
+        @keyframes pulse-animation {
+          0% { box-shadow: 0 0 0 0px rgba(30, 58, 138, 0.7); }
+          70% { box-shadow: 0 0 0 15px rgba(30, 58, 138, 0); }
+          100% { box-shadow: 0 0 0 0px rgba(30, 58, 138, 0); }
+        }
+        
+        /* Chat Box */
+        #chat-box {
+          position: fixed;
+          bottom: 100px;
+          right: 25px;
+          width: 350px;
+          height: 500px;
+          max-height: calc(100dvh - 120px);
+          background: var(--glass-bg);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          border-radius: 16px;
+          box-shadow: 0 10px 40px rgba(0,0,0,0.15), 0 0 30px rgba(37, 99, 235, 0.15);
+          display: flex; /* Always flex, visibility handled by opacity/pointer-events */
+          flex-direction: column;
+          overflow: hidden;
+          z-index: 1000;
+          /* animation: slideIn 0.3s ease-out, glow-pulse 4s infinite ease-in-out; */ /* slideIn replaced by CSS transition */
+          animation: glow-pulse 4s infinite ease-in-out; /* Keep only the glow animation */
+          border: 1px solid rgba(255, 255, 255, 0.3);
+        
+          /* Initial hidden state for smooth transition */
+          opacity: 0;
+          transform: translateY(20px) scale(0.95); /* Start slightly down and smaller */
+          pointer-events: none; /* Prevents interaction when hidden */
+          transform-origin: bottom right; /* Origin for scale and slide */
+          transition: opacity 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), /* Spring-like ease-out */
+                      transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Spring-like ease-out */
+        }
+        
+        /* Class to make chat box visible and interactive */
+        #chat-box.chat-box-active {
+          opacity: 1;
+          transform: translateY(0) scale(1); /* End at original position and size */
+          pointer-events: auto; /* Allow interaction when active */
+        }
+        
+        /* AI Floating Particles Background */
+        #chat-particles-container {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          overflow: hidden; /* Keeps particles within the chatbox bounds */
+          z-index: 0; /* Ensures it's behind other content */
+          pointer-events: none; /* Prevents it from blocking clicks on chatbox content */
+        }
+        
+        #chat-particles-container::before,
+        #chat-particles-container::after {
+          content: '';
+          position: absolute;
+          border-radius: 50%;
+          filter: blur(40px); /* Soft blur effect */
+          opacity: 0.3; /* Subtle presence */
+          z-index: -1; /* Ensures they are behind the container's content */
+        }
+        
+        /* Blob 1 - Blue */
+        #chat-particles-container::before {
+          background: rgba(37, 99, 235, 0.7); /* Primary blue */
+          width: 180px;
+          height: 180px;
+          top: 10%;
+          left: 15%;
+          animation: blob-move-1 15s infinite ease-in-out alternate;
+        }
+        
+        /* Blob 2 - Purple */
+        #chat-particles-container::after {
+          background: rgba(124, 58, 237, 0.7); /* A complementary purple */
+          width: 220px;
+          height: 220px;
+          bottom: 15%;
+          right: 10%;
+          animation: blob-move-2 18s infinite ease-in-out alternate-reverse;
+        }
+        
+        @keyframes blob-move-1 {
+          0% { transform: translate(0, 0) scale(1); opacity: 0.3; }
+          25% { transform: translate(50px, -30px) scale(1.1); opacity: 0.4; }
+          50% { transform: translate(100px, 50px) scale(0.9); opacity: 0.25; }
+          75% { transform: translate(20px, 80px) scale(1.05); opacity: 0.35; }
+          100% { transform: translate(0, 0) scale(1); opacity: 0.3; }
+        }
+        
+        @keyframes blob-move-2 {
+          0% { transform: translate(0, 0) scale(1); opacity: 0.25; }
+          30% { transform: translate(-70px, 40px) scale(1.15); opacity: 0.35; }
+          60% { transform: translate(-20px, -60px) scale(0.95); opacity: 0.2; }
+          100% { transform: translate(0, 0) scale(1); opacity: 0.25; }
+        }
+        
+        /* Removed @keyframes slideIn as its functionality is now handled by CSS transitions */
+        @keyframes glow-pulse {
+          0% { box-shadow: 0 10px 40px rgba(0,0,0,0.15), 0 0 20px rgba(37, 99, 235, 0.1); }
+          50% { box-shadow: 0 10px 40px rgba(0,0,0,0.15), 0 0 45px rgba(37, 99, 235, 0.25); }
+          100% { box-shadow: 0 10px 40px rgba(0,0,0,0.15), 0 0 20px rgba(37, 99, 235, 0.1); }
+        }
+        
+        #chat-header {
+          background: linear-gradient(135deg, var(--chat-primary) 0%, #2563eb 100%);
+          color: var(--chat-white);
+          padding: 15px 20px;
+          font-weight: 700;
+          display: flex;
+          position: relative; /* Needed for z-index to work */
+          z-index: 1; /* Ensures it's above the particles */
+          justify-content: space-between;
+          align-items: center;
+        }
+        
+        .header-left {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+        
+        .bot-avatar {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 2px solid rgba(255, 255, 255, 0.2);
+          box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+          animation: avatar-glow 3s infinite ease-in-out;
+        }
+        
+        @keyframes avatar-glow {
+          0%, 100% { box-shadow: 0 0 10px rgba(255, 255, 255, 0.3); }
+          50% { box-shadow: 0 0 20px rgba(255, 255, 255, 0.6); }
+        }
+        
+        .header-info h3 {
+          margin: 0;
+          font-size: 1.1rem;
+          background: linear-gradient(to right, #ffffff, #93c5fd);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          font-weight: 800;
+          letter-spacing: 0.5px;
+        }
+        
+        .header-info small {
+          font-size: 0.75rem;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          opacity: 0.9;
+        }
+        
+        .status-dot {
+          width: 8px;
+          height: 8px;
+          background: #22c55e;
+          border-radius: 50%;
+          animation: status-pulse 2s infinite;
+        }
+        
+        @keyframes status-pulse {
+          0% { transform: scale(1); opacity: 1; }
+          50% { transform: scale(1.3); opacity: 0.7; }
+          100% { transform: scale(1); opacity: 1; }
+        }
+        
+        #chat-messages {
+          flex: 1;
+          padding: 20px;
+          overflow-y: auto;
+          font-size: 0.95rem;
+          background: var(--chat-bg);
+          position: relative; /* Needed for z-index to work */
+          z-index: 1; /* Ensures it's above the particles */
+          scroll-behavior: smooth;
+          display: flex;
+          flex-direction: column;
+        }
+        
+        /* Message Wrappers & Grouping */
+        .msg-wrapper {
+          display: flex;
+          width: 100%;
+          margin-bottom: 2px;
+          position: relative;
+          align-items: flex-end;
+          transition: all 0.3s ease;
+        }
+        
+        .msg-wrapper:not(.consecutive) {
+          margin-top: 12px;
+        }
+        
+        .bot-group { justify-content: flex-start; gap: 8px; }
+        .user-group { justify-content: flex-end; }
+        
+        .msg-avatar-container {
+          width: 32px;
+          flex-shrink: 0;
+          display: flex;
+          align-items: flex-end;
+        }
+        
+        .msg-avatar {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 1px solid rgba(0,0,0,0.05);
+          animation: fadeUp 0.3s ease-out;
+        }
+        
+        .msg {
+          position: relative;
+          margin-bottom: 0;
+          padding: 10px 14px;
+          border-radius: 18px;
+          line-height: 1.4;
+          max-width: 85%;
+          word-wrap: break-word;
+          animation: fadeUp 0.3s ease-out forwards;
+          white-space: pre-wrap;
+        }
+        
+        .user {
+          background: var(--chat-primary);
+          color: var(--chat-white);
+          border-bottom-right-radius: 2px;
+          box-shadow: 0 4px 15px rgba(30, 58, 138, 0.2);
+        }
+        
+        .bot {
+          background: var(--chat-white);
+          color: var(--chat-text);
+          border-bottom-left-radius: 2px;
+          box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        
+        /* Message Tails */
+        .msg::before {
+          content: "";
+          position: absolute;
+          bottom: 0;
+          width: 10px;
+          height: 10px;
+          z-index: -1;
+        }
+        
+        .bot:not(.consecutive-msg)::before {
+          left: -6px;
+          background: var(--chat-white);
+          clip-path: polygon(100% 0, 100% 100%, 0 100%);
+        }
+        
+        .user:not(.consecutive-msg)::before {
+          right: -6px;
+          background: var(--chat-primary);
+          clip-path: polygon(0 0, 0% 100%, 100% 100%);
+        }
+        
+        /* Consecutive Overrides */
+        .consecutive-msg {
+          border-radius: 18px !important;
+        }
+        
+        .consecutive-msg::before {
+          display: none !important;
+        }
+        
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .msg-time {
+          display: block;
+          font-size: 0.7rem;
+          margin-top: 5px;
+          opacity: 0.8;
+        }
+        .user .msg-time {
+          text-align: right;
+          color: rgba(255, 255, 255, 0.8);
+        }
+        .bot .msg-time {
+          color: #94a3b8;
+        }
+        
+        /* Chips */
+        .chips-container {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin: 10px 0 20px 40px;
+          padding: 0 5px;
+          animation: fadeUp 0.5s ease-out forwards;
+        }
+        
+        .chip {
+          background: var(--chat-white);
+          border: 1px solid var(--chat-primary);
+          color: var(--chat-primary);
+          padding: 6px 14px;
+          border-radius: 20px;
+          font-size: 0.8rem;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+        
+        .chip:hover {
+          background: var(--chat-primary);
+          color: white;
+        }
+        
+        #input-area {
+          display: flex;
+          padding: 12px 15px;
+          background: var(--chat-white);
+          border-top: 1px solid #f1f5f9;
+          position: relative; /* Needed for z-index to work */
+          z-index: 1; /* Ensures it's above the particles */
+          gap: 10px;
+          align-items: center;
+        }
+        
+        #input {
+          flex: 1;
+          padding: 12px 18px;
+          border: 1px solid #f1f5f9;
+          background: #f8fafc;
+          border-radius: 24px;
+          outline: none;
+          font-size: 0.9rem;
+          transition: border-color 0.2s;
+        }
+        
+        #input:focus {
+          border-color: var(--chat-primary);
+        }
+        
+        .send-btn {
+          background: var(--chat-primary);
+          color: var(--chat-white);
+          border: none;
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: background 0.2s;
+        }
+        
+        .send-btn:hover { 
+          background: #1e40af;
+          box-shadow: 0 0 12px rgba(30, 58, 138, 0.3);
+        }
+        
+        /* Typing Animation */
+        .dots { display: flex; gap: 4px; padding: 5px 0; }
+        .dot { width: 6px; height: 6px; background: #94a3b8; border-radius: 50%; animation: pulse 1.4s infinite ease-in-out; }
+        .dot:nth-child(1) { animation-delay: -0.32s; }
+        .dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes pulse { 0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; } 40% { transform: scale(1.1); opacity: 1; } }
+        
+        .chat-footer {
+          background: var(--chat-white);
+          padding: 8px;
+          text-align: center;
+          font-size: 0.65rem;
+          color: #94a3b8;
+          border-top: 1px solid #f1f5f9;
+          position: relative; /* Needed for z-index to work */
+          z-index: 1; /* Ensures it's above the particles */
+          letter-spacing: 0.5px;
+        }
+        
+        /* Mobile Responsiveness */
+        @media (max-width: 480px) {
+          #chat-box {
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100dvh;
+            max-height: 100dvh;
+            border-radius: 0;
+          }
+          #chat-btn {
+            bottom: 15px;
+            right: 15px;
+          }
+        }
+        
+        /* Offline Status Banner */
+        #offline-status {
+          background: #fee2e2;
+          color: #b91c1c;
+          padding: 8px;
+          text-align: center;
+          font-size: 0.75rem;
+          font-weight: 600;
+          display: none;
+          border-bottom: 1px solid #fecaca;
+          position: relative;
+          z-index: 10;
+        }
+        
+        .retry-btn {
+          background: var(--chat-white);
+          border: 1px solid #e2e8f0;
+          color: var(--chat-primary);
+          padding: 5px 12px;
+          border-radius: 12px;
+          font-size: 0.75rem;
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          gap: 
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
@@ -281,24 +755,25 @@
         });
     </script>
     <script>
-        window.chatbaseConfig = {
-            chatbotId: "R1TiiZ1iAxEt-Oy6PjEEF",
-        };
-        
-        const loadChatbase = () => {
-            if (window.chatbaseLoaded) return;
-            window.chatbaseLoaded = true;
-            const script = document.createElement('script');
-            script.src = "https://www.chatbase.co/embed.min.js";
-            script.id = "R1TiiZ1iAxEt-Oy6PjEEF";
-            document.body.appendChild(script);
-        };
+    fetch("chat-widget.html")
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById("chat-widget").innerHTML = data;
 
-        ['mouseover', 'keydown', 'touchstart', 'scroll'].forEach(event => {
-            window.addEventListener(event, loadChatbase, { once: true, passive: true });
+        // Re-run scripts inside fetched HTML
+        const scripts = document.getElementById("chat-widget").querySelectorAll("script");
+
+        scripts.forEach(oldScript => {
+          const newScript = document.createElement("script");
+          newScript.textContent = oldScript.textContent; // Copy content for inline scripts
+          if (oldScript.src) newScript.src = oldScript.src; // Copy src for external scripts
+          document.body.appendChild(newScript);
         });
-        
-        setTimeout(loadChatbase, 5000);
+      });
     </script>
+
+    <div id="chat-widget"></div>
+
+
 </body>
 </html>
