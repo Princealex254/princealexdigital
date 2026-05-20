@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Portfolio – Web Design & Digital Projects in Kenya | Prince Alex Digital</title>
     <meta name="description" content="Explore recent web design, branding, and digital marketing projects by Prince Alex Digital. We showcase real client work delivering results across Kenya.">
     <link rel="canonical" href="https://www.princealex.pro/portfolio/">
@@ -13,9 +13,9 @@
     <link rel="preconnect" href="https://www.gstatic.com">
     <link rel="preconnect" href="https://cdn.tailwindcss.com">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"></noscript>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"></noscript>
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <style>
@@ -561,7 +561,7 @@
         </div>
     </header>
 
-    <main class="pt-24">
+    <main class="pt-24 overflow-x-hidden">
         <section id="portfolio" class="py-20 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
             <div class="absolute inset-0">
                 <div class="absolute top-1/4 right-1/4 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse"></div>
@@ -754,25 +754,25 @@
             if(backdrop) backdrop.addEventListener('click', toggleMenu);
         });
     </script>
+    <div id="chat-widget"></div>
+
     <script>
-    fetch("chat-widget.html")
+    fetch("/chat-widget.html")
       .then(response => response.text())
       .then(data => {
         document.getElementById("chat-widget").innerHTML = data;
 
-        // Re-run scripts inside fetched HTML
+        // Re-run scripts inside fetched HTML cleanly
         const scripts = document.getElementById("chat-widget").querySelectorAll("script");
 
         scripts.forEach(oldScript => {
           const newScript = document.createElement("script");
-          newScript.textContent = oldScript.textContent; // Copy content for inline scripts
-          if (oldScript.src) newScript.src = oldScript.src; // Copy src for external scripts
+          newScript.textContent = oldScript.textContent; 
+          if (oldScript.src) newScript.src = oldScript.src; 
           document.body.appendChild(newScript);
         });
       });
     </script>
-
-    <div id="chat-widget"></div>
 
 
 </body>
