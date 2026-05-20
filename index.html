@@ -27,7 +27,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://unpkg.com">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-    <link rel="preconnect" href="https://www.chatbase.co">
     <link rel="preconnect" href="https://www.gstatic.com">
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"></noscript>
@@ -876,7 +875,7 @@
     </header>
 
     <main class="pt-24">
-        <section id="hero" class="relative min-h-screen flex items-center justify-center overflow-hidden">
+        <section id="hero" class="relative min-h-fit md:min-h-screen flex items-center justify-center overflow-hidden py-8 md:py-0">
             <!-- Modern gradient background -->
             <div class="absolute inset-0 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900"></div>
             <div class="absolute inset-0 bg-cover bg-center opacity-20" style="background-image: url('background.webp');"></div>
@@ -891,16 +890,16 @@
             <div class="relative z-10 text-center px-4 max-w-6xl mx-auto" data-aos="fade-up" data-aos-duration="1000">
                 <!-- Logo with modern styling, hidden on very small screens to save space -->
                 <div class="mb-8">
-                    <div class="inline-flex items-center justify-center w-32 h-32 md:w-40 md:h-40 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 shadow-2xl mb-6">
-                        <img src="mylogo.png" alt="Prince Alex Digital Logo" class="w-28 h-28 object-contain" loading="lazy" width="112" height="112">
+                    <div class="inline-flex items-center justify-center w-24 h-24 md:w-40 md:h-40 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 shadow-2xl mb-6">
+                        <img src="mylogo.png" alt="Prince Alex Digital Logo" class="w-20 h-20 object-contain" loading="lazy" width="80" height="80">
                     </div>
                 </div>
                 
                 <!-- Modern typography -->
-                <h1 class="text-4xl sm:text-5xl md:text-7xl font-black leading-tight mb-6 bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent">
+                <h1 class="text-3xl sm:text-5xl md:text-7xl font-black leading-tight mb-4 bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent">
                     Web Design & Digital Marketing Agency in Kenya
                 </h1>
-                <p class="text-xl md:text-2xl max-w-3xl mx-auto mb-12 text-gray-300 leading-relaxed">
+                <p class="text-lg md:text-2xl max-w-3xl mx-auto mb-8 text-gray-300 leading-relaxed">
                     We help businesses grow with web design, hosting, branding, software solutions, and digital marketing.
                 </p>
                 
@@ -1238,17 +1237,6 @@
             }
         });
     </script>
-    <script
-        src="https://www.chatbase.co/embed.min.js"
-        id="R1TiiZ1iAxEt-Oy6PjEEF"
-        defer>
-    </script>
-    <script>
-        // Ensure chatbaseConfig is defined before the chatbase script loads
-        window.chatbaseConfig = {
-            chatbotId: "R1TiiZ1iAxEt-Oy6PjEEF",
-        };
-    </script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const overlay = document.getElementById('new-year-overlay');
@@ -1264,6 +1252,26 @@
                 localStorage.setItem('newYearOverlayShown_2026', 'true');
             }
         });
+    </script>
+
+    <div id="chat-widget"></div>
+
+    <script>
+    fetch("chat-widget.html")
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById("chat-widget").innerHTML = data;
+
+        // Re-run scripts inside fetched HTML
+        const scripts = document.getElementById("chat-widget").querySelectorAll("script");
+
+        scripts.forEach(oldScript => {
+          const newScript = document.createElement("script");
+          newScript.textContent = oldScript.textContent; // Copy content for inline scripts
+          if (oldScript.src) newScript.src = oldScript.src; // Copy src for external scripts
+          document.body.appendChild(newScript);
+        });
+      });
     </script>
 </body>
 </html>
