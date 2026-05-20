@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Services | Prince Alex Digital</title>
     <meta name="description" content="Prince Alex Digital offers professional web design, SEO, digital marketing, graphic design, social media management, and CV revamping services in Kenya. Grow your brand with us.">
     <link rel="canonical" href="https://www.princealex.pro/services/">
@@ -100,7 +100,7 @@
         </div>
     </header>
 
-    <main class="pt-24">
+    <main class="pt-24 overflow-x-hidden">
         <section id="services" class="py-20 bg-gradient-to-b from-white to-gray-50">
             <div class="container mx-auto px-4 md:px-8 lg:px-16">
                 <div class="text-center mb-16" data-aos="fade-down">
@@ -425,26 +425,23 @@
             }
         });
     </script>
+    <div id="chat-widget"></div>
     <script>
-    fetch("chat-widget.html")
+    fetch("./chat-widget.html")
       .then(response => response.text())
       .then(data => {
         document.getElementById("chat-widget").innerHTML = data;
 
-        // Re-run scripts inside fetched HTML
+        // Re-run scripts inside fetched HTML cleanly
         const scripts = document.getElementById("chat-widget").querySelectorAll("script");
 
         scripts.forEach(oldScript => {
           const newScript = document.createElement("script");
-          newScript.textContent = oldScript.textContent; // Copy content for inline scripts
-          if (oldScript.src) newScript.src = oldScript.src; // Copy src for external scripts
+          newScript.textContent = oldScript.textContent; 
+          if (oldScript.src) newScript.src = oldScript.src; 
           document.body.appendChild(newScript);
         });
       });
     </script>
-
-    <div id="chat-widget"></div>
-
-
 </body>
 </html>
