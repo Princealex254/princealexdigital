@@ -315,25 +315,25 @@
             }
         });
     </script>
-    <script>
-        window.chatbaseConfig = {
-            chatbotId: "R1TiiZ1iAxEt-Oy6PjEEF",
-        };
-        
-        const loadChatbase = () => {
-            if (window.chatbaseLoaded) return;
-            window.chatbaseLoaded = true;
-            const script = document.createElement('script');
-            script.src = "https://www.chatbase.co/embed.min.js";
-            script.id = "R1TiiZ1iAxEt-Oy6PjEEF";
-            document.body.appendChild(script);
-        };
 
-        ['mouseover', 'keydown', 'touchstart', 'scroll'].forEach(event => {
-            window.addEventListener(event, loadChatbase, { once: true, passive: true });
+    <div id="chat-widget"></div>
+
+    <script>
+    fetch("chat-widget.html")
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById("chat-widget").innerHTML = data;
+
+        // Re-run scripts inside fetched HTML
+        const scripts = document.getElementById("chat-widget").querySelectorAll("script");
+
+        scripts.forEach(oldScript => {
+          const newScript = document.createElement("script");
+          newScript.textContent = oldScript.textContent; // Copy content for inline scripts
+          if (oldScript.src) newScript.src = oldScript.src; // Copy src for external scripts
+          document.body.appendChild(newScript);
         });
-        
-        setTimeout(loadChatbase, 5000);
+      });
     </script>
 </body>
 </html>
