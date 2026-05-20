@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Contact | Prince Alex Digital</title>
     <!-- Primary SEO -->
     <meta name="description" content="Contact Prince Alex Digital in Kenya for web design, SEO, digital marketing, and graphic design. Get a quote in 24 hours. Email info@princealex.pro or call 0717384875.">
@@ -23,7 +23,7 @@
     <link rel="preconnect" href="https://unpkg.com">
     <link rel="preconnect" href="https://www.gstatic.com">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"></noscript>
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <style>
@@ -108,7 +108,7 @@
         </div>
     </header>
 
-    <main class="pt-24">
+    <main class="pt-24 overflow-x-hidden">
         <section id="contact" class="py-20 bg-gradient-to-b from-white to-gray-50">
             <div class="container mx-auto px-4 md:px-8 lg:px-16">
                 <div class="text-center mb-16" data-aos="fade-down">
@@ -426,23 +426,6 @@
             }
         });
     </script>
-    <script>
-    fetch("chat-widget.html")
-      .then(response => response.text())
-      .then(data => {
-        document.getElementById("chat-widget").innerHTML = data;
-
-        // Re-run scripts inside fetched HTML
-        const scripts = document.getElementById("chat-widget").querySelectorAll("script");
-
-        scripts.forEach(oldScript => {
-          const newScript = document.createElement("script");
-          newScript.textContent = oldScript.textContent; // Copy content for inline scripts
-          if (oldScript.src) newScript.src = oldScript.src; // Copy src for external scripts
-          document.body.appendChild(newScript);
-        });
-      });
-    </script>
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -463,5 +446,22 @@
 
     <div id="chat-widget"></div>
 
+    <script>
+    fetch("/chat-widget.html")
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById("chat-widget").innerHTML = data;
+
+        // Re-run scripts inside fetched HTML cleanly
+        const scripts = document.getElementById("chat-widget").querySelectorAll("script");
+
+        scripts.forEach(oldScript => {
+          const newScript = document.createElement("script");
+          newScript.textContent = oldScript.textContent; 
+          if (oldScript.src) newScript.src = oldScript.src; 
+          document.body.appendChild(newScript);
+        });
+      });
+    </script>
 </body>
 </html>
