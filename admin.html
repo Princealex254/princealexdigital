@@ -173,6 +173,7 @@
         // Global state
         let currentUser = null;
         let currentSection = 'dashboard';
+        let careersData = {}; // Cache for job data to prevent brittle HTML attribute passing
 
         // DOM elements
         const loginPage = document.getElementById("login-page");
@@ -620,14 +621,18 @@
         }
 
         // Careers Management
-        async function addJobPosting(title, location, type, description, status) {
+        async function addJobPosting(title, location, type, status, salary, deadline, summary, responsibilities, qualifications) {
             try {
                 showLoading();
                 await addDoc(collection(db, `artifacts/${appId}/public/data/careers`), {
                     title,
                     location,
                     type,
-                    description,
+                    summary,
+                    responsibilities,
+                    qualifications,
+                    salary,
+                    deadline,
                     status,
                     createdAt: serverTimestamp()
                 });
@@ -659,27 +664,32 @@
             }
         }
 
-        async function editJobPosting(id, title, location, type, description, status) {
-            // Populate the form
-            document.getElementById('job-form').title.value = title;
-            document.getElementById('job-form').location.value = location;
-            document.getElementById('job-form').type.value = type;
-            document.getElementById('job-form').description.value = description;
-            document.getElementById('job-form').status.value = status;
+        async function editJobPosting(id) {
+            const data = careersData[id];
+            if (!data) return;
 
-            // Change form button to "Update"
-            const submitBtn = document.querySelector('#job-form button[type="submit"]');
-            submitBtn.innerHTML = '<i class="fas fa-save mr-2"></i>Update Job';
-
-            // Replace form to handle update logic
             const form = document.getElementById('job-form');
-            const newForm = form.cloneNode(true);
-            form.parentNode.replaceChild(newForm, form);
+            form.dataset.editId = id; // Store ID on form for submit handler
 
-            newForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                await updateJobPosting(id, newForm);
-            });
+            // Populate the form using cached data
+            form.title.value = data.title || "";
+            form.location.value = data.location || "";
+            form.type.value = data.type || "Full-time";
+            form.status.value = data.status || "open";
+            form.salary.value = data.salary || "";
+            form.deadline.value = data.deadline || "";
+            form.summary.value = data.summary || "";
+            form.responsibilities.value = data.responsibilities || "";
+            form.qualifications.value = data.qualifications || "";
+
+            // Change UI to Edit Mode
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.innerHTML = '<i class="fas fa-save mr-2"></i>Update Job Posting';
+            submitBtn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+            submitBtn.classList.add('bg-yellow-600', 'hover:bg-yellow-700');
+            
+            const sectionTitle = form.closest('.bg-white').querySelector('h2');
+            if (sectionTitle) sectionTitle.textContent = 'Edit Job Posting';
 
             document.getElementById('careers').scrollIntoView({ behavior: 'smooth' });
         }
@@ -703,7 +713,11 @@
                 title: form.title.value,
                 location: form.location.value,
                 type: form.type.value,
-                description: form.description.value,
+                salary: form.salary.value,
+                deadline: form.deadline.value,
+                summary: form.summary.value,
+                responsibilities: form.responsibilities.value,
+                qualifications: form.qualifications.value,
                 status: form.status.value,
                 updatedAt: serverTimestamp()
             };
@@ -729,6 +743,7 @@
             onSnapshot(q, (snapshot) => {
                 const container = document.getElementById('job-list');
                 container.innerHTML = "";
+                careersData = {}; // Clear cache on update
                 document.getElementById('job-count').textContent = snapshot.docs.filter(d => d.data().status === 'open').length;
 
                 if (snapshot.empty) {
@@ -738,6 +753,8 @@
 
                 snapshot.forEach((docSnap) => {
                     const data = docSnap.data();
+                    careersData[docSnap.id] = data; // Cache for secure editing
+                    
                     const item = document.createElement('div');
                     item.className = 'bg-white rounded-xl shadow-lg p-6 card-hover fade-in';
                     const toggleButtonText = data.status === 'open' ? 'Hide' : 'Show';
@@ -745,14 +762,16 @@
                     const toggleButtonColor = data.status === 'open' ? 'bg-gray-500 hover:bg-gray-600' : 'bg-green-500 hover:bg-green-600';
 
                     item.innerHTML = `
-                        <div class="flex justify-between items-start">
-                            <div>
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                            <div class="flex-1">
                                 <h3 class="text-xl font-bold text-gray-800">${data.title}</h3>
-                                <p class="text-gray-600">${data.location} - ${data.type}</p>
-                                <span class="mt-2 inline-block px-3 py-1 text-xs font-semibold rounded-full ${data.status === 'open' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">${data.status}</span>
+                                <p class="text-gray-600 text-sm">${data.location} • ${data.type} ${data.salary ? `• ${data.salary}` : ''}</p>
+                                <div class="flex gap-2 mt-2">
+                                    <span class="px-3 py-1 text-xs font-semibold rounded-full ${data.status === 'open' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">${data.status}</span>
+                                </div>
                             </div>
-                            <div class="flex flex-col sm:flex-row gap-2 flex-shrink-0 ml-4">
-                                <button onclick="editJobPosting('${docSnap.id}', '${JSON.stringify(data.title).slice(1,-1)}', '${JSON.stringify(data.location).slice(1,-1)}', '${data.type}', '${JSON.stringify(data.description).slice(1,-1)}', '${data.status}')" class="inline-flex items-center justify-center px-3 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors text-sm">
+                            <div class="flex gap-2 w-full md:w-auto">
+                                <button onclick="editJobPosting('${docSnap.id}')" class="flex-1 md:flex-none inline-flex items-center justify-center px-3 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors text-sm">
                                     <i class="fas fa-edit mr-2"></i>Edit
                                 </button>
                                 <button onclick="toggleJobStatus('${docSnap.id}', '${data.status}')" class="inline-flex items-center justify-center px-3 py-2 ${toggleButtonColor} text-white rounded-lg transition-colors text-sm">
@@ -882,9 +901,18 @@
                 const title = e.target.title.value;
                 const location = e.target.location.value;
                 const type = e.target.type.value;
-                const description = e.target.description.value;
                 const status = e.target.status.value;
-                addJobPosting(title, location, type, description, status);
+                const salary = e.target.salary.value;
+                const deadline = e.target.deadline.value;
+                const summary = e.target.summary.value;
+                const responsibilities = e.target.responsibilities.value;
+                const qualifications = e.target.qualifications.value;
+
+                if (e.target.dataset.editId) {
+                    updateJobPosting(e.target.dataset.editId, e.target);
+                } else {
+                    addJobPosting(title, location, type, status, salary, deadline, summary, responsibilities, qualifications);
+                }
             });
 
             // Sidebar navigation
@@ -1041,6 +1069,22 @@
         window.deleteJobPosting = deleteJobPosting;
         window.toggleJobStatus = toggleJobStatus;
         window.updateApplicationStatus = updateApplicationStatus;
+
+        // Rich Text Helper
+        window.formatText = (fieldName, type) => {
+            const textarea = document.querySelector(`textarea[name="${fieldName}"]`);
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const selected = textarea.value.substring(start, end);
+            let newVal = '';
+            
+            if (type === 'bold') newVal = `<b>${selected}</b>`;
+            else if (type === 'bullet') newVal = `\n• ${selected}`;
+            else if (type === 'number') newVal = `\n1. ${selected}`;
+            
+            textarea.value = textarea.value.substring(0, start) + newVal + textarea.value.substring(end);
+            textarea.focus();
+        };
     </script>
 </head>
 <body class="bg-gray-100 font-sans">
@@ -1452,9 +1496,46 @@
                                         <option value="closed">Closed</option>
                                     </select>
                                 </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Salary Range (Optional)</label>
+                                    <input name="salary" type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="e.g., KES 50k - 80k">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Application Deadline</label>
+                                    <input name="deadline" type="date" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
                                 <div class="md:col-span-2">
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                                    <textarea name="description" rows="4" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Enter job description..."></textarea>
+                                    <div class="flex justify-between items-center mb-2">
+                                        <label class="block text-sm font-medium text-gray-700">Role Summary</label>
+                                        <div class="flex gap-2">
+                                            <button type="button" onclick="formatText('summary', 'bold')" class="p-1.5 text-xs bg-slate-100 rounded hover:bg-slate-200" title="Bold"><i class="fas fa-bold"></i></button>
+                                            <button type="button" onclick="formatText('summary', 'bullet')" class="p-1.5 text-xs bg-slate-100 rounded hover:bg-slate-200" title="Bullets"><i class="fas fa-list-ul"></i></button>
+                                            <button type="button" onclick="formatText('summary', 'number')" class="p-1.5 text-xs bg-slate-100 rounded hover:bg-slate-200" title="Numbers"><i class="fas fa-list-ol"></i></button>
+                                        </div>
+                                    </div>
+                                    <textarea name="summary" rows="2" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Brief overview of the role..."></textarea>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <label class="block text-sm font-medium text-gray-700">Key Responsibilities</label>
+                                        <div class="flex gap-2">
+                                            <button type="button" onclick="formatText('responsibilities', 'bold')" class="p-1.5 text-xs bg-slate-100 rounded hover:bg-slate-200" title="Bold"><i class="fas fa-bold"></i></button>
+                                            <button type="button" onclick="formatText('responsibilities', 'bullet')" class="p-1.5 text-xs bg-slate-100 rounded hover:bg-slate-200" title="Bullets"><i class="fas fa-list-ul"></i></button>
+                                            <button type="button" onclick="formatText('responsibilities', 'number')" class="p-1.5 text-xs bg-slate-100 rounded hover:bg-slate-200" title="Numbers"><i class="fas fa-list-ol"></i></button>
+                                        </div>
+                                    </div>
+                                    <textarea name="responsibilities" rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="List the main duties..."></textarea>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <label class="block text-sm font-medium text-gray-700">Desired Skills & Qualifications</label>
+                                        <div class="flex gap-2">
+                                            <button type="button" onclick="formatText('qualifications', 'bold')" class="p-1.5 text-xs bg-slate-100 rounded hover:bg-slate-200" title="Bold"><i class="fas fa-bold"></i></button>
+                                            <button type="button" onclick="formatText('qualifications', 'bullet')" class="p-1.5 text-xs bg-slate-100 rounded hover:bg-slate-200" title="Bullets"><i class="fas fa-list-ul"></i></button>
+                                            <button type="button" onclick="formatText('qualifications', 'number')" class="p-1.5 text-xs bg-slate-100 rounded hover:bg-slate-200" title="Numbers"><i class="fas fa-list-ol"></i></button>
+                                        </div>
+                                    </div>
+                                    <textarea name="qualifications" rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Required experience, education, and skills..."></textarea>
                                 </div>
                             </div>
                             <button type="submit" class="mt-6 bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors">
