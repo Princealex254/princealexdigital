@@ -109,6 +109,7 @@
   flex-direction: column;
   overflow: hidden;
   z-index: 1000;
+  /* animation: slideIn 0.3s ease-out, glow-pulse 4s infinite ease-in-out; */ /* slideIn replaced by CSS transition */
   animation: glow-pulse 4s infinite ease-in-out; /* Keep only the glow animation */
   border: 1px solid rgba(255, 255, 255, 0.3);
 
@@ -185,6 +186,7 @@
   100% { transform: translate(0, 0) scale(1); opacity: 0.25; }
 }
 
+/* Removed @keyframes slideIn as its functionality is now handled by CSS transitions */
 @keyframes glow-pulse {
   0% { box-shadow: 0 10px 40px rgba(0,0,0,0.15), 0 0 20px rgba(37, 99, 235, 0.1); }
   50% { box-shadow: 0 10px 40px rgba(0,0,0,0.15), 0 0 45px rgba(37, 99, 235, 0.25); }
@@ -630,35 +632,23 @@ const WELCOME_MESSAGES = [
 let welcomeSent = false;
 let isTyping = false;
 
-// --- Utility Helpers ---
-function getHistory() {
-  return JSON.parse(localStorage.getItem("chatHistory") || "[]");
-}
-
-function saveHistory(history) {
-  localStorage.setItem("chatHistory", JSON.stringify(history));
-}
-
-function scrollToBottom() {
-  const msgBox = document.getElementById("chat-messages");
-  setTimeout(() => {
-    msgBox.scrollTop = msgBox.scrollHeight;
-  }, 50);
-}
-
 function getSessionId() {
   let id = localStorage.getItem("sessionId");
+
   if (!id) {
     id = "user_" + Math.random().toString(36).substring(2, 10);
     localStorage.setItem("sessionId", id);
   }
+
   return id;
 }
 
 function loadChatHistory() {
-  const history = getHistory();
-  welcomeSent = history.length > 0;
-  history.forEach(m => addMessage(m.text, m.type, false, false, m.time));
+  const history = JSON.parse(localStorage.getItem("chatHistory") || "[]");
+  if (history.length > 0) {
+    welcomeSent = true;
+    history.forEach(m => addMessage(m.text, m.type, false, false, m.time));
+  }
 }
 
 window.addEventListener('online', () => {
@@ -720,7 +710,8 @@ function addEndSessionButton() {
   container.innerHTML = `<i class="fa-solid fa-power-off"></i> End Session`;
   container.onclick = resetChat;
   document.getElementById("chat-messages").appendChild(container);
-  scrollToBottom();
+  const msgBox = document.getElementById("chat-messages");
+  msgBox.scrollTop = msgBox.scrollHeight;
 }
 
 function addChips(options) {
@@ -734,7 +725,8 @@ function addChips(options) {
     container.appendChild(chip);
   });
   document.getElementById("chat-messages").appendChild(container);
-  scrollToBottom();
+  const msgBox = document.getElementById("chat-messages");
+  msgBox.scrollTop = msgBox.scrollHeight;
 }
 
 function addMessage(text, type, animate = false, save = true, time = null) {
@@ -773,9 +765,9 @@ function addMessage(text, type, animate = false, save = true, time = null) {
     const timeStr = time || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
     if (save && text) {
-      const history = getHistory();
+      const history = JSON.parse(localStorage.getItem("chatHistory") || "[]");
       history.push({ text, type, time: timeStr });
-      saveHistory(history);
+      localStorage.setItem("chatHistory", JSON.stringify(history));
     }
 
     const textContainer = document.createElement("span");
@@ -804,7 +796,10 @@ function addMessage(text, type, animate = false, save = true, time = null) {
   wrapper.appendChild(div);
   msgBox.appendChild(wrapper);
   
-  scrollToBottom();
+  // Delay ensures scroll happens after DOM layout reflow
+  setTimeout(() => {
+    msgBox.scrollTop = msgBox.scrollHeight;
+  }, 50);
   
   if (animate && type === "bot" && text !== "...") {
     let i = 0;
@@ -857,69 +852,6 @@ function handleKeyPress(e) {
   if (e.key === 'Enter') sendMessage();
 }
 
-function getRecentChatHistory(limit = 10) {
-  return getHistory()
-    .slice(-limit)
-    .map(msg => ({
-      role: msg.type === "user" ? "user" : "assistant",
-      content: msg.text
-    }));
-}
-
-// Deep recursive extractor for various API response formats
-function extractTextFromResponse(obj) {
-  if (!obj) return null;
-
-  // Direct string
-  if (typeof obj === "string" && obj.trim()) {
-    return obj.trim();
-  }
-
-  // Arrays
-  if (Array.isArray(obj)) {
-    for (const item of obj) {
-      const found = extractTextFromResponse(item);
-      if (found) return found;
-    }
-  }
-
-  // Objects
-  if (typeof obj === "object") {
-    // PRIORITY COMMON KEYS
-    const preferredKeys = [
-      "reply", "response", "output", "text", "message",
-      "content", "answer", "result", "clean_text_response"
-    ];
-
-    for (const key of preferredKeys) {
-      if (typeof obj[key] === "string" && obj[key].trim()) {
-        return obj[key].trim();
-      }
-    }
-
-    // OpenAI/Groq format
-    if (
-      obj.choices &&
-      obj.choices[0] &&
-      obj.choices[0].message &&
-      obj.choices[0].message.content
-    ) {
-      return obj.choices[0].message.content.trim();
-    }
-
-    // Recursive deep scan
-    for (const key in obj) {
-      // Avoid scanning standard Object properties or circular refs if any
-      if (obj.hasOwnProperty(key)) {
-        const found = extractTextFromResponse(obj[key]);
-        if (found) return found;
-      }
-    }
-  }
-
-  return null;
-}
-
 async function sendMessage(overrideMsg = null) {
   const input = document.getElementById("input");
   const message = overrideMsg || input.value.trim();
@@ -955,26 +887,51 @@ async function sendMessage(overrideMsg = null) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        message: message,
-        history: getRecentChatHistory()
+        sessionId: getSessionId(),
+        message: message
       })
     });
 
     typingIndicator.remove();
+
     const rawText = await res.text();
-    let reply = "";
+
+    let data;
 
     try {
-      const data = JSON.parse(rawText);
-      reply = extractTextFromResponse(data);
-    } catch (err) {
-      if (rawText && rawText.trim()) {
-        reply = rawText.trim();
-      }
+      data = JSON.parse(rawText);
+    } catch (e) {
+      addMessage("Invalid response from server", "bot");
+      isTyping = false;
+      return;
     }
 
-    if (!reply) {
-      reply = "Sorry, I couldn't understand the server response.";
+    // Robust extraction covering various Activepieces response formats
+    const personality = [
+      "Let me check that for you...",
+      "Working on it...",
+      "Analyzing your request..."
+    ];
+    let reply = personality[Math.floor(Math.random() * personality.length)];
+
+    if (typeof data === 'string') {
+      reply = data;
+    } else if (data.output) {
+      reply = data.output;
+    } else if (data.reply) {
+      if (Array.isArray(data.reply)) {
+        // Checks for 'content', 'Content', or direct string
+        const firstReply = data.reply[0];
+        reply = firstReply?.content || firstReply?.Content || (typeof firstReply === 'string' ? firstReply : JSON.stringify(firstReply));
+      } else {
+        reply = data.reply;
+      }
+    } else if (data.choices?.[0]?.message?.content) {
+      reply = data.choices[0].message.content;
+    } else if (typeof data === 'object' && data !== null) {
+      // Fallback to grab the first string property if the structure changes
+      const stringKeys = Object.keys(data).filter(k => typeof data[k] === 'string');
+      if (stringKeys.length > 0) reply = data[stringKeys[0]];
     }
 
     await addMessage(reply, "bot", true);
