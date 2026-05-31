@@ -901,7 +901,7 @@ async function sendMessage(overrideMsg = null) {
     try {
       data = JSON.parse(rawText);
     } catch (e) {
-      addMessage("Invalid response from server", "bot");
+      addMessage("Apologies for the brief hitch! 🛠️ My connection caught a slight delay just now. Could you try sending that last message one more time?", "bot");
       isTyping = false;
       return;
     }
