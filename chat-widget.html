@@ -901,7 +901,7 @@ async function sendMessage(overrideMsg = null) {
     try {
       data = JSON.parse(rawText);
     } catch (e) {
-      addMessage("Apologies for the brief hitch! 🛠️ My connection caught a slight delay just now. Could you try sending that last message one more time?", "bot");
+      addMessage("Apologies for the brief hitch! 🛠️ My connection timed out, but our technical team has already been alerted and is working to fix this ASAP. Please give it a moment and try sending your message again.", "bot");
       isTyping = false;
       return;
     }
