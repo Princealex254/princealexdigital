@@ -105,28 +105,24 @@
   -webkit-backdrop-filter: blur(12px);
   border-radius: 16px;
   box-shadow: 0 10px 40px rgba(0,0,0,0.15), 0 0 30px rgba(37, 99, 235, 0.15);
-  display: flex; /* Always flex, visibility handled by opacity/pointer-events */
+  display: flex;
   flex-direction: column;
   overflow: hidden;
   z-index: 1000;
-  /* animation: slideIn 0.3s ease-out, glow-pulse 4s infinite ease-in-out; */ /* slideIn replaced by CSS transition */
-  animation: glow-pulse 4s infinite ease-in-out; /* Keep only the glow animation */
+  animation: glow-pulse 4s infinite ease-in-out;
   border: 1px solid rgba(255, 255, 255, 0.3);
-
-  /* Initial hidden state for smooth transition */
   opacity: 0;
-  transform: translateY(20px) scale(0.95); /* Start slightly down and smaller */
-  pointer-events: none; /* Prevents interaction when hidden */
-  transform-origin: bottom right; /* Origin for scale and slide */
-  transition: opacity 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), /* Spring-like ease-out */
-              transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Spring-like ease-out */
+  transform: translateY(20px) scale(0.95);
+  pointer-events: none;
+  transform-origin: bottom right;
+  transition: opacity 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+              transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* Class to make chat box visible and interactive */
 #chat-box.chat-box-active {
   opacity: 1;
-  transform: translateY(0) scale(1); /* End at original position and size */
-  pointer-events: auto; /* Allow interaction when active */
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
 }
 
 /* AI Floating Particles Background */
@@ -136,9 +132,9 @@
   left: 0;
   width: 100%;
   height: 100%;
-  overflow: hidden; /* Keeps particles within the chatbox bounds */
-  z-index: 0; /* Ensures it's behind other content */
-  pointer-events: none; /* Prevents it from blocking clicks on chatbox content */
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
 }
 
 #chat-particles-container::before,
@@ -146,14 +142,13 @@
   content: '';
   position: absolute;
   border-radius: 50%;
-  filter: blur(40px); /* Soft blur effect */
-  opacity: 0.3; /* Subtle presence */
-  z-index: -1; /* Ensures they are behind the container's content */
+  filter: blur(40px);
+  opacity: 0.3;
+  z-index: -1;
 }
 
-/* Blob 1 - Blue */
 #chat-particles-container::before {
-  background: rgba(37, 99, 235, 0.7); /* Primary blue */
+  background: rgba(37, 99, 235, 0.7);
   width: 180px;
   height: 180px;
   top: 10%;
@@ -161,9 +156,8 @@
   animation: blob-move-1 15s infinite ease-in-out alternate;
 }
 
-/* Blob 2 - Purple */
 #chat-particles-container::after {
-  background: rgba(124, 58, 237, 0.7); /* A complementary purple */
+  background: rgba(124, 58, 237, 0.7);
   width: 220px;
   height: 220px;
   bottom: 15%;
@@ -186,7 +180,6 @@
   100% { transform: translate(0, 0) scale(1); opacity: 0.25; }
 }
 
-/* Removed @keyframes slideIn as its functionality is now handled by CSS transitions */
 @keyframes glow-pulse {
   0% { box-shadow: 0 10px 40px rgba(0,0,0,0.15), 0 0 20px rgba(37, 99, 235, 0.1); }
   50% { box-shadow: 0 10px 40px rgba(0,0,0,0.15), 0 0 45px rgba(37, 99, 235, 0.25); }
@@ -199,8 +192,8 @@
   padding: 15px 20px;
   font-weight: 700;
   display: flex;
-  position: relative; /* Needed for z-index to work */
-  z-index: 1; /* Ensures it's above the particles */
+  position: relative;
+  z-index: 1;
   justify-content: space-between;
   align-items: center;
 }
@@ -264,8 +257,8 @@
   overflow-y: auto;
   font-size: 0.95rem;
   background: var(--chat-bg);
-  position: relative; /* Needed for z-index to work */
-  z-index: 1; /* Ensures it's above the particles */
+  position: relative;
+  z-index: 1;
   scroll-behavior: smooth;
   display: flex;
   flex-direction: column;
@@ -330,7 +323,6 @@
   box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
 
-/* Message Tails */
 .msg::before {
   content: "";
   position: absolute;
@@ -352,7 +344,6 @@
   clip-path: polygon(0 0, 0% 100%, 100% 100%);
 }
 
-/* Consecutive Overrides */
 .consecutive-msg {
   border-radius: 18px !important;
 }
@@ -412,8 +403,8 @@
   padding: 12px 15px;
   background: var(--chat-white);
   border-top: 1px solid #f1f5f9;
-  position: relative; /* Needed for z-index to work */
-  z-index: 1; /* Ensures it's above the particles */
+  position: relative;
+  z-index: 1;
   gap: 10px;
   align-items: center;
 }
@@ -509,42 +500,26 @@
   color: #94a3b8;
   border-top: 1px solid transparent;
   border-image: linear-gradient(90deg, transparent, rgba(30, 58, 138, 0.15), transparent) 1;
-  position: relative; /* Needed for z-index to work */
-  z-index: 1; /* Ensures it's above the particles */
+  position: relative;
+  z-index: 1;
   letter-spacing: 0.5px;
 }
 
-/* Mobile Responsiveness */
 @media (max-width: 480px) {
   #chat-box {
     right: 0;
     bottom: 0;
     width: 100%;
-    height: 100dvh; /* Prevents input from being hidden by keyboard */
+    height: 100dvh;
     max-height: 100dvh;
     border-radius: 0;
     border: none;
   }
-  #chat-header {
-    padding: 10px 16px; /* Compact header */
-  }
-  #chat-messages {
-    padding: 12px; /* Reduced padding */
-    overscroll-behavior: contain;
-  }
-  #chat-btn {
-    bottom: 15px;
-    right: 15px;
-  }
-  #chat-tooltip { 
-    bottom: 28px; 
-    right: 80px;
-    font-size: 10px;
-  }
-  .chat-footer {
-    padding-bottom: calc(8px + env(safe-area-inset-bottom)); /* Safe Area Support */
-    font-size: 0.6rem;
-  }
+  #chat-header { padding: 10px 16px; }
+  #chat-messages { padding: 12px; overscroll-behavior: contain; }
+  #chat-btn { bottom: 15px; right: 15px; }
+  #chat-tooltip { bottom: 28px; right: 80px; font-size: 10px; }
+  .chat-footer { padding-bottom: calc(8px + env(safe-area-inset-bottom)); font-size: 0.6rem; }
 }
 
 /* Offline Status Banner */
@@ -621,7 +596,8 @@
 </div>
 
 <script>
-const WEBHOOK_URL = "https://eocm4wbwiq06jds.m.pipedream.net";
+// Pointing securely to your live Cloudflare Worker proxy
+const WEBHOOK_URL = "https://princealex-chat-ai.princealexdigital.workers.dev";
 let lastUserMessage = "";
 let pendingRetry = false;
 
@@ -634,12 +610,10 @@ let isTyping = false;
 
 function getSessionId() {
   let id = localStorage.getItem("sessionId");
-
   if (!id) {
     id = "user_" + Math.random().toString(36).substring(2, 10);
     localStorage.setItem("sessionId", id);
   }
-
   return id;
 }
 
@@ -665,7 +639,6 @@ window.addEventListener('offline', () => {
 
 function toggleChat() {
   const box = document.getElementById("chat-box");
-  const btn = document.getElementById("chat-btn");
   const tooltip = document.getElementById("chat-tooltip");
   
   if (box.classList.contains('chat-box-active')) {
@@ -673,7 +646,7 @@ function toggleChat() {
     if (tooltip) tooltip.style.opacity = "1";
   } else {
     box.classList.add('chat-box-active');
-    btn.classList.remove("pulse");
+    document.getElementById("chat-btn").classList.remove("pulse");
     if (tooltip) tooltip.style.opacity = "0";
     if (!welcomeSent) {
       showWelcome();
@@ -694,7 +667,6 @@ async function showWelcome() {
   isTyping = true;
   for (const text of WELCOME_MESSAGES) {
     const typingIndicator = addMessage("...", "bot");
-    // Simulate a natural pause for reading and typing
     await new Promise(resolve => setTimeout(resolve, 1000));
     typingIndicator.remove();
     await addMessage(text, "bot", true);
@@ -731,8 +703,6 @@ function addChips(options) {
 
 function addMessage(text, type, animate = false, save = true, time = null) {
   const msgBox = document.getElementById("chat-messages");
-  
-  // Grouping logic: check if the last message-wrapper is the same type
   const wrappers = msgBox.querySelectorAll('.msg-wrapper');
   const lastWrapper = wrappers.length > 0 ? wrappers[wrappers.length - 1] : null;
   const isConsecutive = lastWrapper && lastWrapper.classList.contains(type + '-group');
@@ -782,13 +752,11 @@ function addMessage(text, type, animate = false, save = true, time = null) {
       textContainer.textContent = text;
     }
 
-    if (type === "bot") {
-      if (save) {
-        botSound.play().catch(() => {}); // Catch prevents errors if user hasn't interacted yet
-        const box = document.getElementById("chat-box");
-        if (!box.classList.contains('chat-box-active')) {
-          document.getElementById("chat-btn").classList.add("pulse");
-        }
+    if (type === "bot" && save) {
+      botSound.play().catch(() => {});
+      const box = document.getElementById("chat-box");
+      if (!box.classList.contains('chat-box-active')) {
+        document.getElementById("chat-btn").classList.add("pulse");
       }
     }
   }
@@ -796,14 +764,13 @@ function addMessage(text, type, animate = false, save = true, time = null) {
   wrapper.appendChild(div);
   msgBox.appendChild(wrapper);
   
-  // Delay ensures scroll happens after DOM layout reflow
   setTimeout(() => {
     msgBox.scrollTop = msgBox.scrollHeight;
   }, 50);
   
   if (animate && type === "bot" && text !== "...") {
     let i = 0;
-    const speed = 10; // Adjusted for a smooth "streaming" feel
+    const speed = 10;
     const textContainer = div.querySelector('span:not(.msg-time)');
     return new Promise(resolve => {
       function typeWriter() {
@@ -838,7 +805,6 @@ function addErrorMessage(text) {
 
 function retryLastMessage() {
   if (lastUserMessage) {
-    // Clean up previous retry UI if it exists
     const wrappers = document.querySelectorAll('.msg-wrapper');
     const last = wrappers[wrappers.length - 1];
     if (last && last.querySelector('.retry-btn')) {
@@ -846,6 +812,13 @@ function retryLastMessage() {
     }
     sendMessage(lastUserMessage);
   }
+}
+
+// Helper to save messages to local storage context
+function saveToHistory(text, type) {
+  const history = JSON.parse(localStorage.getItem("chatHistory") || "[]");
+  history.push({ text: text, type: type, timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+  localStorage.setItem("chatHistory", JSON.stringify(history));
 }
 
 function handleKeyPress(e) {
@@ -861,7 +834,6 @@ async function sendMessage(overrideMsg = null) {
   lastUserMessage = message;
   pendingRetry = false;
 
-  // Remove chips if they exist when a message is sent
   const existingChips = document.querySelector('.chips-container');
   if (existingChips) existingChips.remove();
 
@@ -872,73 +844,52 @@ async function sendMessage(overrideMsg = null) {
     return;
   }
 
-  addMessage(message, "user");
+  // Save the user's message to history immediately
+  saveToHistory(message, "user");
+
+  addMessage(message, "user", false, false);
   if (!overrideMsg) input.value = "";
 
-  // Remove previous end session button if it exists
   const oldEnd = document.getElementById("end-session-btn");
   if (oldEnd) oldEnd.remove();
 
   isTyping = true;
   const typingIndicator = addMessage("...", "bot");
 
+  // Pull down the fresh history array to send to the Cloudflare Worker
+  const localHistory = JSON.parse(localStorage.getItem("chatHistory") || "[]");
+  
   try {
     const res = await fetch(WEBHOOK_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        sessionId: getSessionId(),
-        message: message
+        message: message,
+        history: localHistory // Passes everything including the prompt history
       })
     });
 
-    typingIndicator.remove();
+    if (typingIndicator) typingIndicator.remove();
+    const data = await res.json();
+    let reply = data.reply || "I didn't catch that. Could you try again?";
 
-    const rawText = await res.text();
-
-    let data;
-
-    try {
-      data = JSON.parse(rawText);
-    } catch (e) {
-      addMessage("Apologies for the brief hitch! 🛠️ My connection timed out, but our technical team has already been alerted and is working to fix this ASAP. Please give it a moment and try sending your message again.", "bot");
-      isTyping = false;
-      return;
+    // Intercept and strip the automated proposal JSON if present
+    let cleanReply = reply;
+    if (reply.includes("###EMAIL_START###")) {
+      cleanReply = reply.split("###EMAIL_START###")[0].trim();
+      console.log("Automated proposal JSON captured successfully from edge worker.");
     }
 
-    // Robust extraction covering various Activepieces response formats
-    const personality = [
-      "Let me check that for you...",
-      "Working on it...",
-      "Analyzing your request..."
-    ];
-    let reply = personality[Math.floor(Math.random() * personality.length)];
-
-    if (typeof data === 'string') {
-      reply = data;
-    } else if (data.output) {
-      reply = data.output;
-    } else if (data.reply) {
-      if (Array.isArray(data.reply)) {
-        // Checks for 'content', 'Content', or direct string
-        const firstReply = data.reply[0];
-        reply = firstReply?.content || firstReply?.Content || (typeof firstReply === 'string' ? firstReply : JSON.stringify(firstReply));
-      } else {
-        reply = data.reply;
-      }
-    } else if (data.choices?.[0]?.message?.content) {
-      reply = data.choices[0].message.content;
-    } else if (typeof data === 'object' && data !== null) {
-      // Fallback to grab the first string property if the structure changes
-      const stringKeys = Object.keys(data).filter(k => typeof data[k] === 'string');
-      if (stringKeys.length > 0) reply = data[stringKeys[0]];
-    }
-
-    await addMessage(reply, "bot", true);
+    // Render bot response to user interface (save=false since we save explicitly below)
+    await addMessage(cleanReply, "bot", true, false);
+    
+    // CRITICAL FIX: Save the bot's clean response into history so it's remembered next turn!
+    saveToHistory(cleanReply, "bot");
+    
     addEndSessionButton();
 
   } catch (err) {
-    console.error("Chatbox Fetch Error:", err);
+    console.error("Connection Error:", err);
     if (typingIndicator) typingIndicator.remove();
     addErrorMessage("Sorry, I'm having trouble connecting. Check your internet.");
     pendingRetry = true;
