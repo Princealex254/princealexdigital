@@ -3,4 +3,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://princealex.pro/sitemap.xml
+Sitemap: https://princealex.digital/sitemap.xml
