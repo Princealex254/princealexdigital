@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Portfolio – Web Design & Digital Projects in Kenya | Prince Alex Digital</title>
     <meta name="description" content="Explore recent web design, branding, and digital marketing projects by Prince Alex Digital. We showcase real client work delivering results across Kenya.">
-    <link rel="canonical" href="https://princealex.digital/portfolio/">
+    <link rel="canonical" href="https://www.princealex.digital/portfolio/">
     <meta name="robots" content="index, follow">
 
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
@@ -292,7 +292,7 @@
             const backdrop = document.getElementById('mobile-menu-backdrop');
             const icon = btn ? btn.querySelector('.hamburger-icon') : null;
             function toggleMenu() {
-                menu.classList.toggle('show');
+                if (menu) menu.classList.toggle('show');
                 backdrop.classList.toggle('show');
                 if(icon) icon.classList.toggle('active');
                 document.body.style.overflow = menu.classList.contains('show') ? 'hidden' : '';
