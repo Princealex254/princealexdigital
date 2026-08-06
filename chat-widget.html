@@ -15,9 +15,24 @@
   --chat-bg: #f8fafc;
   --chat-text: #1e293b;
   --chat-white: #ffffff;
+  --chat-surface: #ffffff;
+  --chat-border: #f1f5f9;
+  --chat-input-bg: #f8fafc;
   --chat-user-msg: #dcfce7;
   --chat-bot-msg: #f1f5f9;
   --glass-bg: rgba(255, 255, 255, 0.85);
+}
+
+/* Dark theme — only surfaces/text swap; --chat-white stays pure white
+   since it's used for text/icons sitting on colored (not surface)
+   backgrounds like the header and primary buttons, which don't change. */
+:root[data-theme="dark"] {
+  --chat-bg: #0f172a;
+  --chat-text: #e2e8f0;
+  --chat-surface: #1e293b;
+  --chat-border: #334155;
+  --chat-input-bg: #0f172a;
+  --glass-bg: rgba(15, 23, 42, 0.9);
 }
 
 * { box-sizing: border-box; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
@@ -77,10 +92,8 @@
   position: fixed;
   bottom: 38px;
   right: 92px;
-  background: var(--chat-white);
+  background: var(--chat-surface);
   color: var(--chat-text);
-  padding: 6px 12px;
-  border-radius: 12px 12px 0 12px;
   font-size: 11px;
   font-weight: 600;
   box-shadow: 0 4px 15px rgba(0,0,0,0.1);
@@ -317,7 +330,7 @@
 }
 
 .bot {
-  background: var(--chat-white);
+  background: var(--chat-surface);
   color: var(--chat-text);
   border-bottom-left-radius: 2px;
   box-shadow: 0 4px 15px rgba(0,0,0,0.05);
@@ -334,7 +347,7 @@
 
 .bot:not(.consecutive-msg)::before {
   left: -6px;
-  background: var(--chat-white);
+  background: var(--chat-surface);
   clip-path: polygon(100% 0, 100% 100%, 0 100%);
 }
 
@@ -382,7 +395,7 @@
 }
 
 .chip {
-  background: var(--chat-white);
+  background: var(--chat-surface);
   border: 1px solid var(--chat-primary);
   color: var(--chat-primary);
   padding: 6px 14px;
@@ -401,8 +414,8 @@
 #input-area {
   display: flex;
   padding: 12px 15px;
-  background: var(--chat-white);
-  border-top: 1px solid #f1f5f9;
+  background: var(--chat-surface);
+  border-top: 1px solid var(--chat-border);
   position: relative;
   z-index: 1;
   gap: 10px;
@@ -412,8 +425,9 @@
 #input {
   flex: 1;
   padding: 12px 18px;
-  border: 1px solid #f1f5f9;
-  background: #f8fafc;
+  border: 1px solid var(--chat-border);
+  background: var(--chat-input-bg);
+  color: var(--chat-text);
   border-radius: 24px;
   outline: none;
   font-size: 0.9rem;
@@ -493,7 +507,7 @@
 }
 
 .chat-footer {
-  background: var(--chat-white);
+  background: var(--chat-surface);
   padding: 10px 8px;
   text-align: center;
   font-size: 0.65rem;
@@ -537,8 +551,8 @@
 }
 
 .retry-btn {
-  background: var(--chat-white);
-  border: 1px solid #e2e8f0;
+  background: var(--chat-surface);
+  border: 1px solid var(--chat-border);
   color: var(--chat-primary);
   padding: 5px 12px;
   border-radius: 12px;
@@ -551,8 +565,121 @@
   transition: all 0.2s;
 }
 .retry-btn:hover {
-  background: #f8fafc;
+  background: var(--chat-input-bg);
   border-color: var(--chat-primary);
+}
+
+/* Unread message badge on the launcher button */
+.unread-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  background: var(--chat-accent);
+  color: var(--chat-white);
+  border: 2px solid var(--chat-white);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+.unread-badge.visible { display: flex; }
+
+/* Fallback avatar shown if mylogo.png fails to load */
+.avatar-fallback, .msg-avatar-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--chat-primary);
+  color: var(--chat-white);
+  border-radius: 50%;
+}
+.avatar-fallback { width: 40px; height: 40px; font-size: 1rem; }
+.msg-avatar-fallback { width: 32px; height: 32px; font-size: 0.85rem; }
+
+/* Visually-hidden but screen-reader-accessible content */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* "New message" pill — appears when the user has scrolled up and a new
+   message arrives, so it isn't missed off-screen */
+#scroll-to-bottom {
+  position: absolute;
+  bottom: 78px;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: var(--chat-primary);
+  color: var(--chat-white);
+  border: none;
+  border-radius: 20px;
+  padding: 7px 16px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  z-index: 2;
+}
+#scroll-to-bottom.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
+}
+
+/* Character counter, only shown near the input's max length */
+.char-counter {
+  font-size: 0.7rem;
+  color: #ef4444;
+  white-space: nowrap;
+  display: none;
+}
+.char-counter.visible { display: inline; }
+
+#mute-btn:hover { opacity: 1 !important; }
+#theme-btn:hover { opacity: 1 !important; }
+
+#mic-btn {
+  background: var(--chat-surface);
+  border: 1px solid var(--chat-border);
+  color: var(--chat-primary);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+#mic-btn:hover { background: var(--chat-input-bg); }
+#mic-btn.recording {
+  background: #ef4444;
+  border-color: #ef4444;
+  color: var(--chat-white);
+  animation: mic-pulse 1.2s infinite;
+}
+@keyframes mic-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.5); }
+  70% { box-shadow: 0 0 0 10px rgba(239,68,68,0); }
+  100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
 }
 </style>
 </head>
@@ -561,34 +688,55 @@
 
 <div id="chat-tooltip">Hi, I'm Alex, how can I assist you?</div>
 
-<button id="chat-btn" class="pulse" onclick="toggleChat()">
+<button id="chat-btn" class="pulse" onclick="toggleChat()" aria-label="Open chat with Alex" aria-expanded="false">
     <i class="fa-solid fa-comments"></i>
+    <span id="unread-badge" class="unread-badge" aria-hidden="true">0</span>
 </button>
 
-<div id="chat-box">
+<div id="chat-box" role="dialog" aria-modal="false" aria-label="Chat with Alex, Prince Alex Digital">
   <div id="offline-status"><i class="fa-solid fa-wifi-slash"></i> No internet connection</div>
   <div id="chat-particles-container"></div>
   <div id="chat-header">
     <div class="header-left">
-      <img src="mylogo.png" class="bot-avatar" alt="Logo">
+      <img src="mylogo.png" class="bot-avatar" alt="Alex's avatar" onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
+      <div class="avatar-fallback" style="display:none;"><i class="fa-solid fa-user"></i></div>
       <div class="header-info">
         <h3>Prince Alex Digital Assistant</h3>
         <small><span class="status-dot"></span> Online • Replies instantly</small>
       </div>
     </div>
-    <button onclick="toggleChat()" title="Minimize" style="background:none; border:none; color:white; cursor:pointer; font-size:1.1rem; opacity: 0.8; transition: opacity 0.2s;">
-      <i class="fa-solid fa-chevron-down"></i>
-    </button>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <button id="theme-btn" onclick="toggleTheme()" title="Toggle dark mode" aria-label="Toggle dark mode" aria-pressed="false" style="background:none; border:none; color:white; cursor:pointer; font-size:1rem; opacity: 0.8; transition: opacity 0.2s;">
+        <i class="fa-solid fa-moon"></i>
+      </button>
+      <button id="mute-btn" onclick="toggleMute()" title="Mute notification sound" aria-label="Mute notification sound" aria-pressed="false" style="background:none; border:none; color:white; cursor:pointer; font-size:1rem; opacity: 0.8; transition: opacity 0.2s;">
+        <i class="fa-solid fa-volume-high"></i>
+      </button>
+      <button onclick="toggleChat()" title="Minimize" aria-label="Minimize chat" style="background:none; border:none; color:white; cursor:pointer; font-size:1.1rem; opacity: 0.8; transition: opacity 0.2s;">
+        <i class="fa-solid fa-chevron-down"></i>
+      </button>
+    </div>
   </div>
 
-  <div id="chat-messages"></div>
+  <div id="chat-messages" aria-live="off"></div>
+  <div id="sr-announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+  <button id="scroll-to-bottom" onclick="scrollToBottomNow()" aria-label="Scroll to latest message">
+    <i class="fa-solid fa-arrow-down"></i> New message
+  </button>
 
   <div id="input-area">
-    <input id="input" placeholder="Type your message..." onkeypress="handleKeyPress(event)" />
-    <button class="send-btn" onclick="sendMessage()">
+    <label for="input" class="sr-only">Type your message</label>
+    <input id="input" placeholder="Type your message..." onkeypress="handleKeyPress(event)" oninput="updateCharCounter()" maxlength="2000" aria-label="Type your message" />
+    <span id="char-counter" class="char-counter" aria-hidden="true"></span>
+    <button id="mic-btn" onclick="toggleVoiceInput()" aria-label="Speak your message" style="display:none;">
+        <i class="fa-solid fa-microphone"></i>
+    </button>
+    <button class="send-btn" onclick="sendMessage()" aria-label="Send message">
         <i class="fa-solid fa-paper-plane"></i>
     </button>
   </div>
+  <div id="voice-status" class="sr-only" aria-live="polite"></div>
+
   
   <div class="chat-footer">
     Powered by Prince Alex Digital AI Suite
@@ -603,10 +751,116 @@ let pendingRetry = false;
 
 const botSound = new Audio("https://cdn.pixabay.com/audio/2022/03/15/audio_502755913e.mp3");
 const WELCOME_MESSAGES = [
-  "Hello 👋 Welcome to Prince Alex Digital.\n\nWe help businesses grow through websites, automation, branding and digital solutions.\n\nHow can we help you today?"
+  "Hey! 👋 I'm Alex over at Prince Alex Digital.\n\nWe do websites, automation, branding — pretty much anything to help your business grow online.\n\nWhat can I help you with today?"
 ];
 let welcomeSent = false;
 let isTyping = false;
+let unreadCount = 0;
+let soundMuted = localStorage.getItem("soundMuted") === "true";
+updateMuteIcon();
+
+let darkMode = localStorage.getItem("darkMode") === "true";
+applyTheme();
+
+function toggleTheme() {
+  darkMode = !darkMode;
+  localStorage.setItem("darkMode", darkMode);
+  applyTheme();
+}
+
+function applyTheme() {
+  document.documentElement.setAttribute("data-theme", darkMode ? "dark" : "light");
+  const btn = document.getElementById("theme-btn");
+  if (!btn) return;
+  btn.setAttribute("aria-pressed", String(darkMode));
+  btn.innerHTML = `<i class="fa-solid ${darkMode ? "fa-sun" : "fa-moon"}"></i>`;
+}
+
+// Voice input via the Web Speech API. Feature-detected — the mic button
+// stays hidden entirely on browsers that don't support it (notably
+// Firefox and most non-Chromium browsers), rather than showing a control
+// that would just fail silently.
+const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = null;
+let isRecording = false;
+
+if (SpeechRecognitionAPI) {
+  document.getElementById("mic-btn").style.display = "inline-flex";
+  recognition = new SpeechRecognitionAPI();
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.lang = "en-US";
+
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    const input = document.getElementById("input");
+    input.value = (input.value ? input.value + " " : "") + transcript;
+    updateCharCounter();
+  };
+  recognition.onerror = () => { stopRecording(); };
+  recognition.onend = () => { stopRecording(); };
+}
+
+function toggleVoiceInput() {
+  if (!recognition) return;
+  if (isRecording) {
+    recognition.stop();
+  } else {
+    isRecording = true;
+    document.getElementById("mic-btn").classList.add("recording");
+    document.getElementById("voice-status").textContent = "Listening...";
+    try { recognition.start(); } catch (e) { stopRecording(); }
+  }
+}
+
+function stopRecording() {
+  isRecording = false;
+  document.getElementById("mic-btn").classList.remove("recording");
+  document.getElementById("voice-status").textContent = "";
+}
+
+function toggleMute() {
+  soundMuted = !soundMuted;
+  localStorage.setItem("soundMuted", soundMuted);
+  updateMuteIcon();
+}
+
+function updateMuteIcon() {
+  const btn = document.getElementById("mute-btn");
+  if (!btn) return;
+  btn.setAttribute("aria-pressed", String(soundMuted));
+  btn.title = soundMuted ? "Unmute notification sound" : "Mute notification sound";
+  btn.innerHTML = `<i class="fa-solid ${soundMuted ? "fa-volume-xmark" : "fa-volume-high"}"></i>`;
+}
+
+function updateUnreadBadge() {
+  const badge = document.getElementById("unread-badge");
+  if (!badge) return;
+  if (unreadCount > 0) {
+    badge.textContent = unreadCount > 9 ? "9+" : String(unreadCount);
+    badge.classList.add("visible");
+  } else {
+    badge.classList.remove("visible");
+  }
+}
+
+function updateCharCounter() {
+  const input = document.getElementById("input");
+  const counter = document.getElementById("char-counter");
+  const remaining = 2000 - input.value.length;
+  if (remaining <= 200) {
+    counter.textContent = remaining;
+    counter.classList.add("visible");
+  } else {
+    counter.classList.remove("visible");
+  }
+}
+
+function scrollToBottomNow() {
+  const msgBox = document.getElementById("chat-messages");
+  msgBox.scrollTop = msgBox.scrollHeight;
+  document.getElementById("scroll-to-bottom").classList.remove("visible");
+}
 
 function getSessionId() {
   let id = localStorage.getItem("sessionId");
@@ -637,16 +891,31 @@ window.addEventListener('offline', () => {
   document.getElementById("offline-status").style.display = "block";
 });
 
+// Show the "new message" pill only when the user has scrolled away from
+// the bottom — no point showing it if they're already looking at the end.
+document.getElementById("chat-messages").addEventListener('scroll', () => {
+  const msgBox = document.getElementById("chat-messages");
+  const distanceFromBottom = msgBox.scrollHeight - msgBox.scrollTop - msgBox.clientHeight;
+  if (distanceFromBottom < 60) {
+    document.getElementById("scroll-to-bottom").classList.remove("visible");
+  }
+});
+
 function toggleChat() {
   const box = document.getElementById("chat-box");
   const tooltip = document.getElementById("chat-tooltip");
+  const btn = document.getElementById("chat-btn");
   
   if (box.classList.contains('chat-box-active')) {
     box.classList.remove('chat-box-active');
+    btn.setAttribute("aria-expanded", "false");
     if (tooltip) tooltip.style.opacity = "1";
   } else {
     box.classList.add('chat-box-active');
-    document.getElementById("chat-btn").classList.remove("pulse");
+    btn.classList.remove("pulse");
+    btn.setAttribute("aria-expanded", "true");
+    unreadCount = 0;
+    updateUnreadBadge();
     if (tooltip) tooltip.style.opacity = "0";
     if (!welcomeSent) {
       showWelcome();
@@ -657,7 +926,10 @@ function toggleChat() {
 
 function resetChat() {
   localStorage.removeItem("chatHistory");
-  localStorage.removeItem("sessionId");
+  // Note: sessionId is intentionally NOT cleared here. It's the key the
+  // backend uses to recall this client (name, past conversations, etc.)
+  // across sessions — wiping it every time someone ends a chat would
+  // defeat the point of having long-term memory at all.
   document.getElementById("chat-messages").innerHTML = "";
   welcomeSent = false;
   toggleChat();
@@ -717,6 +989,14 @@ function addMessage(text, type, animate = false, save = true, time = null) {
       const img = document.createElement("img");
       img.src = "mylogo.png";
       img.className = "msg-avatar";
+      img.alt = "Alex";
+      img.onerror = function () {
+        this.onerror = null;
+        this.replaceWith(Object.assign(document.createElement("div"), {
+          className: "msg-avatar msg-avatar-fallback",
+          innerHTML: '<i class="fa-solid fa-user"></i>'
+        }));
+      };
       avatarContainer.appendChild(img);
     }
     wrapper.appendChild(avatarContainer);
@@ -737,7 +1017,8 @@ function addMessage(text, type, animate = false, save = true, time = null) {
     if (save && text) {
       const history = JSON.parse(localStorage.getItem("chatHistory") || "[]");
       history.push({ text, type, time: timeStr });
-      localStorage.setItem("chatHistory", JSON.stringify(history));
+      const trimmed = history.length > MAX_STORED_MESSAGES ? history.slice(-MAX_STORED_MESSAGES) : history;
+      localStorage.setItem("chatHistory", JSON.stringify(trimmed));
     }
 
     const textContainer = document.createElement("span");
@@ -752,11 +1033,20 @@ function addMessage(text, type, animate = false, save = true, time = null) {
       textContainer.textContent = text;
     }
 
-    if (type === "bot" && save) {
-      botSound.play().catch(() => {});
+    if (type === "bot" && animate) {
+      if (!soundMuted) botSound.play().catch(() => {});
       const box = document.getElementById("chat-box");
       if (!box.classList.contains('chat-box-active')) {
         document.getElementById("chat-btn").classList.add("pulse");
+        unreadCount++;
+        updateUnreadBadge();
+      } else {
+        // Chat is open — if the user has scrolled up away from the
+        // latest message, surface a pill instead of forcing a jump.
+        const distanceFromBottom = msgBox.scrollHeight - msgBox.scrollTop - msgBox.clientHeight;
+        if (distanceFromBottom > 80) {
+          document.getElementById("scroll-to-bottom").classList.add("visible");
+        }
       }
     }
   }
@@ -780,6 +1070,8 @@ function addMessage(text, type, animate = false, save = true, time = null) {
           msgBox.scrollTop = msgBox.scrollHeight;
           setTimeout(typeWriter, speed);
         } else {
+          const announcer = document.getElementById("sr-announcer");
+          if (announcer) announcer.textContent = text;
           resolve(wrapper);
         }
       }
@@ -815,10 +1107,16 @@ function retryLastMessage() {
 }
 
 // Helper to save messages to local storage context
+const MAX_STORED_MESSAGES = 100; // keep localStorage (and the payload we send) bounded
+
 function saveToHistory(text, type) {
   const history = JSON.parse(localStorage.getItem("chatHistory") || "[]");
-  history.push({ text: text, type: type, timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
-  localStorage.setItem("chatHistory", JSON.stringify(history));
+  // NOTE: key is "time", not "timestamp" — must match what addMessage()'s
+  // own inline save uses and what loadChatHistory() reads back, or
+  // reloaded messages silently lose their real send time.
+  history.push({ text: text, type: type, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+  const trimmed = history.length > MAX_STORED_MESSAGES ? history.slice(-MAX_STORED_MESSAGES) : history;
+  localStorage.setItem("chatHistory", JSON.stringify(trimmed));
 }
 
 function handleKeyPress(e) {
@@ -848,7 +1146,7 @@ async function sendMessage(overrideMsg = null) {
   saveToHistory(message, "user");
 
   addMessage(message, "user", false, false);
-  if (!overrideMsg) input.value = "";
+  if (!overrideMsg) { input.value = ""; updateCharCounter(); }
 
   const oldEnd = document.getElementById("end-session-btn");
   if (oldEnd) oldEnd.remove();
@@ -856,29 +1154,50 @@ async function sendMessage(overrideMsg = null) {
   isTyping = true;
   const typingIndicator = addMessage("...", "bot");
 
-  // Pull down the fresh history array to send to the Cloudflare Worker
-  const localHistory = JSON.parse(localStorage.getItem("chatHistory") || "[]");
+  // Pull down the fresh history array to send to the Cloudflare Worker.
+  // Capped to the last 40 — the backend only ever looks at the last 30
+  // for detection and the last 12 for the AI itself, so sending more is
+  // just wasted bandwidth/latency on every single request.
+  const localHistory = JSON.parse(localStorage.getItem("chatHistory") || "[]").slice(-40);
   
   try {
-    const res = await fetch(WEBHOOK_URL, {
+    const fetchPromise = fetch(WEBHOOK_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         message: message,
-        history: localHistory // Passes everything including the prompt history
+        history: localHistory, // Passes everything including the prompt history
+        clientKey: getSessionId() // Lets the backend recall this client across visits
       })
     });
+    // Timeout via Promise.race rather than AbortController/signal — some
+    // hosting/preview environments proxy fetch through postMessage across
+    // an iframe boundary, and AbortSignal can't be structured-cloned
+    // there, which throws a DataCloneError. This approach never touches
+    // fetch's options object, so it can't hit that issue.
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error("TimeoutError")), 30000);
+    });
+    const res = await Promise.race([fetchPromise, timeoutPromise]);
 
     if (typingIndicator) typingIndicator.remove();
     const data = await res.json();
     let reply = data.reply || "I didn't catch that. Could you try again?";
 
-    // Intercept and strip the automated proposal JSON if present
+    // Safety net: the backend should already send a clean reply with any
+    // ###EMAIL_START###/###COMPLAINT_START### block stripped out, but if
+    // that ever fails, showing the raw tags verbatim in chat would be a
+    // glaring, robotic-looking break — so we strip both here too.
     let cleanReply = reply;
-    if (reply.includes("###EMAIL_START###")) {
-      cleanReply = reply.split("###EMAIL_START###")[0].trim();
+    if (cleanReply.includes("###EMAIL_START###")) {
+      cleanReply = cleanReply.split("###EMAIL_START###")[0].trim();
       console.log("Automated proposal JSON captured successfully from edge worker.");
     }
+    if (cleanReply.includes("###COMPLAINT_START###")) {
+      cleanReply = cleanReply.split("###COMPLAINT_START###")[0].trim();
+      console.log("Automated complaint JSON captured successfully from edge worker.");
+    }
+    if (!cleanReply) cleanReply = "Got it — one moment while I sort that out for you.";
 
     // Render bot response to user interface (save=false since we save explicitly below)
     await addMessage(cleanReply, "bot", true, false);
@@ -891,7 +1210,10 @@ async function sendMessage(overrideMsg = null) {
   } catch (err) {
     console.error("Connection Error:", err);
     if (typingIndicator) typingIndicator.remove();
-    addErrorMessage("Sorry, I'm having trouble connecting. Check your internet.");
+    const timedOut = err.message === "TimeoutError";
+    addErrorMessage(timedOut
+      ? "That's taking longer than it should — mind trying again?"
+      : "Sorry, I'm having trouble connecting. Check your internet.");
     pendingRetry = true;
   }
   isTyping = false;
