@@ -1,0 +1,103 @@
+/* ============================================================
+   PRINCE ALEX DIGITAL — HOMEPAGE  (index.css)
+   Relies on /assets/css/pad.css for the design system.
+   ============================================================ */
+
+/* ---------- HERO ---------- */
+/* Rich navy hero — same visual language as the shared .page-hero on inner pages. */
+.hero{
+  position:relative;color:#fff;padding:72px 0 96px;overflow:hidden;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(20,184,166,0.22), transparent 42%),
+    radial-gradient(circle at 88% 12%, rgba(37,99,235,0.5), transparent 48%),
+    linear-gradient(180deg, rgba(12,22,52,0.78) 0%, rgba(22,42,80,0.86) 100%),
+    url("/assets/images/background.jpg") center/cover no-repeat,
+    var(--grad-hero);
+  border-bottom:1px solid rgba(255,255,255,0.08);
+}
+.hero::after{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px),
+                   linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px);
+  background-size:44px 44px;
+  mask-image:radial-gradient(circle at 70% 30%, #000 0%, transparent 70%);
+}
+.hero .container{position:relative;z-index:1;}
+/* Side-by-side layout on desktop: copy left, browser mockup right */
+.hero-grid{display:grid;grid-template-columns:1.02fr 0.98fr;gap:56px;align-items:center;}
+.hero .eyebrow{color:#7DD9EE;}
+.hero .eyebrow::before{background:var(--teal-bright);}
+.hero h1{color:#fff;margin-top:16px;}
+.hero-lead{margin-top:22px;font-size:1.12rem;max-width:52ch;color:#C7D2E8;}
+.hero-actions{display:flex;gap:14px;margin-top:32px;flex-wrap:wrap;}
+.hero-actions .btn-primary{box-shadow:var(--shadow-md);}
+.hero-actions .btn-ghost{border-color:rgba(255,255,255,0.4);color:#fff;}
+.hero-actions .btn-ghost:hover{border-color:var(--teal-bright);color:#fff;}
+
+/* Hero product preview */
+.hero-visual{position:relative;display:flex;justify-content:center;padding:20px 0;}
+.hero-mock{
+  width:100%;transform:perspective(1200px) rotateY(-4deg) rotateX(1deg);transition:transform .4s ease;
+  box-shadow:0 30px 70px rgba(5,10,24,0.55), 0 0 0 1px rgba(255,255,255,0.08);
+}
+.hero-visual:hover .hero-mock{transform:perspective(1200px) rotateY(0) rotateX(0);}
+.float-chip{
+  position:absolute;font-family:var(--font-display);font-weight:600;font-size:0.78rem;
+  background:linear-gradient(135deg, #0B1B4D 0%, var(--navy) 45%, var(--royal) 100%);
+  border:1px solid rgba(255,255,255,0.55);border-radius:999px;
+  padding:8px 14px;box-shadow:0 14px 30px rgba(5,10,24,0.55), inset 0 1px 0 rgba(255,255,255,0.25);
+  color:#fff;display:inline-flex;align-items:center;gap:6px;
+  animation:floaty 5s ease-in-out infinite;
+}
+.float-chip i{color:var(--teal-bright);}
+.fc-web{top:0;left:4%;animation-delay:0s;}
+.fc-saas{top:14%;right:2%;animation-delay:.6s;}
+.fc-ai{bottom:38%;left:-2%;animation-delay:1.2s;}
+.fc-pos{bottom:0;right:14%;animation-delay:1.8s;}
+.fc-brand{top:44%;right:-3%;animation-delay:2.4s;}
+.fc-auto{bottom:-2%;left:16%;animation-delay:3s;}
+@keyframes floaty{0%,100%{transform:translateY(0);}50%{transform:translateY(-9px);}}
+@media (prefers-reduced-motion:reduce){.float-chip{animation:none;}}
+@media (max-width:960px){
+  .hero{padding:40px 0;}
+  .hero-grid{grid-template-columns:1fr;gap:28px;}
+  .hero-visual{display:none;}
+  .hero-actions{margin-top:24px;}
+  .float-chip{font-size:0.7rem;padding:6px 11px;}
+}
+
+/* ---------- WHAT WE DO ---------- */
+.do-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+.do-card{padding:30px 28px;display:flex;flex-direction:column;opacity:0;transform:translateY(18px);transition:opacity .5s ease, transform .5s ease, box-shadow .25s ease, border-color .25s ease;}
+.do-card.is-visible{opacity:1;transform:translateY(0);}
+.do-card h3{margin-bottom:10px;font-size:1.15rem;}
+.do-card p{font-size:0.95rem;flex:1;}
+.do-link{display:inline-block;margin-top:18px;color:var(--royal);font-weight:600;font-size:0.9rem;}
+.do-link:hover{color:var(--teal);}
+.do-cta:hover{background:var(--navy);border-color:var(--navy);}
+.do-cta:hover h3,.do-cta:hover p,.do-cta:hover .do-link{color:#fff;}
+.do-cta .eyebrow{color:var(--teal-bright);}
+@media (max-width:880px){.do-grid{grid-template-columns:1fr 1fr;}}
+@media (max-width:560px){.do-grid{grid-template-columns:1fr;}}
+
+/* ---------- WHY CHOOSE US ---------- */
+.why-grid{margin-top:8px;}
+.why-card{
+  text-align:center;padding:34px 22px;border-top:3px solid var(--teal);
+  opacity:0;transform:translateY(18px);transition:opacity .5s ease, transform .5s ease, box-shadow .25s ease, border-color .25s ease;
+}
+.why-card.is-visible{opacity:1;transform:translateY(0);}
+.why-card:hover{box-shadow:var(--shadow-md);border-color:var(--royal);}
+.why-icon{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:58px;height:58px;border-radius:16px;margin-bottom:16px;font-size:1.45rem;line-height:1;
+  color:var(--teal-bright);
+  background:linear-gradient(140deg, rgba(20,184,166,0.14), rgba(30,58,138,0.12));
+  border:1px solid var(--line-strong);
+  transition:transform .3s ease, box-shadow .3s ease;
+}
+.why-card:hover .why-icon{transform:translateY(-4px) scale(1.06);box-shadow:0 0 26px rgba(20,184,166,0.22);}
+.why-card h3{font-size:1.05rem;}
+
+/* ---------- CTA ---------- */
+.cta-band-inner{padding:8px 0;}
