@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://princealex.digital/sitemap.xml
