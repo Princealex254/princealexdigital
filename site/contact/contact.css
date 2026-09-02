@@ -1,0 +1,125 @@
+/* ============================================================
+   PRINCE ALEX DIGITAL - CONTACT PAGE  (contact.css)
+   Relies on /assets/css/pad.css for the design system.
+   ============================================================ */
+
+/* ---------- QUICK ACTION LINKS ---------- */
+.quick-actions{border-bottom:1px solid var(--line);}
+.quick-actions-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:28px 0;}
+.quick-action{
+  display:flex;align-items:center;justify-content:center;gap:12px;
+  padding:20px 22px;border:1px solid var(--line);border-radius:var(--radius-md);
+  background:var(--surface);color:var(--text);
+  font-family:var(--font-display);font-weight:600;font-size:1rem;
+  box-shadow:var(--shadow-sm);
+  transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.quick-action i{font-size:1.2rem;color:var(--royal);}
+.quick-action:hover{transform:translateY(-3px);box-shadow:var(--shadow-md);border-color:var(--royal);}
+
+/* ---------- CONTACT GRID ---------- */
+.contact-grid{display:grid;grid-template-columns:1fr 1.55fr;gap:36px;align-items:start;}
+.contact-info-card,.contact-form-card{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);
+  padding:36px;box-shadow:var(--shadow-sm);
+}
+.contact-info-card[data-reveal],.contact-form-card[data-reveal]{
+  opacity:0;transform:translateY(18px);transition:opacity .5s ease, transform .5s ease;
+}
+.contact-info-card[data-reveal].is-visible,.contact-form-card[data-reveal].is-visible{opacity:1;transform:translateY(0);}
+
+/* ---------- CONTACT INFORMATION ---------- */
+.contact-info-card h2{font-size:1.3rem;margin-bottom:26px;}
+.contact-info-list{list-style:none;display:grid;gap:24px;margin:0;padding:0;}
+.contact-info-list li{display:flex;gap:14px;align-items:flex-start;}
+.ci-icon{
+  flex:none;width:44px;height:44px;border-radius:12px;
+  display:inline-flex;align-items:center;justify-content:center;
+  background:rgba(30,58,138,0.08);color:var(--royal);font-size:1.05rem;
+}
+html[data-theme="dark"] .ci-icon{background:rgba(96,165,250,0.14);color:var(--teal-bright);}
+.ci-label{display:block;font-family:var(--font-mono);font-size:0.68rem;text-transform:uppercase;letter-spacing:0.09em;color:var(--muted);margin-bottom:3px;}
+.contact-info-list a{color:var(--royal);font-weight:600;}
+.contact-info-list a:hover{color:var(--teal);}
+
+/* ---------- CONTACT FORM ---------- */
+.contact-form-card .eyebrow{margin-bottom:6px;}
+.contact-form-card h2{margin-bottom:8px;}
+.contact-form-desc{color:var(--muted);margin:0 0 26px;}
+
+.form-field{margin-bottom:18px;}
+.form-field label{display:block;font-size:0.84rem;font-weight:600;color:var(--text);margin-bottom:6px;}
+.form-field label em{color:#DC2626;font-style:normal;}
+.form-field input,.form-field textarea,.form-field select{
+  width:100%;padding:12px 14px;font:inherit;font-size:0.95rem;color:var(--text);
+  background:var(--bg);border:1px solid var(--line-strong);border-radius:var(--radius-md);
+  transition:border-color .18s ease, box-shadow .18s ease;
+}
+.form-field input:focus,.form-field textarea:focus,.form-field select:focus{
+  outline:none;border-color:var(--royal);box-shadow:0 0 0 3px rgba(37,99,235,0.15);
+}
+.form-field select{cursor:pointer;}
+.form-field textarea{resize:vertical;min-height:140px;}
+
+.form-footer{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:6px;}
+.form-note{font-size:0.82rem;color:var(--muted);max-width:34ch;margin:0;}
+
+/* ---------- TOAST (AJAX submit feedback) ---------- */
+.toast{
+  position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);
+  z-index:2000;display:flex;align-items:center;gap:10px;
+  background:#0F766E;color:#fff;padding:14px 20px;border-radius:var(--radius-md);
+  box-shadow:0 10px 30px rgba(0,0,0,0.25);font-size:0.92rem;font-weight:600;
+  opacity:0;pointer-events:none;max-width:min(420px,90vw);
+  transition:opacity .3s ease, transform .3s ease;
+}
+.toast.visible{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto;}
+.toast.is-error{background:#B91C1C;}
+.toast i{font-size:1.15rem;}
+
+/* Submit button loading spinner */
+.form-submit{position:relative;}
+.form-submit .btn-spinner{
+  display:none;width:16px;height:16px;flex:none;
+  border:2px solid rgba(255,255,255,0.35);border-top-color:#fff;border-radius:50%;
+  animation:submit-spin .7s linear infinite;
+}
+.form-submit.is-loading .btn-spinner{display:inline-block;}
+.form-submit.is-loading .arrow{display:none;}
+@keyframes submit-spin{to{transform:rotate(360deg);}}
+/* Honeypot (spam trap) */
+.hp-field{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;opacity:0;}
+
+/* Alert box (inline success / error messages instead of a transient toast) */
+.apply-alert{
+  display:flex;align-items:center;gap:10px;margin-bottom:20px;padding:13px 16px;
+  border-radius:var(--radius-md);font-size:0.9rem;font-weight:600;
+}
+.apply-alert.is-success{background:rgba(13,148,136,0.1);color:#0F766E;border:1px solid rgba(13,148,136,0.3);}
+.apply-alert.is-error{background:rgba(220,38,38,0.08);color:#B91C1C;border:1px solid rgba(220,38,38,0.3);}
+html[data-theme="dark"] .apply-alert.is-success{color:#5EEAD4;}
+html[data-theme="dark"] .apply-alert.is-error{color:#FCA5A5;}
+.apply-alert[hidden]{display:none;}
+
+/* Success panel (replaces the form on successful submission) */
+.apply-success{text-align:center;padding:26px 10px 10px;}
+.apply-success-icon{
+  display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;
+  border-radius:50%;font-size:1.9rem;color:#0F766E;margin-bottom:16px;
+  background:rgba(13,148,136,0.12);border:1px solid rgba(13,148,136,0.35);
+}
+html[data-theme="dark"] .apply-success-icon{color:#5EEAD4;background:rgba(20,184,166,0.14);}
+.apply-success h3{margin-bottom:8px;}
+.apply-success p{color:var(--muted);max-width:42ch;margin:0 auto 22px;}
+.apply-success[hidden]{display:none;}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width:980px){
+  .contact-grid{grid-template-columns:1fr;}
+}
+@media (max-width:560px){
+  /* Hide the Call Now / Email Us / WhatsApp quick-action bar on phones */
+  .quick-actions{display:none;}
+  .contact-info-card,.contact-form-card{padding:26px 20px;}
+  .form-footer{flex-direction:column;align-items:flex-start;}
+}
