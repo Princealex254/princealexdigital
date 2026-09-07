@@ -1,0 +1,79 @@
+/* ============================================================
+   PRINCE ALEX DIGITAL — ABOUT PAGE  (about.css)
+   Relies on /assets/css/pad.css for the design system.
+   ============================================================ */
+
+/* ---------- STORY GRID ---------- */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start;}
+.about-grid h2{margin-top:14px;}
+.about-grid p{margin-top:16px;max-width:52ch;}
+@media (max-width:880px){.about-grid{grid-template-columns:1fr;}}
+
+/* ---------- MISSION & VISION ---------- */
+.mission-vision{background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+.mission-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;}
+.mv-card{
+  position:relative;padding:40px 36px;border-radius:var(--radius-lg);overflow:hidden;
+  background:
+    radial-gradient(circle at 88% 12%, rgba(37,99,235,0.16), transparent 45%),
+    linear-gradient(150deg, var(--navy), var(--royal));
+  color:#fff;opacity:0;transform:translateY(18px);
+  transition:opacity .5s ease, transform .5s ease, box-shadow .25s ease;
+}
+.mv-card.is-visible{opacity:1;transform:translateY(0);}
+.mv-card:hover{box-shadow:var(--shadow-lg);}
+.mv-icon{position:absolute;top:34px;right:32px;font-size:2.2rem;opacity:0.85;color:var(--teal-bright);}
+.mv-card .eyebrow{color:var(--teal-bright);}
+.mv-card .eyebrow::before{background:var(--teal-bright);}
+.mv-card h2{color:#fff;margin-top:14px;font-size:clamp(1.3rem,2.2vw,1.7rem);max-width:24ch;}
+@media (max-width:880px){.mission-grid{grid-template-columns:1fr;}}
+
+/* ---------- TIMELINE ---------- */
+.section-light .timeline h3{color:var(--text);}
+
+/* ---------- CTA ---------- */
+.about-cta-inner{
+  display:flex;justify-content:space-between;align-items:center;gap:32px;flex-wrap:wrap;
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);
+  padding:44px 48px;
+}
+.about-cta-inner h2{margin-top:10px;}
+.about-cta-inner p{margin-top:12px;max-width:46ch;}
+.about-cta-actions{display:flex;gap:14px;flex-wrap:wrap;}
+/* ---------- FOUNDER NOTE ---------- */
+.founder-card{
+  position:relative;margin:0 auto;padding:56px 64px;border-radius:var(--radius-lg);overflow:hidden;text-align:center;
+  background:
+    radial-gradient(circle at 12% 12%, rgba(45,212,191,0.14), transparent 45%),
+    radial-gradient(circle at 88% 12%, rgba(37,99,235,0.16), transparent 45%),
+    linear-gradient(150deg, var(--navy), var(--royal));
+  color:#fff;box-shadow:var(--shadow-md);
+  transition:box-shadow .25s ease;
+}
+.founder-card:hover{box-shadow:var(--shadow-lg);}
+.founder-card .eyebrow{color:var(--teal-bright);}
+.founder-card .eyebrow::before{background:var(--teal-bright);}
+.founder-quote-mark{position:absolute;top:30px;right:36px;font-size:2.4rem;opacity:0.3;color:var(--teal-bright);}
+.founder-quote{margin:0;padding:0;}
+.founder-quote p{
+  margin:18px auto 0;max-width:56ch;color:#fff;
+  font-family:var(--font-display);font-size:clamp(1.15rem,2.2vw,1.5rem);
+  line-height:1.5;font-weight:500;
+}
+.founder-signature{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:30px;}
+.founder-avatar{
+  display:flex;align-items:center;justify-content:center;width:60px;height:60px;flex:none;
+  border-radius:50%;background:var(--grad-pop);
+  font-family:var(--font-display);font-weight:700;font-size:1.15rem;letter-spacing:0.02em;color:#fff;
+  box-shadow:0 0 0 3px rgba(255,255,255,0.22), var(--shadow-sm);
+}
+/* Photo-ready: replace the initials <span> with <img class="founder-avatar" src="..." alt="Alex Senerwa">
+   and it crops/centres automatically — no redesign needed. */
+img.founder-avatar{object-fit:cover;}
+.founder-meta{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;}
+.founder-name{font-family:var(--font-display);font-size:1.05rem;font-weight:600;color:#fff;}
+.founder-role{
+  font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.08em;
+  color:var(--teal-bright);text-transform:uppercase;
+}
+@media (max-width:720px){.founder-card{padding:44px 26px;}}

@@ -1,0 +1,51 @@
+/* ============================================================
+   PRINCE ALEX DIGITAL — SOLUTIONS PAGE  (solutions.css)
+   Relies on /assets/css/pad.css for the design system.
+   ============================================================ */
+
+/* ---------- SOLUTION AREA CARDS ---------- */
+.sol-card{padding:30px 28px;display:flex;flex-direction:column;opacity:0;transform:translateY(18px);transition:opacity .5s ease, transform .5s ease, box-shadow .25s ease, border-color .25s ease;}
+.sol-card.is-visible{opacity:1;transform:translateY(0);}
+.sol-icon{
+  font-size:1.6rem;margin-bottom:16px;width:52px;height:52px;flex:none;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--surface-2);border:1px solid var(--line);border-radius:14px;color:var(--teal-bright);
+}
+.sol-card h3{margin-bottom:10px;font-size:1.15rem;}
+.sol-card > p{font-size:0.95rem;}
+.sol-card ul{margin:16px 0 8px;display:grid;gap:8px;}
+.sol-card ul li{font-size:0.9rem;color:var(--muted);display:flex;align-items:center;gap:8px;}
+.sol-card ul li::before{content:"\f00c";font-family:"Font Awesome 6 Free";font-weight:900;color:var(--teal);flex:none;}
+.sol-card .do-link{margin-top:auto;padding-top:16px;}
+
+/* ---------- PRODUCT SECTIONS (ShuleSmart & POS) ---------- */
+.product-section{padding:96px 0;}
+.product-grid{display:grid;grid-template-columns:0.95fr 1.05fr;gap:56px;align-items:center;}
+.product-grid.reverse .product-copy{order:2;}
+.product-grid.reverse .product-mock{order:1;}
+.product-copy h2{margin-top:14px;}
+.product-copy > p{margin-top:16px;font-size:1.03rem;max-width:52ch;}
+.product-features{margin-top:24px;display:grid;gap:14px;}
+.product-features li{
+  padding:14px 18px;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius-sm);font-size:0.94rem;color:var(--muted);
+  display:flex;gap:10px;
+}
+.product-features li strong{flex:none;}
+.product-actions{display:flex;gap:14px;margin-top:30px;flex-wrap:wrap;}
+@media (max-width:880px){
+  .product-grid{grid-template-columns:1fr;gap:40px;}
+  .product-grid.reverse .product-copy{order:1;}
+  .product-grid.reverse .product-mock{order:2;}
+}
+
+/* Mobile: hide the product mockup visuals (ShuleSmart dashboard &
+   POS terminal previews) so the sections stay tight — copy, feature
+   boxes and action buttons carry the message on small screens. */
+@media (max-width:560px){
+  .product-mock{display:none;}
+}
+
+/* ---------- JUMP NAV placement ---------- */
+.page-hero .jump-nav a{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.25);color:#E2E8F0;}
+.page-hero .jump-nav a:hover{border-color:var(--teal-bright);color:#fff;background:rgba(255,255,255,0.14);}
