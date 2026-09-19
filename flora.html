@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="Handcrafted memorial booklet">
+<title>Kumbukumbu ya Marehemu Flora Mideva · 29-3-1970 – 12-9-2026</title>
+<style>
+/* =====================================================================
+   KUMBUKUMBU YA MAREHEMU FLORA MIDEVA
+   A5 portrait memorial programme — single standalone HTML file
+   Pages: 1 Jalada (cover) · 2 Programme · 3 Historia · 4 Kwa ufupi
+
+   PRINT MODES
+   · Normal A5 : four separate A5 portrait pages (1 → 2 → 3 → 4)
+   · Booklet   : A4 landscape, duplex, flip on short edge
+                 sheet front = 4 | 1     sheet back = 2 | 3
+                 fold in the centre  →  1 → 2 → 3 → 4
+   ===================================================================== */
+
+/* ------------------------------ PAGE SETUP ------------------------------ */
+@page {
+    size: A5 portrait;
+    margin: 0;
+}
+
+:root{
+    --pw: 148mm;
+    --ph: 210mm;
+
+    --ink:      #2B2925;
+    --ink-2:    #3C3934;
+    --ink-3:    #5F5A52;
+
+    --gold:     #9A8353;
+    --gold-l:   #C3B08A;
+    --gold-xl:  #E1D6BA;
+
+    --ivory:    #FBF7EE;
+    --ivory-2:  #F4EEE1;
+
+    --serif: "Cormorant Garamond", "EB Garamond", "Adobe Garamond Pro",
+             "Palatino Linotype", "Book Antiqua", Palatino, Georgia, "Times New Roman", serif;
+    --body:  "Sitka Text", Cambria, "Book Antiqua", Palatino,
+             "Palatino Linotype", Georgia, "Times New Roman", serif;
+}
+
+/* -------------------------------- RESET -------------------------------- */
+*, *::before, *::after{ box-sizing: border-box; }
+html{ -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body{
+    margin: 0;
+    background: #E7E1D5;
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+h1, h2, h3, p, figure, ol, ul{ margin: 0; }
+ol, ul{ padding: 0; list-style: none; }
+img{ display: block; max-width: 100%; }
+svg{ display: block; }
+
+/* --------------------- SCREEN ONLY: PREVIEW TOOLBAR --------------------- */
+.toolbar{
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px 22px;
+    padding: 11px clamp(14px, 3vw, 32px);
+    background: #201E1B;
+    color: #EDE5D3;
+    border-bottom: 1px solid rgba(195,176,138,.35);
+}
+.toolbar__title{
+    font-family: var(--serif);
+    font-size: 14.5px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: #E3D8BD;
+}
+.toolbar__hint{
+    font-size: 11.5px;
+    letter-spacing: .03em;
+    color: #ADA595;
+    max-width: 60ch;
+}
+.toolbar__actions{ display: flex; align-items: center; gap: 12px; }
+.btn{
+    appearance: none;
+    cursor: pointer;
+    font-family: var(--body);
+    font-size: 12px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--ivory);
+    background: transparent;
+    border: .8px solid rgba(195,176,138,.8);
+    padding: 9px 20px;
+    border-radius: 1px;
+}
+.btn:hover{ background: rgba(195,176,138,.18); }
+.btn:focus-visible{ outline: 2px solid var(--gold-l); outline-offset: 2px; }
+
+/* ----------------- SCREEN ONLY: BOOKLET PRINT CONTROL PANEL ------------------ */
+.print-controls{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 24px;
+    padding: 12px clamp(14px, 3vw, 32px);
+    background: #2A2723;
+    color: #EDE5D3;
+    border-bottom: 1px solid rgba(195,176,138,.28);
+}
+.print-controls__buttons{ display: flex; flex-wrap: wrap; gap: 10px; }
+.print-controls__info{ flex: 1 1 300px; min-width: 0; }
+.print-controls__status{
+    font-size: 12.5px;
+    letter-spacing: .03em;
+    color: #E3D8BD;
+}
+.print-controls__help{
+    margin-top: 3px;
+    font-size: 11px;
+    line-height: 1.45;
+    letter-spacing: .03em;
+    color: #ADA595;
+}
+.btn--primary{
+    background: rgba(195,176,138,.24);
+    border-color: var(--gold-l);
+    font-weight: 700;
+}
+.btn[aria-pressed="true"]{
+    background: var(--gold-l);
+    border-color: var(--gold-l);
+    color: #201E1B;
+}
+.btn[aria-pressed="true"]:hover{ background: var(--gold-l); }
+
+/* ---------------------- SCREEN ONLY: BOOKLET SPREAD --------------------- */
+.booklet{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 26px;
+    padding: clamp(18px, 3.4vw, 42px) 16px 66px;
+    background: radial-gradient(130% 70% at 50% 0, #F0EBE1 0%, #E3DDD0 58%, #D8D1C2 100%);
+}
+.sheet{
+    --zoom: 1;
+    width: calc(var(--pw) * var(--zoom));
+    height: calc(var(--ph) * var(--zoom));
+}
+
+/* ------------------------------- THE PAGE ------------------------------- */
+.page{
+    position: relative;
+    width: var(--pw);
+    height: var(--ph);
+    overflow: hidden;
+    background: var(--ivory);
+    color: var(--ink);
+    transform: scale(var(--zoom));
+    transform-origin: top left;
+    box-shadow: 0 16px 34px rgba(50,44,34,.22), 0 2px 6px rgba(50,44,34,.12);
+    break-after: page;
+    page-break-after: always;
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+.page-inner{
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 13mm 12.5mm 11.5mm;
+}
+
+/* thin double keyline (printed border) */
+.frame{
+    position: absolute;
+    inset: 6.2mm;
+    border: .3mm solid rgba(154,131,83,.5);
+    pointer-events: none;
+}
+.frame::after{
+    content: "";
+    position: absolute;
+    inset: 1.15mm;
+    border: .18mm solid rgba(195,176,138,.42);
+}
+
+/* ------------------------------ ORNAMENTS ------------------------------- */
+.orn-rule{ width: 34mm; height: 3.4mm; margin: 0 auto; color: var(--gold); opacity: .9; }
+.orn-rule--sm{ width: 24mm; height: 2.4mm; }
+.orn-cross{ width: 7.6mm; height: 9.8mm; margin: 0 auto; color: var(--gold); opacity: .92; }
+.orn-cross--lg{ width: 9.6mm; height: 12.4mm; }
+
+/* ----------------------------- TYPOGRAPHY ------------------------------- */
+.kicker{
+    font-family: var(--serif);
+    font-size: 10.4pt;
+    letter-spacing: .3em;
+    text-indent: .3em;
+    text-transform: uppercase;
+    text-align: center;
+    color: var(--gold);
+}
+.page-title{
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 19pt;
+    line-height: 1.12;
+    letter-spacing: .17em;
+    text-indent: .17em;
+    text-transform: uppercase;
+    text-align: center;
+    color: #26241F;
+}
+.page-title--long{ font-size: 16pt; letter-spacing: .1em; text-indent: .1em; }
+
+/* small ceremonial label used for the history sections */
+.sec-label{
+    font-family: var(--serif);
+    font-size: 11pt;
+    line-height: 1.2;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--gold);
+}
+.page-foot{
+    margin-top: auto;
+    padding-top: 5mm;
+    display: flex;
+    justify-content: center;
+    font-family: var(--serif);
+    font-size: 9.5pt;
+    letter-spacing: .28em;
+    text-indent: .28em;
+    color: rgba(111,105,93,.72);
+}
+
+/* ------------------------- PAGE 1 · MEMORIAL COVER ---------------------- */
+.page--cover .page-inner{ padding: 11mm 13mm 11.5mm; }
+.cover__head{ flex: 0 0 auto; text-align: center; }
+.cover__head .orn-cross{ margin-top: 3mm; }
+.cover__name{
+    margin-top: 4.2mm;
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 30pt;
+    line-height: 1.05;
+    letter-spacing: .06em;
+    text-indent: .06em;
+    text-transform: uppercase;
+    color: #23211D;
+}
+.cover__portrait{
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 0;
+    margin: 3mm 0 2mm;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+.portrait-glow{
+    position: absolute;
+    z-index: 0;
+    left: 50%;
+    bottom: -1mm;
+    width: 100%;
+    height: 74%;
+    transform: translateX(-50%);
+    background: radial-gradient(ellipse 50% 50% at 50% 38%,
+                rgba(199,180,140,.30) 0%,
+                rgba(199,180,140,.13) 56%,
+                rgba(199,180,140,0) 76%);
+}
+.portrait{
+    position: relative;
+    z-index: 1;
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+    object-position: bottom center;
+    filter: drop-shadow(0 .9mm 1.8mm rgba(43,38,30,.20));
+}
+.cover__foot{ flex: 0 0 auto; text-align: center; }
+.days{ margin-top: 4mm; }
+.days p{
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 3.4mm;
+    font-size: 12pt;
+}
+.days p + p{ margin-top: 1.7mm; }
+.days__k{
+    font-family: var(--serif);
+    font-size: 9.6pt;
+    letter-spacing: .24em;
+    text-transform: uppercase;
+    color: var(--gold);
+}
+.days__v{
+    font-family: var(--serif);
+    font-size: 12.4pt;
+    letter-spacing: .08em;
+    color: #2C2A25;
+    font-variant-numeric: tabular-nums;
+}
+.cover__verse{
+    margin: 4mm auto 0;
+    max-width: 120mm;
+    font-size: 10.5pt;
+    line-height: 1.6;
+    font-style: italic;
+    color: var(--ink-2);
+}
+
+/* -------------------- SHARED INNER-PAGE HEADING BLOCK ------------------- */
+.inner-head{ flex: 0 0 auto; text-align: center; }
+.inner-head .orn-cross{ margin-top: 2.6mm; }
+.inner-head .page-title{ margin-top: 3.2mm; }
+.inner-head .orn-rule{ margin-top: 3.4mm; }
+
+/* --------------------------- PAGE 2 · PROGRAMME ------------------------- */
+.programme{ flex: 1 1 auto; display: flex; flex-direction: column; justify-content: center; min-height: 0; }
+.order{ width: 100%; }
+.order > li{
+    display: grid;
+    grid-template-columns: 7mm 1fr;
+    column-gap: 4.2mm;
+    align-items: baseline;
+    padding: 1.2mm 0;
+    border-bottom: .2mm solid rgba(154,131,83,.22);
+    break-inside: avoid;
+}
+.order > li .num{
+    font-family: var(--serif);
+    font-size: 12.4pt;
+    line-height: 1;
+    text-align: right;
+    color: var(--gold);
+    font-variant-numeric: tabular-nums;
+}
+.order > li .label{
+    font-size: 10.3pt;
+    line-height: 1.34;
+    letter-spacing: .055em;
+    text-transform: uppercase;
+    color: #302D28;
+}
+/* indented speakers' list */
+.sub{
+    grid-column: 1 / -1;
+    margin-top: 2.1mm;
+    padding: .5mm 0 .3mm 4.4mm;
+    border-left: .25mm solid rgba(195,176,138,.8);
+}
+.sub > li{
+    display: grid;
+    grid-template-columns: 5.4mm 1fr;
+    column-gap: 2.4mm;
+    align-items: baseline;
+    padding: .6mm 0;
+}
+.sub .mark{
+    font-family: "Segoe UI Symbol", "Arial Unicode MS", "Noto Sans Symbols 2", var(--body);
+    font-size: 9.2pt;
+    line-height: 1.4;
+    color: var(--gold);
+}
+.sub .who{ font-size: 9.9pt; line-height: 1.38; color: var(--ink-2); }
+
+/* ---------------------------- PAGE 3 · HISTORY -------------------------- */
+.history{ flex: 1 1 auto; min-height: 0; }
+.history section + section{ margin-top: 3.2mm; }
+.history section{ break-inside: avoid; }
+.history p{
+    margin-top: 1.2mm;
+    font-size: 9.8pt;
+    line-height: 1.53;
+    text-align: justify;
+    text-justify: inter-word;
+    color: var(--ink-2);
+}
+.history section p:first-of-type{ margin-top: 1.5mm; }
+
+/* ----------------------- PAGE 4 · KWA UFUPI / LEGACY -------------------- */
+.summary{ flex: 1 1 auto; display: flex; flex-direction: column; justify-content: center; min-height: 0; }
+.summary__list{ width: 100%; }
+.summary__list li{
+    display: grid;
+    grid-template-columns: 7mm 1fr;
+    column-gap: 4.2mm;
+    align-items: baseline;
+    padding: 2.35mm 0;
+    border-bottom: .2mm solid rgba(154,131,83,.24);
+    break-inside: avoid;
+}
+.summary__list .num{
+    font-family: var(--serif);
+    font-size: 12.8pt;
+    line-height: 1;
+    text-align: right;
+    color: var(--gold);
+    font-variant-numeric: tabular-nums;
+}
+.summary__list .txt{ font-size: 10.3pt; line-height: 1.45; color: #33302B; }
+
+/* closing memorial statement */
+.closing{
+    flex: 0 0 auto;
+    margin-top: 8mm;
+    padding: 0 6mm;
+    text-align: center;
+}
+.closing__rule{ margin-bottom: 4.6mm; }
+.closing__text{
+    font-family: var(--serif);
+    font-size: 14pt;
+    line-height: 1.5;
+    font-style: italic;
+    color: #2A2823;
+}
+.closing__cross{ margin-top: 4.6mm; }
+.closing__rule--bottom{ margin-top: 4.4mm; margin-bottom: 0; }
+
+/* ============================ PRINT: A5 BOOKLET ========================== */
+@media print{
+    html, body{
+        margin: 0;
+        padding: 0;
+        background: #fff;
+        width: auto;
+        height: auto;
+    }
+    /* screen-only chrome never prints */
+    .no-print,
+    .toolbar,
+    .btn{ display: none !important; }
+
+    .booklet{
+        display: block;
+        padding: 0;
+        margin: 0;
+        gap: 0;
+        background: none;
+    }
+    .sheet{
+        --zoom: 1;
+        width: var(--pw);
+        height: var(--ph);
+        margin: 0;
+        padding: 0;
+    }
+    .page{
+        transform: none !important;
+        margin: 0;
+        box-shadow: none;
+        border-radius: 0;
+        background: var(--ivory);
+    }
+    /* one printed sheet per .page, except the last one (no trailing blank page) */
+    .page{
+        break-after: page;
+        page-break-after: always;
+    }
+    .sheet:last-child .page{
+        break-after: auto;
+        page-break-after: auto;
+    }
+    /* keep warm paper, keylines and ornaments on the printed sheet */
+    .page, .page *{
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    .page a[href]::after{ content: ""; }
+}
+
+/* ================= PRINT: A4 LANDSCAPE BOOKLET IMPOSITION ================ */
+/* The imposed sheets live in .booklet-print (built by the script from the four
+   pages above). They are never visible on screen, and they only print while
+   the document is in Booklet mode (body.mode-booklet). In that mode the script
+   also adds   @page { size: A4 landscape; margin: 0; }   so the browser uses
+   the correct paper. Normal A5 mode keeps the original A5 @page rule.        */
+.booklet-print{
+    --sheet-w: 297mm;      /* A4 landscape width  */
+    --sheet-h: 210mm;      /* A4 landscape height */
+    --half-w: 148.5mm;     /* one half = one A5 portrait page */
+    display: none;
+}
+
+@media print{
+    /* control panel never prints */
+    .print-controls{ display: none !important; }
+
+    /* Booklet mode: hide the stacked A5 preview, show the imposed sheets */
+    body.mode-booklet .normal-preview{ display: none !important; }
+    body.mode-booklet .booklet-print{
+        display: block;
+        width: var(--sheet-w);
+        margin: 0;
+        padding: 0;
+    }
+
+    /* one printed side of an A4 sheet = one PDF page */
+    .bp-side{
+        display: flex;
+        flex-wrap: nowrap;
+        width: var(--sheet-w);
+        height: var(--sheet-h);
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background: var(--ivory);
+        break-inside: avoid;
+        page-break-inside: avoid;
+        break-after: page;
+        page-break-after: always;
+    }
+    .bp-side:last-child{           /* no trailing blank page */
+        break-after: auto;
+        page-break-after: auto;
+    }
+
+    /* each half = one A5 portrait page, fold runs down the centre */
+    .bp-half{
+        flex: 0 0 var(--half-w);
+        width: var(--half-w);
+        height: var(--sheet-h);
+        display: flex;
+        justify-content: center;   /* 148 mm page centred in the 148.5 mm half */
+        align-items: stretch;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background: var(--ivory);
+    }
+    .booklet-print .page{
+        flex: 0 0 var(--pw);
+        margin: 0;
+        transform: none !important;
+        box-shadow: none;
+        break-after: auto;         /* the sheet, not the page, decides breaks */
+        page-break-after: auto;
+    }
+
+    .bp-side, .bp-half, .bp-side .page, .bp-side .page *{
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}
+
+/* ===================== SCREEN: PROPORTIONAL PAGE SCALING ================ */
+@media screen and (max-width: 620px){ .sheet{ --zoom: .9;  } }
+@media screen and (max-width: 560px){ .sheet{ --zoom: .8;  } }
+@media screen and (max-width: 500px){ .sheet{ --zoom: .72; } }
+@media screen and (max-width: 440px){ .sheet{ --zoom: .64; } }
+@media screen and (max-width: 400px){ .sheet{ --zoom: .56; } }
+@media screen and (max-width: 350px){ .sheet{ --zoom: .48; } }
+@media screen and (max-width: 310px){ .sheet{ --zoom: .42; } }
+
+@media screen and (max-width: 620px){
+    .booklet{ gap: 20px; padding: 16px 10px 48px; }
+    .toolbar{ padding: 10px 14px; }
+    .toolbar__hint{ display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===================== SCREEN-ONLY PREVIEW CONTROLS ===================== -->
+<header class="toolbar no-print">
+    <div>
+        <p class="toolbar__title">Flora Mideva &middot; Kumbukumbu</p>
+        <p class="toolbar__hint">A5 (148 &times; 210 mm) &middot; kurasa 4 &middot; tayari kuchapishwa. Chagua &ldquo;Save as PDF&rdquo;, ukubwa A5, na uwashe &ldquo;Background graphics&rdquo;.</p>
+    </div>
+    <div class="toolbar__actions">
+        <button class="btn" id="printBtn" type="button">Chapisha / Save as PDF</button>
+    </div>
+</header>
+
+<!-- ================== SCREEN-ONLY BOOKLET PRINT CONTROLS ================== -->
+<section class="print-controls no-print" aria-label="Booklet print controls">
+    <div class="print-controls__buttons" role="group" aria-label="Print mode">
+        <button class="btn btn--primary" id="printBookletBtn" type="button" aria-pressed="false">Print Booklet</button>
+        <button class="btn" id="normalPreviewBtn" type="button" aria-pressed="true">Normal A5 Preview</button>
+    </div>
+    <div class="print-controls__info">
+        <p class="print-controls__status" id="modeStatus" role="status" aria-live="polite">Mode: Normal A5 preview &mdash; prints four separate A5 pages (1 &rarr; 2 &rarr; 3 &rarr; 4).</p>
+        <p class="print-controls__help">Booklet print settings: A4 &middot; Landscape &middot; Scale 100% (actual size) &middot; Margins: None &middot; Background graphics ON &middot; Two-sided, flip on short edge.</p>
+    </div>
+</section>
+
+<main class="booklet normal-preview">
+
+    <!-- ================= PAGE 1 · MEMORIAL COVER ================= -->
+    <div class="sheet">
+    <section class="page page--cover" aria-label="Ukurasa wa 1 — Jalada">
+        <div class="frame" aria-hidden="true"></div>
+        <div class="page-inner cover">
+
+            <header class="cover__head">
+                <p class="kicker" lang="en">In Loving Memory</p>
+                <svg class="orn-cross orn-cross--lg" viewBox="0 0 48 62" role="img" aria-label="Msalaba">
+                    <g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+                        <path d="M24 5v42"/>
+                        <path d="M13.5 18.5h21"/>
+                    </g>
+                    <path d="M24 48.5c-6.4 0-10.8-3.4-12.8-8.8 5.4-1 10.2 2.4 12.8 8.8Z" fill="currentColor" fill-opacity=".5"/>
+                    <path d="M24 48.5c6.4 0 10.8-3.4 12.8-8.8-5.4-1-10.2 2.4-12.8 8.8Z" fill="currentColor" fill-opacity=".5"/>
+                </svg>
+                <h1 class="cover__name">Flora&nbsp;Mideva</h1>
+            </header>
+
+            <figure class="cover__portrait">
+                <div class="portrait-glow" aria-hidden="true"></div>
+                <img class="portrait" src="flora.png" alt="Marehemu Flora Mideva">
+            </figure>
+
+            <div class="cover__foot">
+                <svg class="orn-rule" viewBox="0 0 160 16" aria-hidden="true">
+                    <g fill="none" stroke="currentColor" stroke-width=".9" stroke-linecap="round">
+                        <path d="M3 8h47"/>
+                        <path d="M110 8h47"/>
+                    </g>
+                    <path d="M80 2.8 84.3 8 80 13.2 75.7 8Z" fill="currentColor"/>
+                    <circle cx="66" cy="8" r="1.15" fill="currentColor"/>
+                    <circle cx="94" cy="8" r="1.15" fill="currentColor"/>
+                </svg>
+                <div class="days">
+                    <p><span class="days__k" lang="en">Sunrise</span><span class="days__v">29-3-1970</span></p>
+                    <p><span class="days__k" lang="en">Sunset</span><span class="days__v">12-9-2026</span></p>
+                </div>
+                <p class="cover__verse">&ldquo;Twaiweka roho yake mikononi mwa Mungu aliyemleta hapa&nbsp;duniani.&rdquo;</p>
+            </div>
+
+        </div>
+    </section>
+    </div>
+
+<!-- ================= PAGE 2 · PROGRAMME ================= -->
+    <div class="sheet">
+    <section class="page page--programme" aria-label="Ukurasa wa 2 — Programme">
+        <div class="frame" aria-hidden="true"></div>
+        <div class="page-inner">
+
+            <header class="inner-head">
+                <svg class="orn-cross" viewBox="0 0 48 62" aria-hidden="true">
+                    <g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+                        <path d="M24 5v42"/>
+                        <path d="M13.5 18.5h21"/>
+                    </g>
+                    <path d="M24 48.5c-6.4 0-10.8-3.4-12.8-8.8 5.4-1 10.2 2.4 12.8 8.8Z" fill="currentColor" fill-opacity=".5"/>
+                    <path d="M24 48.5c6.4 0 10.8-3.4 12.8-8.8-5.4-1-10.2 2.4-12.8 8.8Z" fill="currentColor" fill-opacity=".5"/>
+                </svg>
+                <h2 class="page-title">Programme</h2>
+                <svg class="orn-rule" viewBox="0 0 160 16" aria-hidden="true">
+                    <g fill="none" stroke="currentColor" stroke-width=".9" stroke-linecap="round">
+                        <path d="M3 8h47"/>
+                        <path d="M110 8h47"/>
+                    </g>
+                    <path d="M80 2.8 84.3 8 80 13.2 75.7 8Z" fill="currentColor"/>
+                    <circle cx="66" cy="8" r="1.15" fill="currentColor"/>
+                    <circle cx="94" cy="8" r="1.15" fill="currentColor"/>
+                </svg>
+            </header>
+
+            <div class="programme">
+                <ol class="order">
+                    <li><span class="num">1</span><span class="label">Kufungua ibada kwa maombi</span></li>
+                    <li><span class="num">2</span><span class="label">Nyimbo mbili</span></li>
+                    <li><span class="num">3</span><span class="label">Somo la kwanza</span></li>
+                    <li>
+                        <span class="num">4</span><span class="label">Wanenaji</span>
+                        <ol class="sub">
+                            <li><span class="mark">&#9312;</span><span class="who">Mzee wa ukoo</span></li>
+                            <li><span class="mark">&#9313;</span><span class="who">Jirani</span></li>
+                            <li><span class="mark">&#9314;</span><span class="who">Babu / nyanya</span></li>
+                            <li><span class="mark">&#9315;</span><span class="who">Wajomba / Shangazi / Binarmu</span></li>
+                            <li><span class="mark">&#9316;</span><span class="who">Shemeji</span></li>
+                            <li><span class="mark">&#9317;</span><span class="who">Ndugu / Dada</span></li>
+                            <li><span class="mark">&#9318;</span><span class="who">Baba / mama</span></li>
+                            <li><span class="mark">&#9319;</span><span class="who">Muuguzi</span></li>
+                        </ol>
+                    </li>
+                    <li><span class="num">5</span><span class="label">Mhubiri</span></li>
+                    <li><span class="num">6</span><span class="label">Faraja</span></li>
+                    <li><span class="num">7</span><span class="label">Utawala</span></li>
+                    <li><span class="num">8</span><span class="label">Kanisa</span></li>
+                    <li><span class="num">9</span><span class="label">Kusoma historia</span></li>
+                    <li><span class="num">10</span><span class="label">Kuombea waliofiwa</span></li>
+                    <li><span class="num">11</span><span class="label">Kusindikiza mwili</span></li>
+                </ol>
+            </div>
+
+            <p class="page-foot">&mdash; 2 &mdash;</p>
+        </div>
+    </section>
+    </div>
+
+<!-- ================= PAGE 3 · HISTORIA ================= -->
+    <div class="sheet">
+    <section class="page page--history" aria-label="Ukurasa wa 3 — Historia ya marehemu">
+        <div class="frame" aria-hidden="true"></div>
+        <div class="page-inner">
+
+            <header class="inner-head">
+                <h2 class="page-title page-title--long">Historia ya Marehemu<br>Flora Mideva</h2>
+                <svg class="orn-rule orn-rule--sm" viewBox="0 0 160 16" aria-hidden="true">
+                    <g fill="none" stroke="currentColor" stroke-width=".9" stroke-linecap="round">
+                        <path d="M3 8h47"/>
+                        <path d="M110 8h47"/>
+                    </g>
+                    <path d="M80 2.8 84.3 8 80 13.2 75.7 8Z" fill="currentColor"/>
+                    <circle cx="66" cy="8" r="1.15" fill="currentColor"/>
+                    <circle cx="94" cy="8" r="1.15" fill="currentColor"/>
+                </svg>
+            </header>
+
+            <div class="history">
+                <section>
+                    <h3 class="sec-label">Kuzaliwa:</h3>
+                    <p>Marehemu Flora Mideva alizaliwa tarehe 29-3-1970 katika kijiji cha Mugangu, Vihiga County. Ni mtoto wa marehemu Noah Keverenge na mama Eunice Mocheche. Ni wa ukoo wa Vakilima / Ujomba wa Avatavoli(Kisii).</p>
+                </section>
+
+                <section>
+                    <h3 class="sec-label">Uubatizo / Wafu:</h3>
+                    <p>Aliwekewa mikono wakifu katika kanisa la Mustulyu PAG na Rev. Philip Magomere mwaka wa 1970.</p>
+                </section>
+
+                <section>
+                    <h3 class="sec-label">Masomo:</h3>
+                    <p>Flora Mideva alianza masomo katika shule ya msingi ya Kinu Friends na kwenda Ivola Primary na kujiunga na Stanley Godia Secondary (Givogi) na kufaulu kidato cha nne.</p>
+                    <p>Alijiunga na chuo cha Hospitality (Catering) Nairobi.</p>
+                </section>
+
+                <section>
+                    <h3 class="sec-label">Kazi:</h3>
+                    <p>Aliajiriwa kazi katika hoteli ya Ambwere Plaza Kitale(High view), pia aliwahi kufanya kazi Khetias Supermarket na baadaye kuwacha kazi kwa sababu ya ugonjwa.</p>
+                </section>
+
+                <section>
+                    <h3 class="sec-label">Ugonjwa:</h3>
+                    <p>Alianza kuugua 2024 akapelekwa Kitale district hospital akagunduliwa kuwa na stroke.</p>
+                    <p>Baadaye alipata nafuu na kurudi nyumbani. Mwezi wa tano 2025 akarudi kuwa mgonjwa na akatibiwa Meso(Kapsabet) hospital na akapata nafuu kidogo.</p>
+                    <p>Mwaka huo mwezi wa nane alirudi Meso na akashindikana akapelekwa Kaimosi na akapendekezwa apelekwe Mukumu, alikogunduliwa kuwa na uvimbe wa ubongo na akatibiwa lakini hali ikawa hata mbaya zaidi.</p>
+                </section>
+            </div>
+
+            <p class="page-foot">&mdash; 3 &mdash;</p>
+        </div>
+    </section>
+    </div>
+
+<!-- ================= PAGE 4 · KWA UFUPI / LEGACY ================= -->
+    <div class="sheet">
+    <section class="page page--legacy" aria-label="Ukurasa wa 4 — Kwa ufupi">
+        <div class="frame" aria-hidden="true"></div>
+        <div class="page-inner">
+
+            <header class="inner-head">
+                <h2 class="page-title">Kwa Ufupi</h2>
+                <svg class="orn-rule" viewBox="0 0 160 16" aria-hidden="true">
+                    <g fill="none" stroke="currentColor" stroke-width=".9" stroke-linecap="round">
+                        <path d="M3 8h47"/>
+                        <path d="M110 8h47"/>
+                    </g>
+                    <path d="M80 2.8 84.3 8 80 13.2 75.7 8Z" fill="currentColor"/>
+                    <circle cx="66" cy="8" r="1.15" fill="currentColor"/>
+                    <circle cx="94" cy="8" r="1.15" fill="currentColor"/>
+                </svg>
+            </header>
+
+            <div class="summary">
+                <ol class="summary__list">
+                    <li><span class="num">1</span><span class="txt">Marehemu Flora alizaliwa 1970.</span></li>
+                    <li><span class="num">2</span><span class="txt">Aliwekewa wakfu na Pst Philip Magomere.</span></li>
+                    <li><span class="num">3</span><span class="txt">Alisoma hadi chuo cha Ufundi na kusomea upishi.</span></li>
+                    <li><span class="num">4</span><span class="txt">Alifanya kazi katika hoteli ya Highview na Khetia.</span></li>
+                    <li><span class="num">5</span><span class="txt">Alibatizwa katika maji mengi mwaka 1985.</span></li>
+                    <li><span class="num">6</span><span class="txt">Aliugua ugonjwa wa Stroke hadi kifo chake tarehe 12/9/2026.</span></li>
+                    <li><span class="num">7</span><span class="txt">Katika ukristo amemaliza miaka 41.</span></li>
+                    <li><span class="num">8</span><span class="txt">Duniani amemaliza miaka 56 miezi 5 na siku 13.</span></li>
+                </ol>
+            </div>
+
+            <div class="closing">
+                <svg class="orn-rule closing__rule" viewBox="0 0 160 16" aria-hidden="true">
+                    <g fill="none" stroke="currentColor" stroke-width=".9" stroke-linecap="round">
+                        <path d="M3 8h47"/>
+                        <path d="M110 8h47"/>
+                    </g>
+                    <path d="M80 2.8 84.3 8 80 13.2 75.7 8Z" fill="currentColor"/>
+                    <circle cx="66" cy="8" r="1.15" fill="currentColor"/>
+                    <circle cx="94" cy="8" r="1.15" fill="currentColor"/>
+                </svg>
+                <p class="closing__text">&ldquo;Twaiweka roho yake mikononi mwake Mungu aliyemleta hapa duniani&rdquo;</p>
+                <svg class="orn-cross closing__cross" viewBox="0 0 48 62" aria-hidden="true">
+                    <g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+                        <path d="M24 5v42"/>
+                        <path d="M13.5 18.5h21"/>
+                    </g>
+                    <path d="M24 48.5c-6.4 0-10.8-3.4-12.8-8.8 5.4-1 10.2 2.4 12.8 8.8Z" fill="currentColor" fill-opacity=".5"/>
+                    <path d="M24 48.5c6.4 0 10.8-3.4 12.8-8.8-5.4-1-10.2 2.4-12.8 8.8Z" fill="currentColor" fill-opacity=".5"/>
+                </svg>
+            </div>
+
+            <p class="page-foot">&mdash; 4 &mdash;</p>
+        </div>
+    </section>
+    </div>
+
+</main>
+
+<!-- ===== BOOKLET PRINT CONTAINER (filled by the script; never shown on screen) ===== -->
+<div class="booklet-print" id="bookletPrint" aria-hidden="true"></div>
+
+<script>
+/* Print controls (Normal A5 / A4 Booklet), Ctrl/Cmd+P shortcut and graceful
+   image fallback. No libraries, no external requests, no animation. */
+(function () {
+    "use strict";
+
+    var body        = document.body;
+    var printBtn    = document.getElementById("printBtn");
+    var bookletBtn  = document.getElementById("printBookletBtn");
+    var normalBtn   = document.getElementById("normalPreviewBtn");
+    var statusEl    = document.getElementById("modeStatus");
+    var bookletRoot = document.getElementById("bookletPrint");
+
+    /* ---------------------------------------------------------------
+       BOOKLET IMPOSITION  (A4 landscape, duplex, flip on short edge)
+       Numbers are page numbers of the four A5 pages on screen.
+         Sheet front :  4 | 1      (page 1 = front cover, right-hand side)
+         Sheet back  :  2 | 3
+       After folding in the centre the booklet reads 1 → 2 → 3 → 4.
+       --------------------------------------------------------------- */
+    var IMPOSITION = [
+        { side: "front", left: 4, right: 1 },
+        { side: "back",  left: 2, right: 3 }
+    ];
+
+    var MESSAGES = {
+        normal:  "Mode: Normal A5 preview \u2014 prints four separate A5 pages (1 \u2192 2 \u2192 3 \u2192 4).",
+        booklet: "Mode: Booklet \u2014 prints 2 A4 landscape sides: front = 4 | 1, back = 2 | 3. Fold in the centre."
+    };
+
+    /* In Booklet mode the paper must be A4 landscape with no margins. @page
+       cannot be switched by a class, so this rule is added only in that mode
+       (it comes after, and therefore overrides, the A5 @page rule above). */
+    var pageRule = document.createElement("style");
+    pageRule.id = "bookletPageRule";
+    pageRule.appendChild(document.createTextNode("@page { size: A4 landscape; margin: 0; }"));
+
+    /* ------------------------- build the sheets ------------------------- */
+    function hideIfBroken(img) {
+        function hide() { img.style.visibility = "hidden"; }
+        img.addEventListener("error", hide);
+        if (img.complete && img.naturalWidth === 0) { hide(); }
+    }
+
+    function buildBooklet() {
+        var pages = document.querySelectorAll(".normal-preview .page");
+        if (!bookletRoot || pages.length !== 4) { return false; }
+
+        bookletRoot.textContent = "";
+        IMPOSITION.forEach(function (side, index) {
+            var sheet = document.createElement("section");
+            sheet.className = "bp-side";
+            sheet.setAttribute("data-side", side.side);
+            sheet.setAttribute("data-order", String(index + 1));
+
+            [side.left, side.right].forEach(function (pageNo) {
+                var half = document.createElement("div");
+                half.className = "bp-half";
+                half.setAttribute("data-page", String(pageNo));
+
+                var copy = pages[pageNo - 1].cloneNode(true);
+                Array.prototype.forEach.call(copy.querySelectorAll("[id]"), function (el) {
+                    el.removeAttribute("id");
+                });
+                Array.prototype.forEach.call(copy.querySelectorAll(".portrait"), hideIfBroken);
+
+                half.appendChild(copy);
+                sheet.appendChild(half);
+            });
+            bookletRoot.appendChild(sheet);
+        });
+        return true;
+    }
+
+    var bookletReady = buildBooklet();
+
+    /* --------------------------- mode handling -------------------------- */
+    function setMode(mode) {
+        var isBooklet = (mode === "booklet") && bookletReady;
+
+        body.classList.toggle("mode-booklet", isBooklet);
+        body.classList.toggle("mode-normal", !isBooklet);
+
+        if (isBooklet) {
+            if (!pageRule.parentNode) { document.head.appendChild(pageRule); }
+        } else if (pageRule.parentNode) {
+            pageRule.parentNode.removeChild(pageRule);
+        }
+
+        if (bookletBtn) { bookletBtn.setAttribute("aria-pressed", isBooklet ? "true" : "false"); }
+        if (normalBtn)  { normalBtn.setAttribute("aria-pressed", isBooklet ? "false" : "true"); }
+        if (statusEl)   { statusEl.textContent = isBooklet ? MESSAGES.booklet : MESSAGES.normal; }
+    }
+
+    /* Make sure the portrait in the imposed copy is loaded before printing. */
+    function whenImagesReady(root, done) {
+        var pending = Array.prototype.filter.call(root.querySelectorAll("img"), function (img) {
+            return !img.complete;
+        });
+        if (!pending.length) { done(); return; }
+
+        var finished = false;
+        var left = pending.length;
+        function finish() {
+            if (finished) { return; }
+            finished = true;
+            done();
+        }
+        function one() {
+            left -= 1;
+            if (left <= 0) { finish(); }
+        }
+        pending.forEach(function (img) {
+            img.addEventListener("load", one, { once: true });
+            img.addEventListener("error", one, { once: true });
+        });
+        window.setTimeout(finish, 3000);
+    }
+
+    /* ------------------------------ controls ---------------------------- */
+    if (bookletBtn) {
+        if (!bookletReady) {
+            bookletBtn.disabled = true;
+            bookletBtn.title = "Booklet print needs exactly 4 pages.";
+        }
+        bookletBtn.addEventListener("click", function () {
+            setMode("booklet");
+            whenImagesReady(bookletRoot, function () { window.print(); });
+        });
+    }
+
+    if (normalBtn) {
+        normalBtn.addEventListener("click", function () {
+            setMode("normal");
+        });
+    }
+
+    /* Existing button: always prints the four separate A5 pages. */
+    if (printBtn) {
+        printBtn.addEventListener("click", function () {
+            setMode("normal");
+            window.print();
+        });
+    }
+
+    /* Ctrl/Cmd+P prints whichever mode is currently selected. */
+    document.addEventListener("keydown", function (event) {
+        if ((event.ctrlKey || event.metaKey) && String(event.key).toLowerCase() === "p") {
+            event.preventDefault();
+            window.print();
+        }
+    });
+
+    /* If the portrait file is missing, the page layout must still hold. */
+    var portrait = document.querySelector(".normal-preview .portrait");
+    if (portrait) { hideIfBroken(portrait); }
+
+    setMode("normal");
+})();
+</script>
+
+</body>
+</html>
