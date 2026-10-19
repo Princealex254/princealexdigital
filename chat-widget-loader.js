@@ -33,6 +33,7 @@
     "inset: 0",
     "width: 100vw",
     "height: 100vh",
+    "height: 100dvh",
     "border: 0",
     "z-index: 2147483647",
     "background: transparent",
