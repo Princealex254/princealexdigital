@@ -117,6 +117,7 @@
       // AJAX blocked or refused -> classic multipart POST (the guaranteed path).
       // _next returns the visitor to /contact/?sent=success on acceptance,
       // where the success panel is shown below.
+      showAlert("Finishing your submission, please wait...", false);
       classicSubmit();
     }).then(function () {
       // Re-enable the button only if we are still on the page
