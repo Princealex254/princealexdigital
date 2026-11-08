@@ -6,13 +6,13 @@
 
 /* ---------- DESIGN TOKENS ---------- */
 :root{
-  --navy:#1E3A8A;
-  --navy-deep:#152a63;
-  --royal:#2563EB;
-  --royal-dark:#1D4ED8;
+  --navy:#17337C;
+  --navy-deep:#10245D;
+  --royal:#315DCE;
+  --royal-dark:#244BB4;
   --teal:#14B8A6;
   --teal-bright:#2DD4BF;
-  --canvas:#F8FAFC;
+  --canvas:#F7F9FC;
   --white:#FFFFFF;
   --ink:#0F172A;
   --ink-muted:#475569;
@@ -40,10 +40,10 @@
   --font-body:'Inter', 'Segoe UI', sans-serif;
   --font-mono:'IBM Plex Mono', 'Courier New', monospace;
 
-  --radius-sm:8px;
-  --radius-md:14px;
-  --radius-lg:22px;
-  --radius-xl:30px;
+  --radius-sm:10px;
+  --radius-md:16px;
+  --radius-lg:24px;
+  --radius-xl:32px;
 
   --shadow-sm:0 1px 2px rgba(15,23,42,0.06);
   --shadow-md:0 10px 28px rgba(15,23,42,0.10);
@@ -96,8 +96,8 @@ ul,ol{list-style:none;}
 button,input,textarea,select{font:inherit;color:inherit;}
 button{cursor:pointer;background:none;border:none;}
 h1,h2,h3,h4{font-family:var(--font-display);color:var(--text);line-height:1.15;font-weight:700;letter-spacing:-0.01em;}
-h1{font-size:clamp(2.4rem,5vw,3.8rem);}
-h2{font-size:clamp(1.8rem,3.4vw,2.6rem);}
+h1{font-size:clamp(2.6rem,5.4vw,4.2rem);letter-spacing:-0.035em;}
+h2{font-size:clamp(1.9rem,3.5vw,2.8rem);letter-spacing:-0.025em;}
 h3{font-size:clamp(1.15rem,2vw,1.4rem);}
 p{color:var(--muted);}
 strong{color:var(--text);}
@@ -334,9 +334,6 @@ html[data-theme="dark"] .site-footer{background:#070D18;}
 .footer-col a:hover{color:var(--teal-bright);}
 .footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:24px;flex-wrap:wrap;gap:12px;}
 .footer-bottom small{color:#64748B;font-size:0.85rem;}
-.footer-social{display:flex;gap:14px;}
-.footer-social a{width:38px;height:38px;border:1px solid rgba(255,255,255,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#CBD5E1;transition:all .18s ease;font-size:0.8rem;font-weight:600;}
-.footer-social a:hover{border-color:var(--teal);color:var(--teal);transform:translateY(-2px);}
 @media (max-width:880px){.footer-grid{grid-template-columns:1fr 1fr;}}
 @media (max-width:560px){
   .footer-grid{grid-template-columns:1fr;gap:32px;}
@@ -386,8 +383,9 @@ html[data-theme="dark"] .site-footer{background:#070D18;}
 .jump-nav a.is-active{border-color:var(--royal);color:#fff;background:var(--grad-brand);}
 
 /* ---------- REVEAL ON SCROLL ---------- */
-[data-reveal]{opacity:0;transform:translateY(18px);transition:opacity .55s ease, transform .55s ease;}
+html.reveal-ready [data-reveal]{opacity:0;transform:translateY(18px);transition:opacity .55s ease, transform .55s ease;}
 [data-reveal].is-visible{opacity:1;transform:translateY(0);}
+html:not(.reveal-ready) [data-reveal]{opacity:1;transform:none;}
 
 /* ============================================================
    PRODUCT MOCKUPS  — simulated previews built in pure CSS
@@ -562,4 +560,3 @@ html[data-theme="dark"] .step-index{color:var(--teal-bright);}
 .work-body p{font-size:0.95rem;}
 .work-link{display:inline-block;margin-top:14px;color:var(--royal);font-weight:600;font-size:0.92rem;}
 .work-link:hover{color:var(--teal);}
-

@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title description">
+  <title id="title">Prince Alex Digital</title>
+  <desc id="description">Websites, software and automation for businesses in Kenya.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1537"/>
+      <stop offset=".58" stop-color="#17337c"/>
+      <stop offset="1" stop-color="#315dce"/>
+    </linearGradient>
+    <radialGradient id="glow">
+      <stop offset="0" stop-color="#2dd4bf" stop-opacity=".36"/>
+      <stop offset="1" stop-color="#2dd4bf" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#fff" stroke-opacity=".065"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="url(#background)"/>
+  <circle cx="1020" cy="65" r="430" fill="url(#glow)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <rect x="76" y="74" width="1048" height="482" rx="28" fill="#08132d" fill-opacity=".26" stroke="#fff" stroke-opacity=".16"/>
+  <g transform="translate(126 122)">
+    <rect width="54" height="54" rx="16" fill="#2dd4bf"/>
+    <path d="M17 38V16h12c7 0 11 4 11 10s-4 10-11 10h-5v2zm7-8h5c3 0 5-1 5-4s-2-4-5-4h-5z" fill="#10245d"/>
+    <text x="72" y="23" fill="#fff" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700">Prince Alex Digital</text>
+    <text x="72" y="48" fill="#b9c9ee" font-family="Arial, Helvetica, sans-serif" font-size="13" letter-spacing="2">NAIROBI · KENYA</text>
+  </g>
+  <g font-family="Arial, Helvetica, sans-serif">
+    <text x="126" y="312" fill="#9be9df" font-size="16" font-weight="700" letter-spacing="4">WEB · SOFTWARE · AI</text>
+    <text x="126" y="382" fill="#fff" font-size="54" font-weight="700" letter-spacing="-2">Digital that moves</text>
+    <text x="126" y="444" fill="#fff" font-size="54" font-weight="700" letter-spacing="-2">your business forward.</text>
+    <text x="128" y="495" fill="#d2dcf3" font-size="19">Practical digital solutions for growing businesses.</text>
+  </g>
+  <g transform="translate(956 377)" fill="none" stroke="#9be9df" stroke-opacity=".85" stroke-width="2">
+    <rect width="94" height="94" rx="24"/>
+    <path d="M25 62V32h21c8 0 13 5 13 12s-5 12-13 12H35v6zm10-15h10c3 0 5-1 5-4s-2-4-5-4H35z"/>
+  </g>
+</svg>

@@ -86,6 +86,7 @@
   /* ---------- SCROLL REVEAL ---------- */
   var revealEls = document.querySelectorAll("[data-reveal]");
   if (revealEls.length) {
+    root.classList.add("reveal-ready");
     if (reduceMotion || !("IntersectionObserver" in window)) {
       revealEls.forEach(function (el) { el.classList.add("is-visible"); });
     } else {
