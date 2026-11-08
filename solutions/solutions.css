@@ -4,7 +4,7 @@
    ============================================================ */
 
 /* ---------- SOLUTION AREA CARDS ---------- */
-.sol-card{padding:30px 28px;display:flex;flex-direction:column;opacity:0;transform:translateY(18px);transition:opacity .5s ease, transform .5s ease, box-shadow .25s ease, border-color .25s ease;}
+.sol-card{padding:30px 28px;display:flex;flex-direction:column;transition:opacity .5s ease, transform .5s ease, box-shadow .25s ease, border-color .25s ease;}
 .sol-card.is-visible{opacity:1;transform:translateY(0);}
 .sol-icon{
   font-size:1.6rem;margin-bottom:16px;width:52px;height:52px;flex:none;

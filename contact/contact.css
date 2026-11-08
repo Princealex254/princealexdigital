@@ -22,7 +22,7 @@
 .contact-info-card h2{position:relative;z-index:1;color:var(--text);margin-bottom:12px;}
 .contact-info-intro{position:relative;z-index:1;margin-bottom:30px;color:var(--muted);font-size:0.92rem;line-height:1.7;}
 .contact-info-card[data-reveal],.contact-form-card[data-reveal]{
-  opacity:0;transform:translateY(18px);transition:opacity .5s ease, transform .5s ease;
+  transition:opacity .5s ease, transform .5s ease;
 }
 .contact-info-card[data-reveal].is-visible,.contact-form-card[data-reveal].is-visible{opacity:1;transform:translateY(0);}
 
