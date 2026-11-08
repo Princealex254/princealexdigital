@@ -46,7 +46,7 @@ html[data-theme="dark"] .roles-empty-icon{color:#5EEAD4;background:rgba(20,184,1
   transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease;
 }
 .job-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-md);border-color:rgba(20,184,166,0.5);}
-.job-card[data-reveal]{opacity:0;transform:translateY(18px);transition:opacity .5s ease, transform .5s ease;}
+.job-card[data-reveal]{transition:opacity .5s ease, transform .5s ease;}
 .job-card[data-reveal].is-visible{opacity:1;transform:translateY(0);}
 .job-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;}
 .job-title{font-size:1.14rem;margin:0 0 8px;}

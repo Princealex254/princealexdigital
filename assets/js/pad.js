@@ -86,7 +86,6 @@
   /* ---------- SCROLL REVEAL ---------- */
   var revealEls = document.querySelectorAll("[data-reveal]");
   if (revealEls.length) {
-    root.classList.add("reveal-ready");
     if (reduceMotion || !("IntersectionObserver" in window)) {
       revealEls.forEach(function (el) { el.classList.add("is-visible"); });
     } else {
@@ -99,6 +98,7 @@
         });
       }, { threshold: 0.12, rootMargin: "0px 0px -40px 0px" });
       revealEls.forEach(function (el) { revealIO.observe(el); });
+      root.classList.add("reveal-ready");
     }
   }
 
