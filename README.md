@@ -1,6 +1,6 @@
 # Prince Alex Digital — Website
 
-Static rebuild positioned as **"We Design, Build & Automate Digital Businesses"** — web, software, AI & digital growth solutions.
+Digital studio website for **Prince Alex Digital**, offering web design, software, AI automation and digital growth solutions in Nairobi, Kenya.
 
 ## Structure
 
@@ -18,6 +18,8 @@ contact/    (index.html, contact.css, contact.js)      → Project intake form (
 sitemap.xml, robots.txt, site.webmanifest
 assets/images/logo/logo.png                           → Brand logo (nav, footer, favicon, manifest icon)
 assets/images/logo/prince-alex-digital-mark.svg       → Original SVG mark (kept as maskable manifest fallback)
+assets/images/social-preview.png                      → Branded 1200×630 Open Graph / Twitter image
+assets/images/social-preview.svg                      → Editable source for the social preview image
 ```
 
 ## What's implemented
@@ -29,9 +31,8 @@ assets/images/logo/prince-alex-digital-mark.svg       → Original SVG mark (kep
 - **Progressive enhancement**: all content lives in the HTML; JS only enhances. `prefers-reduced-motion` is respected and JS is `defer`-loaded.
 
 ## Before going live
-- Replace placeholder `og:image` URLs (`/assets/images/og/*-og.jpg`) with real 1200×630 images.
 - Swap gradient project thumbnails (Home/Portfolio) for real screenshots with descriptive `alt` text, explicit `width`/`height` and `loading="lazy"`.
 - Wire the contact form to a real backend or form service — it currently validates client-side and falls back to a pre-filled email.
-- Add real social profile URLs to the footer and the Organization JSON-LD `sameAs` array.
+- Add verified social profile URLs to the footer and the Organization JSON-LD `sameAs` array.
 - Add portfolio case-study sub-pages as they're produced, then list them in `sitemap.xml`.
 - Keep Careers roles current; add posting text per role as hiring formalises.
